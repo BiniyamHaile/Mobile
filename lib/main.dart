@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/ui/pages/login_page.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile/ui/pages/pages.dart';
 
 void main() => runApp(
-  const MaterialApp(
+  MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: LoginPage(),
+    home: HomePage(),
+    theme:ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.tealAccent),
+        useMaterial3: true,
+        textTheme: GoogleFonts.dmSansTextTheme(),
+      ),
   )
 );
 
