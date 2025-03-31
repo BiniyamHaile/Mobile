@@ -3,6 +3,7 @@ import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/pages/feed_page.dart';
 import 'package:mobile/ui/pages/pages.dart';
+import 'package:mobile/ui/pages/reels_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -61,6 +62,7 @@ class _HomePageState extends State<HomePage> {
         const FeedPage(),
         const NotificationsPage(),
         ProfilePage(user: User.dummyUsers[0]),
+        ReelsPage()
       ],
     );
   }
@@ -106,6 +108,14 @@ class _HomePageState extends State<HomePage> {
           ),
           label: const Text('Profile'),
         ),
+                NavigationRailDestination(
+          icon: const Icon(Icons.person_outlined),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label: const Text('Reels'),
+        ),
       ],
     );
   }
@@ -142,6 +152,14 @@ class _HomePageState extends State<HomePage> {
             color: theme.colorScheme.primary,
           ),
           label: 'Profile',
+        ),
+                   NavigationDestination(
+          icon:  Icon(Icons.person_outlined),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label:'Reels',
         ),
       ],
     );
