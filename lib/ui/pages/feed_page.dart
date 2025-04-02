@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
+import 'package:mobile/ui/pages/post_page.dart';
 import 'package:mobile/widgets/widgets.dart';
 
 class FeedPage extends StatelessWidget {
@@ -10,7 +12,7 @@ class FeedPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: _appBar(theme),
+      appBar: _appBar(theme, context),
       body: ResponsivePadding(
         child: ListView(
           children: [
@@ -51,7 +53,7 @@ class FeedPage extends StatelessWidget {
     );
   }
 
-  AppBar _appBar(ThemeData theme) {
+  AppBar _appBar(ThemeData theme, BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
       flexibleSpace: ResponsivePadding(
@@ -62,12 +64,25 @@ class FeedPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const AppLogo(),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.send_sharp,
-                    color: theme.colorScheme.primary,
-                  ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        context.push(route: PostingScreen.route());
+                      },
+                      icon: Icon(
+                        Icons.post_add,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.send_sharp,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
