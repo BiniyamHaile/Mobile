@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
+import 'package:mobile/ui/pages/chat_page.dart';
 import 'package:mobile/ui/pages/post_page.dart';
 import 'package:mobile/widgets/widgets.dart';
 
@@ -76,7 +77,9 @@ class FeedPage extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                         context.push(route: ChatPage.route());
+                      },
                       icon: Icon(
                         Icons.send_sharp,
                         color: theme.colorScheme.primary,
