@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/common/common.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/models/models.dart';
-import 'package:mobile/ui/pages/user_story_page.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/widgets/user_story_avatar.dart';
 
 class UserStoryTile extends StatelessWidget {
@@ -26,7 +26,9 @@ class UserStoryTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: UserStoryAvatar(
             userStory: userStory,
-            onTap: () => context.push(route: UserStoryPage.route(index)),
+            onTap: () => context.push(RouteNames.stories, extra: {
+              'initialIndex': index,
+            }),
           ),
         ),
         SizedBox(

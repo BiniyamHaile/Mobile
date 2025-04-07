@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/common/common.dart';
-import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/pages/feed_page.dart';
 import 'package:mobile/ui/pages/pages.dart';
 import 'package:mobile/ui/pages/reels_page.dart';
@@ -61,7 +60,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         const FeedPage(),
         const NotificationsPage(),
-        ProfilePage(user: User.dummyUsers[0]),
+        ProfilePage(),
         ReelsPage()
       ],
     );

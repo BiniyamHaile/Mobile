@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/pages/pages.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/widgets/widgets.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
-    required this.post,
   });
-
-  final Post post;
+  
 
   @override
   Widget build(BuildContext context) {
-    final mobileCard = _mobileCard(context);
-    final tabletCard = _tabletCard(context);
+    final Post post = Post.dummyPosts[0];
+    final mobileCard = _mobileCard(context, post);
+    final tabletCard = _tabletCard(context , post);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -26,13 +27,14 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _mobileCard(BuildContext context) {
+  Widget _mobileCard(BuildContext context, Post post) {
+
     final textTheme = Theme.of(context).textTheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          onTap: () => context.push(route: ProfilePage.route(post.owner)),
+          onTap: () =>         context.push(RouteNames.profile),
           leading: CircleAvatar(
             backgroundImage: NetworkImage(post.owner.profileImage),
           ),
@@ -58,17 +60,17 @@ class PostCard extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: _postImage(),
+          child: _postImage(post),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: _postButtons(),
+          child: _postButtons(post),
         ),
       ],
     );
   }
 
-  Widget _tabletCard(BuildContext context) {
+  Widget _tabletCard(BuildContext context, Post post) {
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -80,7 +82,7 @@ class PostCard extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: _postImage(),
+                child: _postImage(post),
               ),
             ),
             Expanded(
@@ -96,7 +98,7 @@ class PostCard extends StatelessWidget {
                       children: [
                         ListTile(
                           onTap: () {
-                            context.push(route: ProfilePage.route(post.owner));
+                            context.push(RouteNames.profile);
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
@@ -123,7 +125,7 @@ class PostCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    _postButtons(),
+                    _postButtons(post),
                   ],
                 ),
               ),
@@ -134,7 +136,7 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _postImage() {
+  Widget _postImage(Post post) {
     return Image.network(
       post.postImage,
       fit: BoxFit.fitWidth,
@@ -154,7 +156,7 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _postButtons() {
+  Widget _postButtons(Post post) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

@@ -8,28 +8,13 @@ class UserStoryPage extends StatelessWidget {
   const UserStoryPage({
     super.key,
     required this.initialIndex,
-    required this.userStories,
   });
 
-  static MaterialPageRoute route(
-    int initialIndex, {
-    List<UserStory>? userStories,
-  }) {
-    return MaterialPageRoute(
-      builder: (_) {
-        return UserStoryPage(
-          initialIndex: initialIndex,
-          userStories: userStories ?? UserStory.dummyUserStories,
-        );
-      },
-    );
-  }
-
   final int initialIndex;
-  final List<UserStory> userStories;
 
   @override
   Widget build(BuildContext context) {
+    final userStories = UserStory.dummyUserStories;
     return Scaffold(
       body: StoryPageView(
         initialPage: initialIndex,

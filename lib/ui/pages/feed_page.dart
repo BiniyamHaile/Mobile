@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/common/common.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/models/models.dart';
-import 'package:mobile/ui/pages/post_page.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/widgets/widgets.dart';
 
 class FeedPage extends StatelessWidget {
@@ -45,7 +45,7 @@ class FeedPage extends StatelessWidget {
                   child: Divider(height: 4),
                 );
               },
-              itemBuilder: (_, index) => PostCard(post: Post.dummyPosts[index]),
+              itemBuilder: (_, index) => PostCard(),
             )
           ],
         ),
@@ -68,7 +68,7 @@ class FeedPage extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        context.push(route: PostingScreen.route());
+                        context.push(RouteNames.post);
                       },
                       icon: Icon(
                         Icons.post_add,

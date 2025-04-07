@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/common/common.dart';
-import 'package:mobile/ui/pages/home_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/widgets/widgets.dart';
 
 class SplashPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class SplashPage extends StatelessWidget {
   void splashing(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 3), () async {
-        if (context.mounted) context.push(route: HomePage.route());
+        if (context.mounted) context.push(RouteNames.home);
       });
     });
   }
