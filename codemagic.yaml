@@ -1,0 +1,127 @@
+
+definitions:
+  instance_and_duration: &instance_and_duration
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+
+  env_versions: &env_versions
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+  triggering:
+    merge_into_develop: &merge_into_develop
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: "main"
+          include: true
+          source: true
+
+  scripts:
+    - &install_dependencies
+      name: Install Dependencies
+      working_directory: app
+      script: flutter pub get
+
+    - &generate_dto_files
+      name: Generate Data Transfer Objects (DTOs)
+      working_directory: app
+      script: dart run build_runner build -d
+
+    - &setup_keystore
+      name: Setup the keystore
+      script: |
+        echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
+        cat >> "$CM_BUILD_DIR/app/android/key.properties" << EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=$CM_KEYSTORE_PATH
+        EOF
+
+workflows:
+
+  Android-Firebase-distribution-workflow:
+    name: Android Firebase Distribution Workflow
+
+    <<: *instance_and_duration
+    
+    triggering:
+      <<: *merge_into_develop
+
+    environment:
+      vars:
+        CM_KEYSTORE_PATH: /tmp/keystore.keystore
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase_credentials.json
+
+      groups:
+        - keystore_credentials
+        - google_credentials
+        - firebase_credentials
+
+      <<: *env_versions
+
+    scripts:
+      - *install_dependencies
+
+      - *generate_dto_files
+
+          
+
+      - name: Get the latest build number and Build the app
+        working_directory: app
+        script: |
+          flutter build apk --release 
+    publishing: 
+      email:
+        recipients:
+          - dawitminale474@gmail.com
+          - bilenmehalek7@gmail.com
+          - biniyhale@gmail.com
+          - tiledan2015@gmail.com
+        notify:
+          success: true
+          failure: false
+
+
+    name: Android Internal Testing Workflow
+    
+    <<: *instance_and_duration
+    
+    triggering:
+      events:
+        - tag
+      tag_patterns:                
+        - pattern: '*'
+          include: true
+
+    environment:
+      vars:
+        CM_KEYSTORE_PATH: /tmp/keystore.keystore
+
+      groups:
+        - keystore_credentials
+        - google_credentials
+      <<: *env_versions
+
+    scripts:
+      
+      - *install_dependencies
+
+      - *generate_dto_files
+
+    artifacts:
+      - app/build/**/outputs/**/*.aab
+      
+    publishing: 
+      email:
+        recipients:
+          - dawitminale474@gmail.com
+          - bilenmehalek7@gmail.com
+          - biniyhale@gmail.com
+          - tiledan2015@gmail.com
+        notify:
+          success: true
+          failure: false
