@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/ui/routes/route_names.dart';
-import 'package:mobile/widgets/widgets.dart';
+import 'package:mobile/ui/widgets/widgets.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});

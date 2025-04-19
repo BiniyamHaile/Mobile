@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/routes/route_names.dart';
-import 'package:mobile/widgets/image.dart';
-import 'package:mobile/widgets/widgets.dart';
+import 'package:mobile/ui/widgets/image.dart';
+import 'package:mobile/ui/widgets/widgets.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({

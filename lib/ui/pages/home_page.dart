@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/common/common.dart';
-import 'package:mobile/ui/pages/feed_page.dart';
+import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/pages.dart';
-import 'package:mobile/ui/pages/reels_page.dart';
+import 'package:mobile/ui/pages/post/reels_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
