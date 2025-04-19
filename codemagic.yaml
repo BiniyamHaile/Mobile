@@ -69,33 +69,3 @@ workflows:
           failure: false
 
 
-    name: Android Internal Testing Workflow
-    
-    <<: *instance_and_duration
-    
-    triggering:
-      events:
-        - tag
-      tag_patterns:                
-        - pattern: '*'
-          include: true
-
-    scripts:
-      
-      - *install_dependencies
-
-      - *generate_dto_files
-
-    artifacts:
-      - app/build/**/outputs/**/*.aab
-      
-    publishing: 
-      email:
-        recipients:
-          - dawitminale474@gmail.com
-          - bilenmehalek7@gmail.com
-          - biniyhale@gmail.com
-          - tiledan2015@gmail.com
-        notify:
-          success: true
-          failure: false
