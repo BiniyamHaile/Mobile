@@ -80,11 +80,6 @@ workflows:
         - pattern: '*'
           include: true
 
-    environment:
-
-      groups:
-      <<: *env_versions
-
     scripts:
       
       - *install_dependencies
