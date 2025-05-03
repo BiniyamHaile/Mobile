@@ -1,41 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/common/common.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/models/models.dart';
-import 'package:mobile/ui/pages/user_story_page.dart';
-import 'package:mobile/widgets/widgets.dart';
+import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/widgets/image.dart';
+import 'package:mobile/ui/widgets/widgets.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({
     super.key,
-    required this.user,
     this.isNavigatorPushed = false,
-  })  : story = UserStory.dummyUserStories.firstWhere((e) => e.owner == user),
-        posts = Post.dummyPosts.where((e) => e.owner == user).toList();
-
-  static MaterialPageRoute route(User user) {
-    return MaterialPageRoute(
-      builder: (_) => ProfilePage(user: user, isNavigatorPushed: true),
-    );
-  }
+  });
 
   final bool isNavigatorPushed;
 
-  final UserStory story;
-  final User user;
-  final List<Post> posts;
-
   @override
   Widget build(BuildContext context) {
+  final User owner = User.dummyUsers[0];
+  final story = UserStory.dummyUserStories.firstWhere((e) => e.owner == owner);
+  final posts = Post.dummyPosts.where((e) => e.owner == owner).toList();
+
+
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _appBar(context),
+      appBar: _appBar(context, owner),
       body: ResponsivePadding(
         child: ListView(
           padding: const EdgeInsets.only(top: 0),
           shrinkWrap: true,
           children: [
-            _bannerAndProfilePicture(context),
-            _userBio(context),
+            _bannerAndProfilePicture(context, owner, story),
+            _userBio(context, owner),
             UserPostsTabView(posts: posts),
           ],
         ),
@@ -43,7 +37,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  AppBar _appBar(BuildContext context) {
+  AppBar _appBar(BuildContext context, User owner) {
     final theme = Theme.of(context);
     return AppBar(
       forceMaterialTransparency: true,
@@ -74,7 +68,7 @@ class ProfilePage extends StatelessWidget {
                     backgroundColor: theme.colorScheme.primary.withAlpha(75),
                   ),
                   icon: Icon(
-                    user.isMe ? Icons.settings : Icons.more_vert,
+                    owner.isMe ? Icons.settings : Icons.more_vert,
                     color: Colors.white,
                   ),
                 ),
@@ -86,7 +80,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _bannerAndProfilePicture(BuildContext context) {
+  Widget _bannerAndProfilePicture(BuildContext context, User user , UserStory story) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return Stack(
@@ -96,8 +90,8 @@ class ProfilePage extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: const BoxConstraints.expand(height: 200),
-              child: Image.network(
-                user.bannerImage,
+              child: CustomImage(
+                imageUrl:  user.bannerImage,
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -150,7 +144,7 @@ class ProfilePage extends StatelessWidget {
                 userStory: story,
                 onTap: () {
                   context.push(
-                    route: UserStoryPage.route(0, userStories: [story]),
+                    RouteNames.stories,
                   );
                 },
               ),
@@ -161,7 +155,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _userBio(BuildContext context) {
+  Widget _userBio(BuildContext context, User user) {
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),

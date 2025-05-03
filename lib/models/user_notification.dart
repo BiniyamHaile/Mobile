@@ -29,9 +29,9 @@ class UserNotification {
       return UserNotification(
         type: type,
         message: switch (type) {
-          NotificationType.like => '${user.username} menyukai postingan anda',
-          NotificationType.comment => '${user.username} membalas komentar anda',
-          NotificationType.follow => '${user.username} mulai mengikuti anda',
+          NotificationType.like => '${user.username} Liked your post',
+          NotificationType.comment => '${user.username} commented on your post',
+          NotificationType.follow => '${user.username} started following you',
         },
         dateTime: faker.date.dateTime(minYear: 2020, maxYear: 2023),
       );
