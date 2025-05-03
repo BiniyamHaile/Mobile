@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/data/dummy_favorite.dart';
 import 'package:mobile/data/dummy_recent.dart';
-import 'package:mobile/widgets/favorite_contacts.dart';
-import 'package:mobile/widgets/recent_chats.dart';
+import 'package:mobile/ui/widgets/favourite_contacts.dart';
+import 'package:mobile/ui/widgets/recent_chats.dart';
 
 
 class ChatPage extends StatefulWidget {
