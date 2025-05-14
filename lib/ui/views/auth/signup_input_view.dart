@@ -49,28 +49,23 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
     if (controller == widget.nameController && _shouldValidate(controller)) {
       final nameError = context.read<AuthFormBloc>().state.nameError;
 
-      return nameError == null ? null : nameError;
+      return nameError;
     } else if (controller == widget.surnameController &&
         _shouldValidate(controller)) {
       final surnameError = context.read<AuthFormBloc>().state.surnameError;
 
-      return surnameError == null
-          ? null : surnameError;
+      return surnameError;
     } else if (controller == widget.passwordController &&
         _shouldValidate(controller)) {
       final passwordError = context.read<AuthFormBloc>().state.passwordError;
 
-      return passwordError == null
-          ? null
-          : passwordError;
+      return passwordError;
     } else if (controller == widget.confirmPasswordController &&
         _shouldValidate(controller)) {
       final confirmPasswordError =
           context.read<AuthFormBloc>().state.confirmPasswordError;
 
-      return confirmPasswordError == null
-          ? null
-          : confirmPasswordError;
+      return confirmPasswordError;
     }
     return null;
   }

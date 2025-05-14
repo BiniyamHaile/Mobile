@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
 import 'package:mobile/ui/utils/screen_size_utils.dart';
 import 'package:mobile/ui/utils/ui_helpers.dart';

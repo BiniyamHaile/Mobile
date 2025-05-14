@@ -29,7 +29,7 @@ Either<EmailFailure, String> validateEmail(String? input) {
   if (input.trim().isEmpty) {
     return left(EmailFailure.empty());
   }
-  final emailPattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+  const emailPattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
   if (!RegExp(emailPattern).hasMatch(input)) {
     return left(EmailFailure.invalid());
   }

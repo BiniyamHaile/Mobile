@@ -138,7 +138,7 @@ class AppTheme {
       BuildContext context, AppColors colors) {
     return InputDecorationTheme(
       iconColor: colors.blackColor,
-      contentPadding: EdgeInsets.symmetric(
+      contentPadding: const EdgeInsets.symmetric(
           horizontal: StyleConstants.inputHorizontalPadding,
           vertical: StyleConstants.inputVerticalPadding),
       filled: true,

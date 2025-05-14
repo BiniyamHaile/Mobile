@@ -96,7 +96,7 @@ class SignupPage extends StatelessWidget {
                                     blurRadius: 20.0,
                                     offset: Offset(0, 10))
                               ]),
-                          child: SignupFormView()
+                          child: const SignupFormView()
                         )),
                   
                   ],

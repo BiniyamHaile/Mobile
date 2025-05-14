@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class OptionsScreen extends StatelessWidget {
+  const OptionsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -8,27 +10,27 @@ class OptionsScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(),
+          const SizedBox(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 children: [
-                  SizedBox(height: 110),
+                  const SizedBox(height: 110),
                   Row(
                     children: [
-                      CircleAvatar(
-                        child: Icon(Icons.person, size: 18),
+                      const CircleAvatar(
                         radius: 16,
+                        child: Icon(Icons.person, size: 18),
                       ),
-                      SizedBox(width: 6),
-                      Text('flutter_developer02'),
-                      SizedBox(width: 10),
-                      Icon(Icons.verified, size: 15),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
+                      const Text('flutter_developer02'),
+                      const SizedBox(width: 10),
+                      const Icon(Icons.verified, size: 15),
+                      const SizedBox(width: 6),
                       TextButton(
                         onPressed: () {},
-                        child: Text(
+                        child: const Text(
                           'Follow',
                           style: TextStyle(
                             color: Colors.white,
@@ -37,10 +39,10 @@ class OptionsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(width: 6),
-                  Text('Flutter is beautiful and fast 💙❤💛 ..'),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(width: 6),
+                  const Text('Flutter is beautiful and fast 💙❤💛 ..'),
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
                       Icon(
                         Icons.music_note,
@@ -53,18 +55,18 @@ class OptionsScreen extends StatelessWidget {
               ),
               Column(
                 children: [
-                  Icon(Icons.favorite_outline),
-                  Text('601k'),
-                  SizedBox(height: 20),
-                  Icon(Icons.comment_rounded),
-                  Text('1123'),
-                  SizedBox(height: 20),
+                  const Icon(Icons.favorite_outline),
+                  const Text('601k'),
+                  const SizedBox(height: 20),
+                  const Icon(Icons.comment_rounded),
+                  const Text('1123'),
+                  const SizedBox(height: 20),
                   Transform(
                     transform: Matrix4.rotationZ(5.8),
-                    child: Icon(Icons.send),
+                    child: const Icon(Icons.send),
                   ),
-                  SizedBox(height: 50),
-                  Icon(Icons.more_vert),
+                  const SizedBox(height: 50),
+                  const Icon(Icons.more_vert),
                 ],
               )
             ],

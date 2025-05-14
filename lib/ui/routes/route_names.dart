@@ -18,4 +18,5 @@ class RouteNames {
   static const String chat = '/chat';
   static const String stories = '/stories';
   static const String reels = '/reels';
+  static const String reportPost = '/reportPost';
 }

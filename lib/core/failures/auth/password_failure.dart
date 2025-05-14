@@ -4,22 +4,22 @@ class PasswordFailure extends Failure {
   const PasswordFailure(super.message);
 
   factory PasswordFailure.empty() {
-    return PasswordFailure('This field is required.');
+    return const PasswordFailure('This field is required.');
   }
 
   factory PasswordFailure.tooShort() {
-    return PasswordFailure('Password is too short.');
+    return const PasswordFailure('Password is too short.');
   }
 
   factory PasswordFailure.noUppercase() {
-    return PasswordFailure( 'Password must contain at least one uppercase letter.');
+    return const PasswordFailure( 'Password must contain at least one uppercase letter.');
   }
 
   factory PasswordFailure.noNumber() {
-    return PasswordFailure('Password must contain at least one number.');
+    return const PasswordFailure('Password must contain at least one number.');
   }
 
   factory PasswordFailure.noSpecialChar() {
-    return PasswordFailure( 'Password must contain at least one special character (@\$!%*?&).');
+    return const PasswordFailure( 'Password must contain at least one special character (@\$!%*?&).');
   }
 }

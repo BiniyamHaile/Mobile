@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static const String baseUrl = "https://dev-api.aladia.io/v2";
+  static const String baseUrl = "http://192.168.43.4:3000";
   static const String _authUrl = '$baseUrl/auth';
   static const String _notificationUrl = '$baseUrl/notifications';
 

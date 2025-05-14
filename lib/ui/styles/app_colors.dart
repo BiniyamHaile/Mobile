@@ -21,10 +21,10 @@ class AppColors {
   Color brightYellowColor = const Color.fromARGB(255, 250, 196, 36);
   Color brightYellow2 = const Color(0xFFE4B53D);
   Color greyColor50 = const Color(0xFF565656).withOpacity(0.5);
-  Color lightGrey2 = Color(0XFFBABABA);
+  Color lightGrey2 = const Color(0XFFBABABA);
   Color lightGrey3 = const Color.fromARGB(255, 167, 165, 165);
   Color darkGrey2 = const Color(0XFF4A4A4A);
-  Color greyColor70 = Color(0XFF707070);
+  Color greyColor70 = const Color(0XFF707070);
   Color greyColor2 = const Color(0XFF212121);
   Color brownYellowTransparent = const Color(0x7E554301);
   Color goldenYellowColor = const Color(0xFFE0B92C);
@@ -50,10 +50,10 @@ class AppColors {
   Color greyColor7 = const Color(0xFFD9D9D9).withOpacity(0.7);
   Color greyColor8 = const Color(0xFFB0B0B0);
   Color yellowColor3 = const Color(0xFFFDCC1E);
-  Color yellowColor4 = Color(0XFFF0CA41);
+  Color yellowColor4 = const Color(0XFFF0CA41);
   Color darkGreyColor5 = const Color.fromARGB(255, 14, 14, 14);
-  Color transparentColor = Color(0x00000000);
-  Color greenColor2 = Color(0xFF296A35);
+  Color transparentColor = const Color(0x00000000);
+  Color greenColor2 = const Color(0xFF296A35);
   Color darkGoldenrod = const Color(0xFF9C802D);
   Color greyColor9 = const Color(0xFF555555);
   Color almostBlackColor = const Color(0xFF060606);

@@ -6,7 +6,7 @@ import 'package:mobile/ui/widgets/image.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
 
 class ProfilePage extends StatelessWidget {
-  ProfilePage({
+  const ProfilePage({
     super.key,
     this.isNavigatorPushed = false,
   });
@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
   final User owner = User.dummyUsers[0];
   final story = UserStory.dummyUserStories.firstWhere((e) => e.owner == owner);
-  final posts = Post.dummyPosts.where((e) => e.owner == owner).toList();
+  final posts = [];
 
 
     return Scaffold(
@@ -30,7 +30,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             _bannerAndProfilePicture(context, owner, story),
             _userBio(context, owner),
-            UserPostsTabView(posts: posts),
+            const UserPostsTabView(posts: []),
           ],
         ),
       ),

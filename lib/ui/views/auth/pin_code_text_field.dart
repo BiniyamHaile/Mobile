@@ -63,7 +63,7 @@ class PinCodeTextFieldState extends State<PinCodeTextField>
     _inputList = List<String>.filled(widget.length, "");
 
     _cursorController = AnimationController(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
     _cursorAnimation = Tween<double>(
@@ -238,7 +238,7 @@ class PinCodeTextFieldState extends State<PinCodeTextField>
       controller: _textEditingController,
       keyboardType: widget.keyboardType,
       focusNode: _focusNode,
-      autofillHints: <String>[AutofillHints.oneTimeCode],
+      autofillHints: const <String>[AutofillHints.oneTimeCode],
       autocorrect: false,
       inputFormatters: [
         LengthLimitingTextInputFormatter(widget.length),
@@ -247,8 +247,8 @@ class PinCodeTextFieldState extends State<PinCodeTextField>
       enableInteractiveSelection: false,
       showCursor: false,
       cursorWidth: 0.01,
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(0),
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.all(0),
         border: InputBorder.none,
         fillColor: Colors.transparent,
         enabledBorder: InputBorder.none,

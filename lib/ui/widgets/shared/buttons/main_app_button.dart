@@ -32,7 +32,7 @@ class MainAppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
     final screen = ScreenSizeUtils(context);
-    final opacity = 0.5;
+    const opacity = 0.5;
 
     return Container(
         padding: padding,
@@ -48,7 +48,7 @@ class MainAppButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              prefixIcon ?? SizedBox.shrink(),
+              prefixIcon ?? const SizedBox.shrink(),
               Center(
                 child: loading
                     ? CircularProgressIndicator(
@@ -61,7 +61,7 @@ class MainAppButton extends StatelessWidget {
                         ),
                       ),
               ),
-              suffixIcon ?? SizedBox.shrink(),
+              suffixIcon ?? const SizedBox.shrink(),
             ],
           ),
         ),
