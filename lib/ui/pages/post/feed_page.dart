@@ -129,7 +129,9 @@ class _FeedPageState extends State<FeedPage> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                         context.push( RouteNames.chat);
+                      },
                       icon: Icon(
                         Icons.send_sharp,
                         color: theme.colorScheme.primary,
