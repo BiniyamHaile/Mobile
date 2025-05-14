@@ -1,4 +1,9 @@
 import 'package:go_router/go_router.dart';
+import 'package:mobile/ui/pages/auth/forgot-password-page.dart';
+import 'package:mobile/ui/pages/auth/login_page.dart';
+import 'package:mobile/ui/pages/auth/otp_page.dart';
+import 'package:mobile/ui/pages/auth/preference_page.dart';
+import 'package:mobile/ui/pages/auth/reset-password-page.dart';
 import 'package:mobile/ui/pages/auth/signup_page.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/home_page.dart';
@@ -9,7 +14,7 @@ import 'package:mobile/ui/routes/route_names.dart';
 
 class AppRoutes {
   static final router = GoRouter(
-    initialLocation: RouteNames.register,
+    initialLocation: RouteNames.resetPassword,
     routes: [
     GoRoute(path: RouteNames.home, builder: (context, state) => const HomePage()
     ),
@@ -24,6 +29,12 @@ class AppRoutes {
     ),
     GoRoute(path: RouteNames.profile, builder: (context, state) => ProfilePage(),
     ),
-    GoRoute(path: RouteNames.register, builder: (context, state) => SignupPage())
+    GoRoute(path: RouteNames.register, builder: (context, state) => const SignupPage()),
+    GoRoute(path: RouteNames.otp, builder: (context, state) => const OtpPage(),
+    ),
+    GoRoute(path: RouteNames.preferences, builder: (context, state) => const PreferencesPage()),
+    GoRoute(path: RouteNames.login, builder: (context, state) => const LoginPage()),
+    GoRoute(path: RouteNames.resetPassword, builder: (context, state) => const ResetPasswordPage()),
+    GoRoute(path: RouteNames.forgotPassword, builder: (context, state) => const ForgotPasswordPage()),
   ]);
 }

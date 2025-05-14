@@ -18,4 +18,8 @@ class RouteNames {
   static const String chat = '/chat';
   static const String stories = '/stories';
   static const String reels = '/reels';
+  static const String otp = '/otp';
+  static const String preferences = '/preferences';
+  static const String resetPassword = '/reset-password';
+  static const String forgotPassword = '/forgot-password';
 }
