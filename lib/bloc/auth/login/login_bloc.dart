@@ -27,7 +27,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (response.statusCode == 201) {
         // Handle successful login
         // You might want to save the token and user data here
-        final token = response.data['token'] as String?;
+        final token = response.data['accessToken'] as String?;
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
