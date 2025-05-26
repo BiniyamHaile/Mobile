@@ -9,13 +9,14 @@ import 'package:mobile/ui/pages/chat_page.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
+import 'package:mobile/ui/pages/profile/profile-setting-page.dart';
 import 'package:mobile/ui/pages/profile_page.dart';
 import 'package:mobile/ui/pages/story/user_story_page.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 
 class AppRoutes {
   static final router = GoRouter(
-    initialLocation: RouteNames.home,
+    initialLocation: RouteNames.login,
     routes: [
     GoRoute(path: RouteNames.home, builder: (context, state) => const HomePage()
     ),
@@ -38,6 +39,7 @@ class AppRoutes {
     GoRoute(path: RouteNames.resetPassword, builder: (context, state) => const ResetPasswordPage()),
     GoRoute(path: RouteNames.forgotPassword, builder: (context, state) => const ForgotPasswordPage()),
     GoRoute(path: RouteNames.register, builder: (context, state) => const SignupPage()),
+    GoRoute(path: RouteNames.profileSetting, builder: (context, state) =>  SettingsPage()),
     GoRoute(path: RouteNames.chat, builder: (context, state) => ChatPage())
   ]);
 }

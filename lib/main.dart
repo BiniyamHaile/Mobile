@@ -5,6 +5,7 @@ import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
 import 'package:mobile/bloc/auth/login/login_bloc.dart';
 import 'package:mobile/bloc/auth/otp/otp_bloc.dart';
+import 'package:mobile/bloc/auth/preference/preference_bloc.dart';
 import 'package:mobile/bloc/auth/reset_password/reset_password_bloc.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
@@ -28,6 +29,9 @@ class App extends StatelessWidget {
     BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
     BlocProvider<ResetPasswordBloc>(create: (context) => ResetPasswordBloc()),
     BlocProvider<ForgotPasswordBloc>(create: (context) => ForgotPasswordBloc()),
+     BlocProvider<PreferenceBloc>(
+              create: (context) => PreferenceBloc()),
+    
   ], child:  MaterialApp.router(
     routerConfig: AppRoutes.router,
     debugShowCheckedModeBanner: false,
