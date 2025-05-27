@@ -54,6 +54,7 @@ dependencies:
   dartz: ^0.10.1
   dio: ^5.8.0+1
   shared_preferences: ^2.5.3
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

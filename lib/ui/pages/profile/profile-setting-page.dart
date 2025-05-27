@@ -6,6 +6,8 @@ import 'package:mobile/bloc/profile/profile_picture_cubit.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
+import 'package:mobile/ui/pages/search/search_page.dart';
+
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,11 @@ class SettingsPage extends StatelessWidget {
             _buildSectionHeader('Preference'),
             _buildSettingItem(context, 'Notifications', Icons.notifications),
             _buildSettingItem(context, 'LIVE', Icons.live_tv),
-            _buildSettingItem(context, 'Activity center', Icons.history),
+            _buildSettingItem(context, 'SEARCH', Icons.history, onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchPage()),
+                    )),
             _buildSettingItem(context, 'Content preferences', Icons.tune),
             _buildSettingItem(context, 'Audience controls', Icons.people),
             _buildSettingItem(context, 'Ads', Icons.ads_click),
