@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/models/comment.dart';
 import 'package:mobile/repository/social/comment_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'comment_event.dart';
 part 'comment_state.dart';
@@ -20,6 +21,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<CreateComment>(_onCreateComment);
     on<UpdateComment>(_onUpdateComment);
     on<DeleteComment>(_onDeleteComment);
+    on<ToggleReaction>(_onToggleReaction);
   }
 
   Future<void> _onLoadComments(
@@ -30,6 +32,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     try {
       final comments =
           await _commentRepository.getCommentsForPost(event.postId);
+      print('Loaded comments: $comments');
       emit(CommentsLoaded(comments));
     } catch (e) {
       emit(CommentError('Failed to load comments: $e'));
@@ -172,4 +175,59 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       }
     }
   }
+
+Future<void> _onToggleReaction(
+  ToggleReaction event,
+  Emitter<CommentState> emit,
+) async {
+  // Get current state and user ID
+  final prefs = await SharedPreferences.getInstance();
+  final currentUserId = prefs.getString('userId');
+  
+  if (state is! CommentsLoaded) return;
+  final currentState = state as CommentsLoaded;
+
+  // Find the comment being liked/unliked
+  final commentIndex = currentState.comments.indexWhere((c) => c.id == event.commentId);
+  if (commentIndex == -1) return;
+
+  // Create temporary updated comment with optimistic UI update
+  final originalComment = currentState.comments[commentIndex];
+  final tempComment = originalComment.copyWith(
+    likedBy: List.from(originalComment.likedBy),
+  );
+
+  // Optimistically update UI
+  final isLiked = currentUserId != null && tempComment.likedBy.contains(currentUserId);
+  if (isLiked) {
+    tempComment.likedBy.remove(currentUserId);
+  } else if (currentUserId != null) {
+    tempComment.likedBy.add(currentUserId);
+  }
+
+  // Create updated comments list
+  final updatedComments = List<Comment>.from(currentState.comments);
+  updatedComments[commentIndex] = tempComment;
+
+  // Emit optimistic update
+  emit(CommentsLoaded(updatedComments));
+
+  try {
+    // Make actual API call
+    final updatedComment = await _commentRepository.toggleReaction(event.commentId);
+
+    // Update with real server response
+    updatedComments[commentIndex] = updatedComment;
+    emit(CommentsLoaded(updatedComments));
+    emit(CommentOperationSuccess(
+      comments: updatedComments,
+      message: 'Reaction toggled successfully',
+    ));
+  } catch (e) {
+    // Revert if error occurs
+    updatedComments[commentIndex] = originalComment;
+    emit(CommentsLoaded(updatedComments));
+    emit(CommentError('Failed to toggle reaction', updatedComments));
+  }
+}
 }

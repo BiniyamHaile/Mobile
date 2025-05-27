@@ -61,7 +61,10 @@ class _FeedPageState extends State<FeedPage> {
           },
           builder: (context, state) {
             if (state is PostInitial || state is PostLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                  child: CircularProgressIndicator(
+                backgroundColor: Colors.blue,
+              ));
             } else if (state is PostError) {
               return Center(child: Text(state.message));
             } else if (state is PostLoaded) {
@@ -80,7 +83,15 @@ class _FeedPageState extends State<FeedPage> {
                     if (index < posts.length) {
                       return Column(
                         children: [
-                          PostCard(post: posts[index]),
+                          PostCard(
+                            post: posts[index],
+                            onDeleted: () {
+                              // Update your state here to remove the deleted post
+                              setState(() {
+                                posts.removeWhere((p) => p.id == posts[index].id);
+                              });
+                            },
+                          ),
                           if (index < posts.length - 1)
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -108,7 +119,9 @@ class _FeedPageState extends State<FeedPage> {
 
   AppBar _appBar(ThemeData theme, BuildContext context) {
     return AppBar(
+      backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
       automaticallyImplyLeading: false,
+      
       flexibleSpace: ResponsivePadding(
         child: SafeArea(
           child: Padding(
@@ -124,13 +137,14 @@ class _FeedPageState extends State<FeedPage> {
                         context.push(RouteNames.post);
                       },
                       icon: Icon(
-                        Icons.post_add,
+                        Icons.post_add_outlined,
                         color: theme.colorScheme.primary,
+                        size: 30,
                       ),
                     ),
                     IconButton(
                       onPressed: () {
-                         context.push( RouteNames.chat);
+                        context.push(RouteNames.chat);
                       },
                       icon: Icon(
                         Icons.send_sharp,

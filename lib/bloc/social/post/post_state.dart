@@ -118,3 +118,35 @@ class PostDeleteFailure extends PostState {
   List<Object?> get props => [error];
 }
 
+
+class PostReactionLoading extends PostState {
+  final String postId;
+
+  const PostReactionLoading(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+
+class PostReactionSuccess extends PostState {
+  final Post updatedPost;
+
+  const PostReactionSuccess(this.updatedPost);
+
+  @override
+  List<Object?> get props => [updatedPost];
+}
+
+class PostReactionFailure extends PostState {
+  final String postId;
+  final String error;
+
+  const PostReactionFailure({
+    required this.postId,
+    required this.error,
+  });
+
+  @override
+  List<Object?> get props => [postId, error];
+}
+

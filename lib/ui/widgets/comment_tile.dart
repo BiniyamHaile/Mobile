@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class CommentTile extends StatefulWidget {
   const CommentTile({
@@ -29,12 +32,15 @@ class CommentTile extends StatefulWidget {
 class _CommentTileState extends State<CommentTile> {
   late Comment _currentComment;
   final Map<String, VideoPlayerController> _videoControllers = {};
+  final Map<String, ChewieController> _chewieControllers = {};
+  String? currentUserId;
 
   @override
   void initState() {
     super.initState();
     _currentComment = widget.comment;
     _initializeVideos();
+    _loadUserId();
   }
 
   void _initializeVideos() async {
@@ -45,6 +51,14 @@ class _CommentTileState extends State<CommentTile> {
         controller.setLooping(true);
         controller.pause();
         _videoControllers[file] = controller;
+        
+        _chewieControllers[file] = ChewieController(
+          videoPlayerController: controller,
+          autoPlay: false,
+          looping: true,
+          showControls: false,
+          allowFullScreen: false,
+        );
       }
     }
   }
@@ -59,7 +73,9 @@ class _CommentTileState extends State<CommentTile> {
     super.didUpdateWidget(oldWidget);
     if (widget.comment != oldWidget.comment) {
       _videoControllers.forEach((_, c) => c.dispose());
+      _chewieControllers.forEach((_, c) => c.dispose());
       _videoControllers.clear();
+      _chewieControllers.clear();
       _currentComment = widget.comment;
       _initializeVideos();
     }
@@ -68,7 +84,68 @@ class _CommentTileState extends State<CommentTile> {
   @override
   void dispose() {
     _videoControllers.forEach((_, c) => c.dispose());
+    _chewieControllers.forEach((_, c) => c.dispose());
     super.dispose();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentUserId = prefs.getString('userId');
+    });
+  }
+
+  void _showFullScreenMedia(BuildContext context, String url, bool isVideo) {
+    if (isVideo) {
+      final controller = _videoControllers[url];
+      if (controller != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+                iconTheme: const IconThemeData(color: Colors.white),
+              ),
+              body: Center(
+                child: Chewie(
+                  controller: ChewieController(
+                    videoPlayerController: controller,
+                    autoPlay: true,
+                    looping: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
+            body: Center(
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -93,10 +170,16 @@ class _CommentTileState extends State<CommentTile> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 20,
+              backgroundColor: Colors.grey.shade200,
               backgroundImage:
-                  NetworkImage("https://randomuser.me/api/portraits/men/1.jpg"),
+                  (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
+                      ? CachedNetworkImageProvider('${_currentComment.owner?.profilePic}')
+                      : null,
+              child: (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
+                  ? null
+                  : Icon(Icons.person, color: Colors.grey.shade800),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -107,19 +190,30 @@ class _CommentTileState extends State<CommentTile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Bemni', // Replace with actual author name
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                      Row(
+                        children: [
+                          Text(
+                            "${_currentComment.owner?.firstName} ${_currentComment.owner?.lastName}",
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const Spacer(),
+                          Text(
+                            _formatDate(_currentComment.createdAt),
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _currentComment.content,
-                        style: TextStyle(
-                          color: theme.textTheme.bodyMedium?.color,
-                          fontSize: theme.textTheme.bodyLarge?.fontSize,
+                      const SizedBox(height: 8),
+                      if (_currentComment.content.isNotEmpty)
+                        Text(
+                          _currentComment.content,
+                          style: TextStyle(
+                            color: theme.textTheme.bodyMedium?.color,
+                            fontSize: theme.textTheme.bodyLarge?.fontSize,
+                          ),
                         ),
-                      ),
                       if (_currentComment.files.isNotEmpty)
                         _buildMediaAttachments(),
                       const SizedBox(height: 8),
@@ -129,10 +223,10 @@ class _CommentTileState extends State<CommentTile> {
                           Row(
                             children: [
                               _CommentLikeButton(
-                                likeCount: _currentComment.likeCount,
                                 commentId: _currentComment.id,
-                                isLiked: _currentComment.likedBy
-                                    .contains('currentUserId'),
+                                initialLikeCount: _currentComment.likeCount,
+                                initialIsLiked: _currentComment.likedBy
+                                    .contains(currentUserId),
                               ),
                               const SizedBox(width: 16),
                               if (widget.showReplyButton)
@@ -143,12 +237,14 @@ class _CommentTileState extends State<CommentTile> {
                                 ),
                             ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.more_vert, size: 18),
-                            onPressed: () => _showCommentOptions(context),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
+                          if (currentUserId != null &&
+                              _currentComment.owner?.id == currentUserId) ...[
+                            IconButton(
+                              icon: const Icon(Icons.more_vert, size: 18),
+                              onPressed: () =>
+                                  _showCommentOptions(context, _currentComment),
+                            ),
+                          ],
                         ],
                       ),
                     ],
@@ -168,68 +264,97 @@ class _CommentTileState extends State<CommentTile> {
         final isVideo = _isVideo(file);
         return Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: isVideo
-                ? _buildVideoPlayer(file)
-                : CachedNetworkImage(
-                    imageUrl: file,
-                    fit: BoxFit.cover,
-                    width: 100,
-                    placeholder: (context, url) => Container(
-                      height: 60,
-                      color: Colors.grey[200],
-                    ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+          child: GestureDetector(
+            onTap: () => _showFullScreenMedia(context, file, isVideo),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  children: [
+                    isVideo
+                        ? _buildVideoThumbnail(file)
+                        : CachedNetworkImage(
+                            imageUrl: file,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 300,
+                            placeholder: (context, url) => Container(
+                              height: 300,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              height: 300,
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.error,
+                                size: 50,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       }).toList(),
     );
   }
 
-  Widget _buildVideoPlayer(String url) {
-    if (!_videoControllers.containsKey(url)) {
+  Widget _buildVideoThumbnail(String url) {
+    if (!_chewieControllers.containsKey(url)) {
       return Container(
-        height: 100,
+        height: 300,
         color: Colors.grey[200],
         child: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    final controller = _videoControllers[url]!;
-    return GestureDetector(
-      onTap: () {
-        if (controller.value.isPlaying) {
-          controller.pause();
-        } else {
-          controller.play();
-        }
-        setState(() {});
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: VideoPlayer(controller),
+    final chewieController = _chewieControllers[url]!;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          height: 300,
+          child: AspectRatio(
+            aspectRatio: chewieController.videoPlayerController.value.aspectRatio,
+            child: Chewie(controller: chewieController),
           ),
-          if (!controller.value.isPlaying)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Icon(
-                Icons.play_arrow,
-                size: 50,
-                color: Colors.white,
-              ),
+        ),
+        if (!chewieController.isPlaying)
+          Container(
+            height: 300,
+            color: Colors.black.withOpacity(0.3),
+            child: const Icon(
+              Icons.play_arrow,
+              size: 50,
+              color: Colors.white,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
-  void _showCommentOptions(BuildContext context) {
+  String _formatDate(DateTime date) {
+    return DateFormat('MMM d, y • h:mm a').format(date);
+  }
+
+  void _showCommentOptions(BuildContext context, Comment comment) async {
     final commentBloc = BlocProvider.of<CommentBloc>(context);
 
     showModalBottomSheet(
@@ -268,38 +393,50 @@ class _CommentTileState extends State<CommentTile> {
   }
 }
 
-class _CommentLikeButton extends StatelessWidget {
+class _CommentLikeButton extends StatefulWidget {
   const _CommentLikeButton({
-    required this.likeCount,
     required this.commentId,
-    required this.isLiked,
+    required this.initialLikeCount,
+    required this.initialIsLiked,
   });
 
-  final int likeCount;
   final String commentId;
-  final bool isLiked;
+  final int initialLikeCount;
+  final bool initialIsLiked;
+
+  @override
+  __CommentLikeButtonState createState() => __CommentLikeButtonState();
+}
+
+class __CommentLikeButtonState extends State<_CommentLikeButton> {
+  late int _likeCount;
+  late bool _isLiked;
+
+  @override
+  void initState() {
+    super.initState();
+    _likeCount = widget.initialLikeCount;
+    _isLiked = widget.initialIsLiked;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return PostButton(
       icon: Icon(
-        isLiked ? Icons.favorite : Icons.favorite_outline,
-        color: isLiked ? theme.colorScheme.primary : null,
+        _isLiked ? Icons.favorite : Icons.favorite_outline,
+        color: _isLiked ? Colors.red : null,
         size: 18,
       ),
-      text: likeCount.toString(),
+      text: _likeCount.toString(),
       onTap: () {
-        if (isLiked) {
-          // context.read<CommentBloc>().add(
-          //       // UnlikeComment(commentId, 'currentUserId'), // Replace with actual user ID
-          //     );
-        } else {
-          // context.read<CommentBloc>().add(
-          //       // LikeComment(commentId, 'currentUserId'), // Replace with actual user ID
-          //     );
-        }
+        setState(() {
+          _isLiked = !_isLiked;
+          _likeCount = _isLiked ? _likeCount + 1 : _likeCount - 1;
+        });
+
+        context
+            .read<CommentBloc>()
+            .add(ToggleReaction(commentId: widget.commentId));
       },
     );
   }

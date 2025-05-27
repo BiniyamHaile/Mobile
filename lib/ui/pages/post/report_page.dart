@@ -77,7 +77,7 @@ class _ReportPageState extends State<ReportPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.push(RouteNames.feed);
+            context.push(RouteNames.home);
           } else if (state is PostReportFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -90,9 +90,13 @@ class _ReportPageState extends State<ReportPage> {
         child: Scaffold(
           backgroundColor: isDark ? Colors.black : Colors.grey[100],
           appBar: AppBar(
-            title: const Text('Report Post'),
+            title: const Text(
+              'Report Post',
+              style: TextStyle(color: Colors.white),
+            ),
             centerTitle: true,
-            backgroundColor: isDark ? Colors.black : Colors.white,
+            backgroundColor:
+                const Color.fromRGBO(143, 148, 251, 1), // Add this lin
             foregroundColor: isDark ? Colors.white : Colors.black,
             elevation: 1,
           ),

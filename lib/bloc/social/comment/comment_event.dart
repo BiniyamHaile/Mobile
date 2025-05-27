@@ -71,3 +71,15 @@ class DeleteComment extends CommentEvent {
   @override
   List<Object> get props => [commentId];
 }
+
+
+class ToggleReaction extends CommentEvent {
+  final String commentId;
+
+  const ToggleReaction({
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [commentId];
+}

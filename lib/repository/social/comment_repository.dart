@@ -3,23 +3,25 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:mobile/models/comment.dart';
 import 'package:mobile/services/api/global/base_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommentRepository extends BaseRepository {
   Future<List<Comment>> getCommentsForPost(String postId) async {
     try {
-      print('Fetching comments for post ID: $postId');
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
       final response = await get(
         '/social/posts/$postId/comments',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'multipart/form-data'
+        }),
       );
-
-      print('Comments response: $response');
 
       // First, fetch all top-level comments
       final comments = (response.data as List)
           .map((json) => Comment.fromJson(json))
           .toList();
-
-      print("after comments: $comments");
 
       // Then, for each comment, fetch its replies
       for (var comment in comments) {
@@ -43,9 +45,17 @@ class CommentRepository extends BaseRepository {
       print('Fetching replies for comment IDs: $commentIds');
 
       // Fetch replies for all comment IDs in parallel
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
       final List<dynamic> responses =
           await Future.wait(commentIds.map((id) async {
-        final response = await get('/social/comments/$id');
+        final response = await get(
+          '/social/comments/$id',
+          options: Options(headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data'
+          }),
+        );
         return response.data; // Get the actual data from the response
       }));
 
@@ -82,25 +92,29 @@ class CommentRepository extends BaseRepository {
     List<File>? files,
     List<String>? mentions,
   }) async {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    final formData = FormData.fromMap({
+      'content': content,
+      'postId': postId,
+      if (parentId != null) 'parentId': parentId,
+      if (mentions != null) 'mentions': mentions,
+      if (files != null)
+        'files': await Future.wait(
+          files.map((file) async => await MultipartFile.fromFile(file.path)),
+        ),
+    });
 
-      final formData = FormData.fromMap({
-        'content': content,
-        'postId': postId,
-        if (parentId != null) 'parentId': parentId,
-        if (mentions != null) 'mentions': mentions,
+    print('Creating comment with formData: $formData');
 
-        if (files != null)
-          'files': await Future.wait(
-            files.map((file) async => await MultipartFile.fromFile(file.path)),
-          ),
-      });
-
-      print('Creating comment with formData: $formData');
-      
     try {
       final response = await dio.post(
         '/social/comments',
         data: formData,
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'multipart/form-data'
+        }),
       );
       print('Response from createComment: ${response}');
       return Comment.fromJson(response.data);
@@ -117,6 +131,8 @@ class CommentRepository extends BaseRepository {
     List<String>? mentions,
   }) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
       final formData = FormData.fromMap({
         'content': content,
         if (files != null)
@@ -128,6 +144,9 @@ class CommentRepository extends BaseRepository {
       final response = await dio.patch(
         '/social/comments/$commentId',
         data: formData,
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
       );
       return Comment.fromJson(response.data);
     } catch (e) {
@@ -137,12 +156,35 @@ class CommentRepository extends BaseRepository {
 
   Future<bool> deleteComment(String commentId) async {
     try {
-      final response = await delete(
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final response = await dio.delete(
         '/social/comments/$commentId',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
       );
       return response.data['success'] ?? false;
     } catch (e) {
       throw Exception('Failed to delete comment: $e');
+    }
+  }
+
+  Future<Comment> toggleReaction(String commentId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await dio.post(
+        '/social/comments/$commentId/toggleReaction',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      return Comment.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to toggle reaction: $e');
     }
   }
 }

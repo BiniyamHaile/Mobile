@@ -17,8 +17,9 @@ abstract class PostEvent {
 class CreatePost extends PostEvent {
   final String? content;
   final List<XFile>? mediaFiles;
+  final List<String>? mentions;
 
-  const CreatePost({this.content, this.mediaFiles});
+  const CreatePost({this.content, this.mediaFiles, this.mentions});
 
   @override
   List<Object?> get props => [content, mediaFiles];
@@ -29,11 +30,13 @@ class UpdatePost extends PostEvent {
   final String postId;
   final String? content;
   final List<XFile>? mediaFiles;
+  final List<String>? mentions;
 
   const UpdatePost({
     required this.postId,
     this.content,
     this.mediaFiles,
+    this.mentions,
   });
 }
 
@@ -74,6 +77,17 @@ class DeletePost extends PostEvent {
   final String postId;
 
   const DeletePost(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+
+class ToggleReaction extends PostEvent {
+  final String postId;
+
+  const ToggleReaction({
+    required this.postId,
+  });
 
   @override
   List<Object?> get props => [postId];

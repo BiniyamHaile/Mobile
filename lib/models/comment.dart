@@ -1,3 +1,6 @@
+
+import 'package:mobile/models/new_user.dart';
+
 class Comment {
   final String id;
   final String content;
@@ -10,6 +13,7 @@ class Comment {
   final DateTime updatedAt;
   final String? parentId;
   final String? authorId;
+  final User? owner;
 
   late List<Comment> commentRepliesList = [];
 
@@ -26,8 +30,44 @@ class Comment {
     this.parentId,
     this.authorId,
     this.commentRepliesList = const [],
+    this.owner,
 
   });
+
+
+  bool isLikedByUser(String userId) => likedBy.contains(userId);
+
+  Comment copyWith({
+    String? id,
+    String? content,
+    String? postId,
+    List<String>? replies,
+    List<String>? likedBy,
+    List<String>? files,
+    List<String>? mentions,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? parentId,
+    String? authorId,
+    User? owner,
+    List<Comment>? commentRepliesList,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      postId: postId ?? this.postId,
+      replies: replies ?? this.replies,
+      likedBy: likedBy ?? this.likedBy,
+      files: files ?? this.files,
+      mentions: mentions ?? this.mentions,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      parentId: parentId ?? this.parentId,
+      authorId: authorId ?? this.authorId,
+      owner: owner ?? this.owner,
+      commentRepliesList: commentRepliesList ?? this.commentRepliesList,
+    );
+  }
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     print('Comment.fromJson: $json');
@@ -44,6 +84,7 @@ class Comment {
       updatedAt: DateTime.parse(json['updatedAt']),
       parentId: json['parentId'],
       authorId: json['authorId'],
+      owner: json['owner'] != null ? User.fromJson(json['owner']) : null,
      
           
     );
@@ -63,5 +104,8 @@ class Comment {
         'updatedAt': updatedAt.toIso8601String(),
         'parentId': parentId,
         'authorId': authorId,
-      };
+        'owner': owner?.toJson(),};
+
 }
+
+

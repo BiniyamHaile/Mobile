@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
@@ -17,6 +16,7 @@ class SignupInputFields extends StatefulWidget {
   final TextEditingController confirmPasswordController;
   final TextEditingController emailController;
   final void Function() onSubmit;
+  final void Function(String) onGenderChanged;
   const SignupInputFields({
     super.key,
     required this.formKey,
@@ -26,6 +26,7 @@ class SignupInputFields extends StatefulWidget {
     required this.confirmPasswordController,
     required this.onSubmit,
     required this.emailController,
+    required this.onGenderChanged,
   });
 
   @override
@@ -37,6 +38,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
   bool showPasswordError = false;
   TextEditingController? activeController;
   bool validateAll = false;
+  String? selectedGender;
 
   void _onPrevalidation() {
     validateAll = true;
@@ -45,7 +47,6 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
   }
 
   String? _validate(TextEditingController controller) {
-
     if (controller == widget.nameController && _shouldValidate(controller)) {
       final nameError = context.read<AuthFormBloc>().state.nameError;
 
@@ -54,18 +55,18 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
         _shouldValidate(controller)) {
       final surnameError = context.read<AuthFormBloc>().state.surnameError;
 
-      return surnameError;
+      return surnameError == null ? null : surnameError;
     } else if (controller == widget.passwordController &&
         _shouldValidate(controller)) {
       final passwordError = context.read<AuthFormBloc>().state.passwordError;
 
-      return passwordError;
+      return passwordError == null ? null : passwordError;
     } else if (controller == widget.confirmPasswordController &&
         _shouldValidate(controller)) {
       final confirmPasswordError =
           context.read<AuthFormBloc>().state.confirmPasswordError;
 
-      return confirmPasswordError;
+      return confirmPasswordError == null ? null : confirmPasswordError;
     }
     return null;
   }
@@ -95,7 +96,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 margin: EdgeInsets.symmetric(
                     vertical: screen.scaledScreenHeight(0.015)),
                 controller: widget.nameController,
-                hintText: "name",
+                hintText: "first name",
                 keyboardType: TextInputType.name,
                 prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
                 validator: (value) => _validate(widget.nameController),
@@ -110,7 +111,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 margin: EdgeInsets.symmetric(
                     vertical: screen.scaledScreenHeight(0.015)),
                 controller: widget.surnameController,
-                hintText: "surname",
+                hintText: "last name",
                 keyboardType: TextInputType.name,
                 prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
                 validator: (value) => _validate(widget.surnameController),
@@ -163,6 +164,28 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                       ));
                   return null;
                 },
+              ),
+              SizedBox(
+                height: screen.scaledScreenHeight(0.03),
+              ),
+              DropdownButtonFormField<String>(
+                value: selectedGender,
+                items: const [
+                  DropdownMenuItem(value: 'male', child: Text('Male')),
+                  DropdownMenuItem(value: 'female', child: Text('Female')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedGender = value;
+                  });
+                  if (value != null) {
+                    widget.onGenderChanged(value);
+                  }
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Select Gender',
+                  prefixIcon: Icon(Icons.people),
+                ),
               ),
             ],
             bottomGap: screen.scaledScreenHeight(0.025),

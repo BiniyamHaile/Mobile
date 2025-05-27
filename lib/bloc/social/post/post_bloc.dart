@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/models/post.dart';
 import 'package:mobile/repository/social/post_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';
@@ -16,6 +17,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<CreatePost>(_onCreatePost);
     on<UpdatePost>(_onUpdatePost);
     on<DeletePost>(_onDeletePost);
+    on<ToggleReaction>(_onToggleReaction);
   }
 
   Future<void> _onFetchPosts(FetchPosts event, Emitter<PostState> emit) async {
@@ -47,6 +49,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final createdPost = await postRepository.createPost(
         content: event.content,
         files: files,
+        mentions: event.mentions,
       );
       emit(PostCreationSuccess(createdPost));
     } catch (e) {
@@ -55,8 +58,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   Future<void> _onUpdatePost(UpdatePost event, Emitter<PostState> emit) async {
-    emit(
-        PostCreationLoading()); // You can create a separate UpdateLoading if needed
+    emit(PostUpdateLoading());
     try {
       List<File> files = [];
       if (event.mediaFiles != null) {
@@ -69,9 +71,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         files: files,
       );
 
-      emit(PostCreationSuccess(updatedPost)); // Or create PostUpdateSuccess
+      emit(PostUpdateSuccess(updatedPost));
     } catch (e) {
-      emit(PostCreationFailure(e.toString())); // Or create PostUpdateFailure
+      emit(PostUpdateFailure(e.toString()));
     }
   }
 
@@ -82,6 +84,66 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(PostDeleteSuccess(event.postId));
     } catch (e) {
       emit(PostDeleteFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onToggleReaction(
+    ToggleReaction event,
+    Emitter<PostState> emit,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentUserId = prefs.getString('userId');
+    if (state is! PostLoaded) return;
+    final currentState = state as PostLoaded;
+
+    final postIndex =
+        currentState.posts.data.indexWhere((p) => p.id == event.postId);
+    if (postIndex == -1) return;
+
+    final originalPost = currentState.posts.data[postIndex];
+    final tempPost = originalPost.copyWith(
+      likedBy: List.from(originalPost.likedBy),
+    );
+
+    final isLiked = tempPost.likedBy.contains(currentUserId);
+    if (isLiked) {
+      tempPost.likedBy.remove(currentUserId);
+    } else {
+      tempPost.likedBy.add(currentUserId!);
+    }
+
+    final updatedPosts = List<Post>.from(currentState.posts.data);
+    updatedPosts[postIndex] = tempPost;
+
+    emit(PostLoaded(
+      posts: FindResult(
+        data: updatedPosts,
+        total: currentState.posts.total,
+      ),
+    ));
+
+    try {
+      final updatedPost = await postRepository.toggleReaction(
+        postId: event.postId,
+      );
+
+      updatedPosts[postIndex] = updatedPost;
+      emit(PostLoaded(
+        posts: FindResult(
+          data: updatedPosts,
+          total: currentState.posts.total,
+        ),
+      ));
+    } catch (e) {
+      updatedPosts[postIndex] = originalPost;
+      emit(PostLoaded(
+        posts: FindResult(
+          data: updatedPosts,
+          total: currentState.posts.total,
+        ),
+      ));
+
+      emit(PostError(message: 'Failed to update like'));
     }
   }
 }

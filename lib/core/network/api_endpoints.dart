@@ -14,8 +14,7 @@ class ApiEndpoints {
   String get sendRecoveryMail => "$_authUrl/forgot-password";
   String get resetPassword => "$_authUrl/reset-password";
   String get sendOtp => "$_authUrl/resend-verification";
-  String get verifyOtp => "$_authUrl/verify-user";
+  String get verifyOtp => "$_authUrl/verifyEmail";
   String get signup => "$_authUrl/register";
   String get logout => "$_authUrl/logout";
-
 }

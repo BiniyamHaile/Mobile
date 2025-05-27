@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/repository/social/comment_repository.dart';
@@ -234,16 +232,63 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     );
   }
 
+  Widget _buildNoCommentsUI() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          Icon(
+            Icons.mode_comment_outlined,
+            size: 60,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No comments yet',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Be the first to comment!',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCommentsList(CommentState state) {
     if (state is CommentLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CircularProgressIndicator(
+            color: Colors.blue,
+            strokeWidth: 2,
+          ),
+        ),
+      );
     } else if (state is CommentsLoaded || state is CommentOperationSuccess) {
       final comments = (state is CommentsLoaded)
           ? state.comments
           : (state as CommentOperationSuccess).comments;
 
+      final sortedComments = List<Comment>.from(comments)
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
       final topLevelComments =
-          comments.where((c) => c.parentId == null).toList();
+          sortedComments.where((c) => c.parentId == null).toList();
+      if (topLevelComments.isEmpty) {
+        return _buildNoCommentsUI();
+      }
 
       return ListView.builder(
         itemCount: topLevelComments.length,
@@ -257,7 +302,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               if (index == 0) const SizedBox(height: 16),
               CommentTile(
                 comment: comment,
-                onReply: () => _setReplyingTo(comment.id, 'User'),
+                onReply: () => _setReplyingTo(comment.id,
+                    '${comment.owner?.firstName} ${comment.owner?.lastName}'),
                 isReplying: _replyingToCommentId == comment.id,
                 showReplyButton: true,
                 onEdit: (content) {
@@ -275,9 +321,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         },
       );
     } else if (state is CommentError) {
-      return Center(child: Text(state.message));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            state.message,
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+      );
     }
-    return const Center(child: CircularProgressIndicator());
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: CircularProgressIndicator(
+          color: Colors.blue,
+          strokeWidth: 2,
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildReplies(List<Comment> replies, {int indentLevel = 1}) {
@@ -297,10 +359,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 40.0 * indentLevel),
+            padding: EdgeInsets.only(left: 40.0),
             child: CommentTile(
               comment: reply,
-              onReply: () => _setReplyingTo(reply.id, 'User'),
+              onReply: () => _setReplyingTo(reply.id,
+                  '${reply.owner?.firstName} ${reply.owner?.lastName}'),
               isReplying: _replyingToCommentId == reply.id,
               showReplyButton: true,
               onEdit: (content) {

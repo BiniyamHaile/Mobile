@@ -48,4 +48,8 @@ class User {
     },
   );
 
+  static fromJson(json) {}
+
+  toJson() {}
+
 }
