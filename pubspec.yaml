@@ -75,7 +75,6 @@ dependencies:
 
   
 
-  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -104,7 +103,6 @@ flutter:
   assets:
     - assets/
     - assets/images/
-    - .env
     - assets/contracts/StarsToken.json
     - assets/contracts/StarsPlatform.json
     - assets/contracts/
