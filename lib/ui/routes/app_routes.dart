@@ -70,7 +70,6 @@ class AppRoutes {
         path: RouteNames.chat,
         builder: (context, state) => ChatPage(),
       ),
-     
     ],
   );
 }

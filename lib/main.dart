@@ -52,10 +52,20 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: AppRoutes.router,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme(context),
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
+          BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+          BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+          BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+          BlocProvider<ResetPasswordBloc>(
+              create: (context) => ResetPasswordBloc()),
+          BlocProvider<ForgotPasswordBloc>(
+              create: (context) => ForgotPasswordBloc()),
+        ],
+        child: MaterialApp.router(
+            routerConfig: AppRoutes.router,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme(context)));
   }
 }
