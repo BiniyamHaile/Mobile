@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
           label: 'Profile',
         ),
                    NavigationDestination(
-          icon:  Icon(Icons.person_outlined),
+          icon:  const Icon(Icons.person_outlined),
           selectedIcon: Icon(
             Icons.photo_camera,
             color: theme.colorScheme.primary,

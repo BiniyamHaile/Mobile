@@ -28,7 +28,7 @@ class ValidationIndicator extends StatelessWidget {
         children: [
           Expanded(
             child: copyMessage == null
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : Text(
                     copyMessage,
                     style: appTheme.textTheme.labelSmall

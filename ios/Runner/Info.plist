@@ -33,6 +33,8 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		 <string>wc</string>
+            <string>mystarapp</string> 
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

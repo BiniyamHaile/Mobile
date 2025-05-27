@@ -13,10 +13,12 @@ class ReelsPage extends StatelessWidget {
         'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
     'https://filesamples.com/samples/video/mp4/sample_1280x720.mp4',
   ];
+
+   ReelsPage({super.key});
   @override
   Widget build(BuildContext context) {
     return  Container(
-      padding: EdgeInsets.only(top: 50),
+      padding: const EdgeInsets.only(top: 50),
           child: Stack(
             children: [
               //We need swiper for every content
@@ -29,8 +31,8 @@ class ReelsPage extends StatelessWidget {
                 itemCount: videos.length,
                 scrollDirection: Axis.vertical,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
