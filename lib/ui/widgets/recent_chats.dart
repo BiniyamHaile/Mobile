@@ -85,17 +85,19 @@ class RecentChats extends StatelessWidget {
                         child: Row(
                           // Removed mainAxisAlignment to allow flexible width distribution
                           children: <Widget>[
-                            Expanded( // Wrap the left side in Expanded
+                            Expanded(
+                              // Wrap the left side in Expanded
                               child: Row(
                                 children: <Widget>[
                                   CircleAvatar(
                                     radius: 35.0,
-                                    backgroundImage: AssetImage(
-                                        otherUser.imageUrl ??
-                                            'assets/images/default_profile.png'),
+                                    backgroundImage: AssetImage(otherUser
+                                            .imageUrl ??
+                                        'assets/images/default_profile.png'),
                                   ),
                                   SizedBox(width: 10.0),
-                                  Expanded( // Wrap the column with text in Expanded
+                                  Expanded(
+                                    // Wrap the column with text in Expanded
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -124,7 +126,9 @@ class RecentChats extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 8.0), // Add a small spacing between the two sections
+                            SizedBox(
+                                width:
+                                    8.0), // Add a small spacing between the two sections
                             Column(
                               children: <Widget>[
                                 Text(

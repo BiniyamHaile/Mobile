@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/common/common.dart';
-import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/pages.dart';
-import 'package:mobile/ui/pages/post/reels_page.dart';
+import 'package:mobile/ui/pages/post/feed_page.dart';
+import 'package:mobile/ui/views/reel/profile/profile_view.dart';
+import 'package:mobile/ui/views/reel/video_feed_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -57,11 +58,11 @@ class _HomePageState extends State<HomePage> {
     return PageView(
       controller: _pageController,
       onPageChanged: _pageChanged,
-      children: [
-        const FeedPage(),
-        const NotificationsPage(),
-        ProfilePage(),
-        ReelsPage()
+      children: const [
+        FeedPage(),
+        VideoFeedView(),
+        NotificationsPage(),
+        ProfileView(),
       ],
     );
   }
@@ -92,6 +93,14 @@ class _HomePageState extends State<HomePage> {
           label: const Text('Home'),
         ),
         NavigationRailDestination(
+          icon: const Icon(Icons.videocam),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label: const Text('Reels'),
+        ),
+        NavigationRailDestination(
           icon: const Icon(Icons.notifications_outlined),
           selectedIcon: Icon(
             Icons.notifications,
@@ -106,14 +115,6 @@ class _HomePageState extends State<HomePage> {
             color: theme.colorScheme.primary,
           ),
           label: const Text('Profile'),
-        ),
-                NavigationRailDestination(
-          icon: const Icon(Icons.person_outlined),
-          selectedIcon: Icon(
-            Icons.photo_camera,
-            color: theme.colorScheme.primary,
-          ),
-          label: const Text('Reels'),
         ),
       ],
     );
@@ -137,6 +138,14 @@ class _HomePageState extends State<HomePage> {
           label: 'Home',
         ),
         NavigationDestination(
+          icon: Icon(Icons.videocam),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label: 'Reels',
+        ),
+        NavigationDestination(
           icon: const Icon(Icons.notifications_outlined),
           selectedIcon: Icon(
             Icons.notifications,
@@ -151,14 +160,6 @@ class _HomePageState extends State<HomePage> {
             color: theme.colorScheme.primary,
           ),
           label: 'Profile',
-        ),
-                   NavigationDestination(
-          icon:  Icon(Icons.person_outlined),
-          selectedIcon: Icon(
-            Icons.photo_camera,
-            color: theme.colorScheme.primary,
-          ),
-          label:'Reels',
         ),
       ],
     );

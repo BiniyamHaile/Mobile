@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -10,16 +9,19 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:mime/mime.dart';
 import 'package:mobile/models/message_model.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key, required this.user, required this.friend, required this.initialMessages});
+  const ChatPage(
+      {super.key,
+      required this.user,
+      required this.friend,
+      required this.initialMessages});
 
   final types.User user;
   final types.User friend;
@@ -61,7 +63,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _addChatMessage(ChatMessage chatMessage) {
-    final author = chatMessage.senderId == widget.user.id ? widget.user : widget.friend;
+    final author =
+        chatMessage.senderId == widget.user.id ? widget.user : widget.friend;
     final createdAt = DateTime.now().millisecondsSinceEpoch;
 
     if (chatMessage.text != null) {
@@ -78,16 +81,12 @@ class _ChatPageState extends State<ChatPage> {
               createdAt: createdAt,
               id: const Uuid().v4(),
               text: text,
-              previewData: types.PreviewData(link: url)
-          );
+              previewData: types.PreviewData(link: url));
 
           _addMessage(textMessage);
           break;
         }
-
-      }
-      else {
-
+      } else {
         final textMessage = types.TextMessage(
           author: author,
           createdAt: createdAt,
@@ -96,7 +95,6 @@ class _ChatPageState extends State<ChatPage> {
         );
         _addMessage(textMessage);
       }
-
     } else if (chatMessage.file != null) {
       final fileMessage = types.FileMessage(
         author: author,
@@ -143,7 +141,6 @@ class _ChatPageState extends State<ChatPage> {
       _messages.remove(message);
     });
   }
-
 
   Future<Uint8List?> _loadImage(String imagePath) async {
     try {
@@ -214,7 +211,11 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     if (result != null && result.files.single.path != null) {
-      final chatMessage = ChatMessage(senderId: widget.user.id, receiverId: widget.friend.id, file: ChatFile(uri: result.files.single.path!, name: result.files.single.name));
+      final chatMessage = ChatMessage(
+          senderId: widget.user.id,
+          receiverId: widget.friend.id,
+          file: ChatFile(
+              uri: result.files.single.path!, name: result.files.single.name));
       _addInitialChat([chatMessage]);
     }
   }
@@ -227,7 +228,10 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     if (result != null) {
-      final chatMessage = ChatMessage(senderId: widget.user.id, receiverId: widget.friend.id, image: ChatImage(uri: result.path, name: result.name));
+      final chatMessage = ChatMessage(
+          senderId: widget.user.id,
+          receiverId: widget.friend.id,
+          image: ChatImage(uri: result.path, name: result.name));
       _addInitialChat([chatMessage]);
     }
   }
@@ -238,7 +242,8 @@ class _ChatPageState extends State<ChatPage> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Open Link?'),
-          content: Text('Do you want to open this link in your browser?\n${message.previewData!.link!}'),
+          content: Text(
+              'Do you want to open this link in your browser?\n${message.previewData!.link!}'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -266,8 +271,7 @@ class _ChatPageState extends State<ChatPage> {
           }
         }
       });
-    }
-    else if (message is types.FileMessage) {
+    } else if (message is types.FileMessage) {
       var localPath = message.uri;
 
       if (message.uri.startsWith('http')) {
@@ -312,9 +316,9 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _handlePreviewDataFetched(
-      types.TextMessage message,
-      types.PreviewData previewData,
-      ) {
+    types.TextMessage message,
+    types.PreviewData previewData,
+  ) {
     final index = _messages.indexWhere((element) => element.id == message.id);
     final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
       previewData: previewData,
@@ -330,13 +334,17 @@ class _ChatPageState extends State<ChatPage> {
       final index = _messages.indexOf(_editingMessage!);
       if (index >= 0) {
         setState(() {
-          _messages[index] = _editingMessage!.copyWith(text: _editingController.text) as types.Message;
+          _messages[index] = _editingMessage!
+              .copyWith(text: _editingController.text) as types.Message;
           _editingMessage = null;
           _editingController.clear();
         });
       }
     } else {
-      final chatMessage = ChatMessage(senderId: widget.user.id, receiverId: widget.friend.id, text: message.text);
+      final chatMessage = ChatMessage(
+          senderId: widget.user.id,
+          receiverId: widget.friend.id,
+          text: message.text);
       _addInitialChat([chatMessage]);
     }
   }
@@ -346,7 +354,8 @@ class _ChatPageState extends State<ChatPage> {
       final index = _messages.indexOf(_editingMessage!);
       if (index >= 0) {
         setState(() {
-          _messages[index] = _editingMessage!.copyWith(text: _editingController.text) as types.Message;
+          _messages[index] = _editingMessage!
+              .copyWith(text: _editingController.text) as types.Message;
           _editingMessage = null;
           _editingController.clear();
         });
@@ -379,8 +388,12 @@ class _ChatPageState extends State<ChatPage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: widget.friend.imageUrl != null ? AssetImage(widget.friend.imageUrl!) : null, // Use AssetImage if imageUrl is available
-              child: widget.friend.imageUrl == null ? Text(widget.friend.firstName![0].toUpperCase()) : null, // Display first letter if no image
+              backgroundImage: widget.friend.imageUrl != null
+                  ? AssetImage(widget.friend.imageUrl!)
+                  : null, // Use AssetImage if imageUrl is available
+              child: widget.friend.imageUrl == null
+                  ? Text(widget.friend.firstName![0].toUpperCase())
+                  : null, // Display first letter if no image
             ),
             const SizedBox(width: 8),
             Text(widget.friend.firstName ?? 'Unknown'),
@@ -392,7 +405,8 @@ class _ChatPageState extends State<ChatPage> {
         onAttachmentPressed: _handleAttachmentPressed,
         onMessageTap: _handleMessageTap,
         onPreviewDataFetched: _handlePreviewDataFetched,
-        onSendPressed: (types.PartialText partialText) => _handleSendPressed(partialText),
+        onSendPressed: (types.PartialText partialText) =>
+            _handleSendPressed(partialText),
         showUserAvatars: true,
         showUserNames: true,
         user: widget.user,
@@ -410,41 +424,41 @@ class _ChatPageState extends State<ChatPage> {
         },
         customBottomWidget: _editingMessage != null
             ? Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _editingController,
-                  decoration: const InputDecoration(
-                    hintText: 'Edit your message...',
-                  ),
-                  onChanged: (text) {
-                  },
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _editingController,
+                        decoration: const InputDecoration(
+                          hintText: 'Edit your message...',
+                        ),
+                        onChanged: (text) {},
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _handleEditSendPressed,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.cancel),
+                      onPressed: () {
+                        setState(() {
+                          _editingMessage = null;
+                          _editingController.clear();
+                        });
+                      },
+                    ),
+                  ],
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: _handleEditSendPressed,
-              ),
-              IconButton(
-                icon: const Icon(Icons.cancel),
-                onPressed: () {
-                  setState(() {
-                    _editingMessage = null;
-                    _editingController.clear();
-                  });
-                },
-              ),
-            ],
-          ),
-        )
+              )
             : null,
       ),
     );
   }
 
-  Widget _buildTextMessage(types.TextMessage message, int messageWidth, bool showName) {
+  Widget _buildTextMessage(
+      types.TextMessage message, int messageWidth, bool showName) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -467,51 +481,51 @@ class _ChatPageState extends State<ChatPage> {
     return Stack(
       alignment: Alignment.topRight,
       children: [
-       Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    Flexible(
-      child: ImageMessage(
-        message: message,
-        imageHeaders: const {},
-        messageWidth: messageWidth,
-      ),
-    ),
-    if (message.author.id == widget.user.id)
-      _buildOptionsButton(context, message),
-  ],
-),
-if (message.author.id != widget.user.id)
-  Positioned(
-    top: 0,
-    right: 0,
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: InkWell(
-        onTap: () {
-          print('Close button tapped for image: ${message.name}');
-          int index = _messages.indexWhere((m) => m.id == message.id);
-          if (index != -1) {
-            setState(() {
-              _messages.removeAt(index);
-            });
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.7),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.close,
-            size: 16,
-            color: Colors.white,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: ImageMessage(
+                message: message,
+                imageHeaders: const {},
+                messageWidth: messageWidth,
+              ),
+            ),
+            if (message.author.id == widget.user.id)
+              _buildOptionsButton(context, message),
+          ],
         ),
-      ),
-    ),
-  ),
+        if (message.author.id != widget.user.id)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                onTap: () {
+                  print('Close button tapped for image: ${message.name}');
+                  int index = _messages.indexWhere((m) => m.id == message.id);
+                  if (index != -1) {
+                    setState(() {
+                      _messages.removeAt(index);
+                    });
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.7),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -555,7 +569,8 @@ if (message.author.id != widget.user.id)
               ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Message', style: TextStyle(color: Colors.red)),
+              title: const Text('Delete Message',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _deleteMessage(message);
