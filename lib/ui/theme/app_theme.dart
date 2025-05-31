@@ -76,14 +76,20 @@ class AppTheme {
         cardColor: appColors.accent2,
         splashColor: appColors.greyColor,
         appBarTheme: AppBarTheme(
-          backgroundColor: appColors.blackColor,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
         iconTheme: IconThemeData(
           color: appColors.greyColor,
         ),
         hintColor: appColors.greyColor,
         colorScheme: ColorScheme.light(
-            error: appColors.redColor, primary: appColors.whiteColor),
+            primary:
+                appColors.darkGreenColor,
+            surface:
+                appColors.whiteColor10,
+            error: appColors.redColor,
+            secondary: appColors.yellowColor2.withOpacity(0.1)),
         textTheme: _buildTextTheme(context, isDark: false),
         inputDecorationTheme:
             _buildLightInputDecorationTheme(context, appColors),

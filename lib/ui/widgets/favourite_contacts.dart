@@ -51,7 +51,8 @@ class FavoriteContacts extends StatelessWidget {
                       builder: (_) => ChatPage(
                         user: currentUser,
                         friend: favoriteUser,
-                        initialMessages: favoriteChat.messages,
+                        roomId: "",
+                        // initialMessages: favoriteChat.messages,
                       ),
                     ),
                   ),

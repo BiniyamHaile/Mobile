@@ -1,24 +1,19 @@
 import 'package:mobile/common/constants.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/services/utls/header_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 class SocketService {
   final ApiEndpoints apiEndpoints = ApiEndpoints();
-  final SharedPreferences prefs;
+  // final SharedPreferences prefs;
 
   late io.Socket _socket;
   String? _accessToken;
   bool _isInitialized = false;
 
-  factory SocketService({
-    required SharedPreferences prefs,
-  }) =>
-      SocketService._internal(prefs: prefs);
+  factory SocketService() =>
+      SocketService._internal();
 
-  SocketService._internal({
-    required this.prefs,
-  });
+  SocketService._internal();
 
   
   Future<void> initialize() async {
@@ -68,7 +63,7 @@ class SocketService {
   }
 
   String? _getAccessToken() {
-    return prefs.getString(Constants.accessToken);
+    // return prefs.getString(Constants.accessToken);
   }
 
   

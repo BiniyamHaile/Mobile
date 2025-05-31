@@ -1,9 +1,11 @@
 class ApiEndpoints {
-  static const String baseUrl = "https://dev-api.aladia.io/v2";
+  static const String ip = "http://192.168.191.97";
+  static const String baseUrl = "$ip:3000";
   static const String _authUrl = '$baseUrl/auth';
   static const String _notificationUrl = '$baseUrl/notifications';
+  static const String _chatUrl = '$baseUrl/chat';
 
-  String get socketServerUrl => "https://dev-api.aladia.io";
+  String get socketServerUrl => "$ip:4000";
   String get notifications => _notificationUrl;
   String get userExistence => "$_authUrl/user-existence";
   String get loginWithEmail => "$_authUrl/login";
@@ -17,5 +19,13 @@ class ApiEndpoints {
   String get verifyOtp => "$_authUrl/verify-user";
   String get signup => "$_authUrl/register";
   String get logout => "$_authUrl/logout";
+
+  String get recentChats => "$_chatUrl/recent-chats";
+
+  // accept path parameter, in /messages/:roomId
+
+  String retrieveMessages(String roomId) =>
+      "$_chatUrl/messages/$roomId";
+  String get sendMessage => "$_chatUrl/send";
 
 }
