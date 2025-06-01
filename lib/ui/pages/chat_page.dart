@@ -40,9 +40,9 @@ class _HomeScreenState extends State<ChatPage> {
               ),
               child: Column(
                 children: <Widget>[
-                  FavoriteContacts(
-                    favoriteChats: favoriteChats,
-                  ),
+                  // FavoriteContacts(
+                  //   favoriteChats: favoriteChats,
+                  // ),
                   BlocBuilder<RecentChatBloc, RecentChatState>(
                     builder: (context, state) {
                       if (state is RecentChatLoading) {

@@ -204,8 +204,8 @@ String formatChatTimestamp(String isoDate) {
                                               BorderRadius.circular(30.0),
                                         ),
                                         alignment: Alignment.center,
-                                        child: const Text(
-                                          'NEW',
+                                        child: Text(
+                                          '${recentChat.unreadCount} NEW',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 12.0,

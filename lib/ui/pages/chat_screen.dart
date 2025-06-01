@@ -14,7 +14,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mime/mime.dart';
 import 'package:mobile/bloc/chat/retrieve_messages/retrieve_messages_bloc.dart';
 import 'package:mobile/bloc/chat/send_message/send_message_bloc.dart';
+import 'package:mobile/core/injections/get_it.dart';
 import 'package:mobile/models/chat/chat_messages.dart';
+import 'package:mobile/services/socket/socket-service.dart';
 import 'package:mobile/services/socket/websocket-service.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -41,41 +43,42 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<types.Message> _messages = [];
+  // List<types.Message> _messages = [];
 
   types.TextMessage? _editingMessage;
   final TextEditingController _editingController = TextEditingController();
+  late StreamSubscription<dynamic> _messageSub;
+late StreamSubscription<void> _typingSub;
+late StreamSubscription<void> _stopTypingSub;
+
 // define a boolean to track typing status
   bool isTyping = false;
   @override
-  void initState() {
-    super.initState();
-    context
-        .read<RetrieveMessagesBloc>()
-        .add(RetrieveMessages(roomId: widget.roomId));
+void initState() {
+  super.initState();
 
-    final socketService = WebSocketService();
-    socketService.connect(widget.user.id);
-    socketService.joinRoom(widget.roomId);
+final socket = getIt<WebSocketService>();
 
-    socketService.onNewMessage((data) {
-      print("New message received: $data");
-      final message = ChatMessage.fromJson(data);
-      context
-          .read<RetrieveMessagesBloc>()
-          .add(AddMessageToQueue(message: message));
-    });
+socket.joinRoom(widget.roomId);
 
-    socketService.onTyping((_) {
-      setState(() => isTyping = true);
-    });
+_messageSub = socket.newMessageStream.listen((data) {
+  final message = ChatMessage.fromJson(data);
+  context.read<RetrieveMessagesBloc>().add(AddMessageToQueue(message: message));
+});
 
-    socketService.onStopTyping((_) {
-      setState(() => isTyping = false);
-    });
+_typingSub = socket.typingStream.listen((_) {
+  setState(() => isTyping = true);
+});
 
-    // _loadMessages();
-  }
+_stopTypingSub = socket.stopTypingStream.listen((_) {
+  setState(() => isTyping = false);
+});
+
+
+  context.read<RetrieveMessagesBloc>().add(
+        RetrieveMessages(roomId: widget.roomId),
+      );
+}
 
   @override
   void dispose() {
@@ -100,39 +103,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildVideoMessage(types.VideoMessage message, int messageWidth) {
     return _VideoPlayerWidget(
         videoUrl: message.uri, width: messageWidth.toDouble());
-  }
-
-  void _editMessage(types.TextMessage message) {
-    setState(() {
-      _editingMessage = message;
-      _editingController.text = message.text;
-    });
-  }
-
-  void _deleteMessage(types.Message message) {
-    setState(() {
-      _messages.remove(message);
-    });
-  }
-
-  Future<Uint8List?> _loadImage(String imagePath) async {
-    try {
-      if (imagePath.startsWith('assets/')) {
-        final ByteData imageData = await rootBundle.load(imagePath);
-        return imageData.buffer.asUint8List();
-      } else {
-        final File imageFile = File(imagePath);
-        if (await imageFile.exists()) {
-          return Uint8List.fromList(await imageFile.readAsBytes());
-        } else {
-          print("File not found: $imagePath");
-          return null;
-        }
-      }
-    } catch (e) {
-      print("Error loading image: $e");
-      return null;
-    }
   }
 
   void _handleAttachmentPressed() {
@@ -236,98 +206,98 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _handleMessageTap(BuildContext context, types.Message message) async {
-    if (message is types.TextMessage && message.previewData?.link != null) {
-      showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Open Link?'),
-          content: Text(
-              'Do you want to open this link in your browser?\n${message.previewData!.link!}'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Yes'),
-            ),
-          ],
-        ),
-      ).then((value) async {
-        if (value == true) {
-          final Uri url = Uri.parse(message.previewData!.link!);
-          try {
-            if (await canLaunchUrl(url)) {
-              await launchUrl(url);
-            } else {
-              throw 'Could not launch $url';
-            }
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Could not launch URL: $e')),
-            );
-          }
-        }
-      });
-    } else if (message is types.FileMessage) {
-      var localPath = message.uri;
+  // void _handleMessageTap(BuildContext context, types.Message message) async {
+  //   if (message is types.TextMessage && message.previewData?.link != null) {
+  //     showDialog<bool>(
+  //       context: context,
+  //       builder: (BuildContext context) => AlertDialog(
+  //         title: const Text('Open Link?'),
+  //         content: Text(
+  //             'Do you want to open this link in your browser?\n${message.previewData!.link!}'),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(false),
+  //             child: const Text('No'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(true),
+  //             child: const Text('Yes'),
+  //           ),
+  //         ],
+  //       ),
+  //     ).then((value) async {
+  //       if (value == true) {
+  //         final Uri url = Uri.parse(message.previewData!.link!);
+  //         try {
+  //           if (await canLaunchUrl(url)) {
+  //             await launchUrl(url);
+  //           } else {
+  //             throw 'Could not launch $url';
+  //           }
+  //         } catch (e) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(content: Text('Could not launch URL: $e')),
+  //           );
+  //         }
+  //       }
+  //     });
+  //   } else if (message is types.FileMessage) {
+  //     var localPath = message.uri;
 
-      if (message.uri.startsWith('http')) {
-        try {
-          final index =
-              _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-              (_messages[index] as types.FileMessage).copyWith(
-            isLoading: true,
-          );
+  //     if (message.uri.startsWith('http')) {
+  //       try {
+  //         final index =
+  //             _messages.indexWhere((element) => element.id == message.id);
+  //         final updatedMessage =
+  //             (_messages[index] as types.FileMessage).copyWith(
+  //           isLoading: true,
+  //         );
 
-          setState(() {
-            _messages[index] = updatedMessage;
-          });
+  //         setState(() {
+  //           _messages[index] = updatedMessage;
+  //         });
 
-          final client = http.Client();
-          final request = await client.get(Uri.parse(message.uri));
-          final bytes = request.bodyBytes;
-          final documentsDir = (await getApplicationDocumentsDirectory()).path;
-          localPath = '$documentsDir/${message.name}';
+  //         final client = http.Client();
+  //         final request = await client.get(Uri.parse(message.uri));
+  //         final bytes = request.bodyBytes;
+  //         final documentsDir = (await getApplicationDocumentsDirectory()).path;
+  //         localPath = '$documentsDir/${message.name}';
 
-          if (!File(localPath).existsSync()) {
-            final file = File(localPath);
-            await file.writeAsBytes(bytes);
-          }
-        } finally {
-          final index =
-              _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-              (_messages[index] as types.FileMessage).copyWith(
-            isLoading: null,
-          );
+  //         if (!File(localPath).existsSync()) {
+  //           final file = File(localPath);
+  //           await file.writeAsBytes(bytes);
+  //         }
+  //       } finally {
+  //         final index =
+  //             _messages.indexWhere((element) => element.id == message.id);
+  //         final updatedMessage =
+  //             (_messages[index] as types.FileMessage).copyWith(
+  //           isLoading: null,
+  //         );
 
-          setState(() {
-            _messages[index] = updatedMessage;
-          });
-        }
-      }
+  //         setState(() {
+  //           _messages[index] = updatedMessage;
+  //         });
+  //       }
+  //     }
 
-      await OpenFilex.open(localPath);
-    }
-  }
+  //     await OpenFilex.open(localPath);
+  //   }
+  // }
 
-  void _handlePreviewDataFetched(
-    types.TextMessage message,
-    types.PreviewData previewData,
-  ) {
-    final index = _messages.indexWhere((element) => element.id == message.id);
-    final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
-      previewData: previewData,
-    );
+  // void _handlePreviewDataFetched(
+  //   types.TextMessage message,
+  //   types.PreviewData previewData,
+  // ) {
+  //   final index = _messages.indexWhere((element) => element.id == message.id);
+  //   final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
+  //     previewData: previewData,
+  //   );
 
-    setState(() {
-      _messages[index] = updatedMessage;
-    });
-  }
+  //   setState(() {
+  //     _messages[index] = updatedMessage;
+  //   });
+  // }
 
   void _handleSendPressed(types.PartialText partialText) {
     final content = partialText.text.trim();
@@ -346,31 +316,20 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _handleEditSendPressed() {
-    if (_editingMessage != null) {
-      final index = _messages.indexOf(_editingMessage!);
-      if (index >= 0) {
-        setState(() {
-          _messages[index] = _editingMessage!
-              .copyWith(text: _editingController.text) as types.Message;
-          _editingMessage = null;
-          _editingController.clear();
-        });
-      }
-    }
-  }
+  // void _handleEditSendPressed() {
+  //   if (_editingMessage != null) {
+  //     final index = _messages.indexOf(_editingMessage!);
+  //     if (index >= 0) {
+  //       setState(() {
+  //         _messages[index] = _editingMessage!
+  //             .copyWith(text: _editingController.text) as types.Message;
+  //         _editingMessage = null;
+  //         _editingController.clear();
+  //       });
+  //     }
+  //   }
+  // }
 
-  void _loadMessages() async {
-    //Load initial message from asset if needed
-    // final response = await rootBundle.loadString('assets/messages.json');
-    // final messages = (jsonDecode(response) as List)
-    //     .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
-    //     .toList();
-    //
-    // setState(() {
-    //   _messages = messages;
-    // });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -403,7 +362,7 @@ class _ChatPageState extends State<ChatPage> {
           if (state is SendMessageSuccess) {
             // Add the sent message to the chat
             print("message sent: ${state.message}");
-            _addMessage(state.message);
+            // _addMessage(state.message);
           } else if (state is SendMessageFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Failed to send message: ${state.error}')),
@@ -433,12 +392,12 @@ class _ChatPageState extends State<ChatPage> {
               return Chat(
                 messages: chatMessages,
                 onAttachmentPressed: _handleAttachmentPressed,
-                onMessageTap: _handleMessageTap,
+                // onMessageTap: _handleMessageTap,
                 videoMessageBuilder: (types.VideoMessage message,
                     {required int messageWidth}) {
                   return _buildVideoMessage(message, messageWidth);
                 },
-                onPreviewDataFetched: _handlePreviewDataFetched,
+                // onPreviewDataFetched: _handlePreviewDataFetched,
                 onSendPressed: (types.PartialText partialText) =>
                     _handleSendPressed(partialText),
                 showUserAvatars: true,
@@ -472,7 +431,10 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.send),
-                              onPressed: _handleEditSendPressed,
+                              // onPressed: _handleEditSendPressed,
+                              onPressed: () {
+                                
+                              },
                             ),
                             IconButton(
                               icon: const Icon(Icons.cancel),
@@ -544,12 +506,12 @@ class _ChatPageState extends State<ChatPage> {
               child: InkWell(
                 onTap: () {
                   print('Close button tapped for image: ${message.name}');
-                  int index = _messages.indexWhere((m) => m.id == message.id);
-                  if (index != -1) {
-                    setState(() {
-                      _messages.removeAt(index);
-                    });
-                  }
+                  // int index = _messages.indexWhere((m) => m.id == message.id);
+                  // if (index != -1) {
+                  //   setState(() {
+                      // _messages.removeAt(index);
+                    // });
+                  // }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(2),
@@ -604,7 +566,7 @@ class _ChatPageState extends State<ChatPage> {
                 title: const Text('Edit Message'),
                 onTap: () {
                   Navigator.pop(context);
-                  _editMessage(message);
+                  // _editMessage(message);
                 },
               ),
             ListTile(
@@ -613,7 +575,7 @@ class _ChatPageState extends State<ChatPage> {
                   style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
-                _deleteMessage(message);
+                // _deleteMessage(message);
               },
             ),
           ],

@@ -7,3 +7,10 @@ abstract class RecentChatEvent {}
 class LoadRecentChatsEvent extends RecentChatEvent {
   LoadRecentChatsEvent();
 }
+
+
+class UpdateRecentChatEvent extends RecentChatEvent {
+  final List<RecentChat> updatedChat;
+
+  UpdateRecentChatEvent({required this.updatedChat});
+}

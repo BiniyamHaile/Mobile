@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static const String ip = "http://192.168.191.97";
+  static const String ip = "http://192.168.151.98";
   static const String baseUrl = "$ip:3000";
   static const String _authUrl = '$baseUrl/auth';
   static const String _notificationUrl = '$baseUrl/notifications';
