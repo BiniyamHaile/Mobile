@@ -7,7 +7,7 @@ class BaseRepository {
     dio.interceptors.add(AuthInterceptor());
   }
 
-  final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+  final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl, sendTimeout: const Duration(seconds: 30)));
 
   Future<Response> get(
     String url, {

@@ -1,14 +1,46 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-import 'package:mobile/data/dummy_user.dart';
+import 'package:mobile/models/chat/recent_chat.dart';
 import 'package:mobile/models/message_model.dart';
-import 'package:mobile/models/recent_chat_model.dart';
 import 'package:mobile/ui/pages/chat_screen.dart';
+import 'package:intl/intl.dart';
 
 class RecentChats extends StatelessWidget {
   final List<RecentChat> recentChats;
 
   const RecentChats({Key? key, required this.recentChats}) : super(key: key);
+
+  String formatChatTimestamp(String isoDate) {
+    final date = DateTime.parse(isoDate);
+    final now = DateTime.now();
+
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDay = DateTime(date.year, date.month, date.day);
+
+    final isToday = today == messageDay;
+    final isSameYear = now.year == date.year;
+
+    if (isToday) {
+      return DateFormat('hh:mm a').format(date); // → 10:30 AM
+    }
+
+    final daysDifference = now.difference(messageDay).inDays;
+
+    if (daysDifference < 7 && now.weekday >= date.weekday) {
+      return DateFormat('EEE').format(date); // → Mon, Tue
+    }
+
+    if (now.month == date.month && now.year == date.year) {
+      return DateFormat('MMM d').format(date); // → May 12
+    }
+
+    if (isSameYear) {
+      return DateFormat('MMM d').format(date); // → Feb 5
+    }
+
+    return DateFormat('MM/dd/yyyy').format(date); // → 11/24/2023
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +48,8 @@ class RecentChats extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 20.0, bottom: 10.0),
+          const Padding(
+            padding: EdgeInsets.only(left: 20.0, top: 20.0, bottom: 10.0),
             child: Text(
               'Recent Chats',
               style: TextStyle(
@@ -29,7 +61,7 @@ class RecentChats extends StatelessWidget {
           ),
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30.0),
@@ -37,7 +69,7 @@ class RecentChats extends StatelessWidget {
                 ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
@@ -45,15 +77,34 @@ class RecentChats extends StatelessWidget {
                   itemCount: recentChats.length,
                   itemBuilder: (BuildContext context, int index) {
                     final RecentChat recentChat = recentChats[index];
-                    final types.User otherUser = recentChat.otherUser;
-                    final ChatMessage lastMessage =
-                        recentChat.messages.isNotEmpty
-                            ? recentChat.messages.last
-                            : ChatMessage(
-                                senderId: currentUser.id,
-                                receiverId: greg.id,
-                                text: "No Message",
-                                time: "0:00");
+                    final types.User otherUser = new types.User(
+                      id: recentChat.user.id,
+                      firstName: recentChat.user.firstName,
+                      imageUrl: recentChat.user.profilePic,
+                    );
+
+                    final currentUserId = recentChat.participants
+                        .firstWhere((id) => id != recentChat.user.id);
+
+                    final isLastMessageMine =
+                        recentChat.lastMessageSenderId == currentUserId;
+
+                    final receiverId =
+                        isLastMessageMine ? recentChat.user.id : currentUserId;
+
+                    final ChatMessage lastMessage = ChatMessage(
+                      senderId: recentChat.lastMessageSenderId!,
+                      receiverId: receiverId,
+                      text: recentChat.lastMessageContent,
+                      time: recentChat.lastMessageTime?.toIso8601String(),
+                      unread: recentChat.unreadCount > 0,
+                    );
+
+                    final types.User currentUser = types.User(
+                      id: currentUserId,
+                      firstName: recentChat.currentUser.firstName,
+                      imageUrl: recentChat.currentUser.profilePic,
+                    );
 
                     return GestureDetector(
                       onTap: () => Navigator.push(
@@ -62,20 +113,20 @@ class RecentChats extends StatelessWidget {
                           builder: (_) => ChatPage(
                             user: currentUser,
                             friend: otherUser,
-                            initialMessages: recentChat.messages,
+                            roomId: recentChat.roomId,
                           ),
                         ),
                       ),
                       child: Container(
-                        margin: EdgeInsets.only(
+                        margin: const EdgeInsets.only(
                             top: 5.0, bottom: 5.0, right: 10.0, left: 10.0),
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                         decoration: BoxDecoration(
                           color: lastMessage.unread
-                              ? Color.fromARGB(255, 230, 227, 227)
+                              ? const Color.fromARGB(255, 230, 227, 227)
                               : Colors.white,
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topRight: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                             topLeft: Radius.circular(20.0),
@@ -91,11 +142,15 @@ class RecentChats extends StatelessWidget {
                                 children: <Widget>[
                                   CircleAvatar(
                                     radius: 35.0,
-                                    backgroundImage: AssetImage(otherUser
-                                            .imageUrl ??
-                                        'assets/images/default_profile.png'),
+                                    backgroundImage: otherUser.imageUrl != null
+                                        ? CachedNetworkImageProvider(
+                                                otherUser.imageUrl!)
+                                            as ImageProvider<Object>
+                                        : const AssetImage(
+                                                'assets/images/user.png')
+                                            as ImageProvider<Object>,
                                   ),
-                                  SizedBox(width: 10.0),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     // Wrap the column with text in Expanded
                                     child: Column(
@@ -104,16 +159,16 @@ class RecentChats extends StatelessWidget {
                                       children: <Widget>[
                                         Text(
                                           otherUser.firstName ?? 'Unknown User',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 15.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(height: 5.0),
+                                        const SizedBox(height: 5.0),
                                         Text(
                                           lastMessage.text ?? 'No messages yet',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.blueGrey,
                                             fontSize: 15.0,
                                             fontWeight: FontWeight.w600,
@@ -126,21 +181,21 @@ class RecentChats extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                                 width:
                                     8.0), // Add a small spacing between the two sections
                             Column(
                               children: <Widget>[
                                 Text(
-                                  lastMessage.time ?? '',
-                                  style: TextStyle(
+                                  formatChatTimestamp(lastMessage.time!),
+                                  style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 15.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 5.0),
-                                lastMessage.unread
+                                const SizedBox(height: 5.0),
+                                lastMessage.unread && !isLastMessageMine
                                     ? Container(
                                         width: 40.0,
                                         height: 20.0,
@@ -159,7 +214,13 @@ class RecentChats extends StatelessWidget {
                                           ),
                                         ),
                                       )
-                                    : Container(),
+                                    : recentChat.unreadCount > 0 &&
+                                            isLastMessageMine
+                                        ? Icon(Icons.done)
+                                        : recentChat.unreadCount > 0 &&
+                                                isLastMessageMine
+                                            ? Icon(Icons.done_all)
+                                            : const SizedBox.shrink(),
                               ],
                             ),
                           ],

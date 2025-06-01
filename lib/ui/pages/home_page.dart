@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/ui/pages/pages.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/views/reel/profile/profile_view.dart';
 import 'package:mobile/ui/views/reel/video_feed_view.dart';
+
+
+const String channelId = 'aladia_notifications';
+const String channelName = 'Aladia Alerts';
+const String channelDescription =
+    'Stay informed with the latest updates, news, and alerts from Aladia.';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,6 +33,52 @@ class _HomePageState extends State<HomePage> {
     _pageController.dispose();
     super.dispose();
   }
+@override
+void initState() {
+  super.initState();
+  initNotifications().then((_) {
+    flutterLocalNotificationsPlugin.show(
+      22,
+      'title',
+      'body',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          channelDescription: channelDescription,
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  });
+}
+
+
+final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+Future<void> initNotifications() async {
+  const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true, // You can handle foreground manually if needed
+  );
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    iOS: iosSettings,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+}
+
+
 
   @override
   Widget build(BuildContext context) {
