@@ -75,14 +75,6 @@ dependencies:
   convert: ^3.1.1 # For hex utilities if needed, though flutter_web3 handles much of this
   shimmer: ^2.0.0
   flutter_cache_manager: ^3.3.1
-  intl: ^0.18.1
-
-
-
-
-
-  
-
 
 dev_dependencies:
   flutter_test:
