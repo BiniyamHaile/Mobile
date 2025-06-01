@@ -4,10 +4,10 @@ class NameFailure extends Failure {
   const NameFailure(super.message);
 
   factory NameFailure.empty() {
-    return NameFailure('This field is required.');
+    return const NameFailure('This field is required.');
   }
 
   factory NameFailure.tooShort() {
-    return NameFailure('Name is too short.');
+    return const NameFailure('Name is too short.');
   }
 }

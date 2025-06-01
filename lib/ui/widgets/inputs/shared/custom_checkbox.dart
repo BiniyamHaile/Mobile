@@ -75,7 +75,7 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
             ),
           ),
           SizedBox(width: widget.gap),
-          title ?? SizedBox.shrink(),
+          title ?? const SizedBox.shrink(),
         ],
       ),
     );

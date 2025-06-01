@@ -54,9 +54,14 @@ class UserPostsTabView extends StatelessWidget {
       itemBuilder: (_, index) {
         return AspectRatio(
           aspectRatio: 1,
-          child: Image.network(
-            posts[index].postImage,
-            fit: BoxFit.cover,
+          child: PageView.builder(
+            itemCount: posts[index].files.length,
+            itemBuilder: (context, fileIndex) {
+              return Image.network(
+                posts[index].files[fileIndex],
+                fit: BoxFit.cover,
+              );
+            },
           ),
         );
       },

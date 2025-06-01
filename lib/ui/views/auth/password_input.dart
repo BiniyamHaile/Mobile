@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:mobile/ui/utils/screen_size_utils.dart';
 import 'package:mobile/ui/widgets/inputs/auth/custom_input_field.dart';
