@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
+import 'package:mobile/core/injections/get_it.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
+import 'package:mobile/services/socket/websocket-service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'login_event.dart';
@@ -11,6 +15,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
   }
+
+  
+Future<void> connectSocket()async {
+    final prefs = await SharedPreferences.getInstance();
+   final token =  prefs.getString('token') ?? "";
+  final parts = token.split('.');
+  if (parts.length != 3) throw Exception('Invalid token');
+
+  final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+  final Map<String, dynamic> data = json.decode(payload);
+
+  getIt<WebSocketService>().connect(data['userId']);
+
+}
 
   Future<void> _onLoginSubmitted(
       LoginSubmitted event, Emitter<LoginState> emit) async {
@@ -35,7 +53,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           await prefs.setString('token', token);
           await prefs.setString("userId", response.data['userId']);
         }
-
+        await connectSocket();
         emit(LoginSuccess());
       } else {
         emit(LoginFailure(error: 'Login failed. Please try again.'));

@@ -11,41 +11,39 @@ class RecentChats extends StatelessWidget {
 
   const RecentChats({Key? key, required this.recentChats}) : super(key: key);
 
-String formatChatTimestamp(String isoDate) {
-  final date = DateTime.parse(isoDate);
-  final now = DateTime.now();
+  String formatChatTimestamp(String isoDate) {
+    final date = DateTime.parse(isoDate);
+    final now = DateTime.now();
 
-  final today = DateTime(now.year, now.month, now.day);
-  final messageDay = DateTime(date.year, date.month, date.day);
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDay = DateTime(date.year, date.month, date.day);
 
-  final isToday = today == messageDay;
-  final isSameYear = now.year == date.year;
+    final isToday = today == messageDay;
+    final isSameYear = now.year == date.year;
 
-  if (isToday) {
-    return DateFormat('hh:mm a').format(date); // → 10:30 AM
+    if (isToday) {
+      return DateFormat('hh:mm a').format(date); // → 10:30 AM
+    }
+
+    final daysDifference = now.difference(messageDay).inDays;
+
+    if (daysDifference < 7 && now.weekday >= date.weekday) {
+      return DateFormat('EEE').format(date); // → Mon, Tue
+    }
+
+    if (now.month == date.month && now.year == date.year) {
+      return DateFormat('MMM d').format(date); // → May 12
+    }
+
+    if (isSameYear) {
+      return DateFormat('MMM d').format(date); // → Feb 5
+    }
+
+    return DateFormat('MM/dd/yyyy').format(date); // → 11/24/2023
   }
-
-  final daysDifference = now.difference(messageDay).inDays;
-
-  if (daysDifference < 7 && now.weekday >= date.weekday) {
-    return DateFormat('EEE').format(date); // → Mon, Tue
-  }
-
-  if (now.month == date.month && now.year == date.year) {
-    return DateFormat('MMM d').format(date); // → May 12
-  }
-
-  if (isSameYear) {
-    return DateFormat('MMM d').format(date); // → Feb 5
-  }
-
-  return DateFormat('MM/dd/yyyy').format(date); // → 11/24/2023
-}
-
 
   @override
   Widget build(BuildContext context) {
-  
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,18 +89,16 @@ String formatChatTimestamp(String isoDate) {
                     final isLastMessageMine =
                         recentChat.lastMessageSenderId == currentUserId;
 
-                    final receiverId = isLastMessageMine
-                        ? recentChat.user.id
-                        : currentUserId;
-
+                    final receiverId =
+                        isLastMessageMine ? recentChat.user.id : currentUserId;
 
                     final ChatMessage lastMessage = ChatMessage(
-                        senderId: recentChat.lastMessageSenderId!,
-                        receiverId: receiverId,
-                        text: recentChat.lastMessageContent,
-                        time: recentChat.lastMessageTime?.toIso8601String(),
-                        unread: recentChat.unreadCount > 0,
-                      );
+                      senderId: recentChat.lastMessageSenderId!,
+                      receiverId: receiverId,
+                      text: recentChat.lastMessageContent,
+                      time: recentChat.lastMessageTime?.toIso8601String(),
+                      unread: recentChat.unreadCount > 0,
+                    );
 
                     final types.User currentUser = types.User(
                       id: currentUserId,
@@ -111,7 +107,7 @@ String formatChatTimestamp(String isoDate) {
                     );
 
                     return GestureDetector(
-                      onTap: ()=> Navigator.push(
+                      onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => ChatPage(
@@ -121,7 +117,6 @@ String formatChatTimestamp(String isoDate) {
                           ),
                         ),
                       ),
-
                       child: Container(
                         margin: const EdgeInsets.only(
                             top: 5.0, bottom: 5.0, right: 10.0, left: 10.0),
@@ -141,19 +136,23 @@ String formatChatTimestamp(String isoDate) {
                         child: Row(
                           // Removed mainAxisAlignment to allow flexible width distribution
                           children: <Widget>[
-                            Expanded( // Wrap the left side in Expanded
+                            Expanded(
+                              // Wrap the left side in Expanded
                               child: Row(
                                 children: <Widget>[
                                   CircleAvatar(
                                     radius: 35.0,
-                                    backgroundImage: otherUser.imageUrl != null?  CachedNetworkImageProvider(
-                                      otherUser.imageUrl ?? '',
-                                    ) : AssetImage(
-                                      'assets/images/user.png',
-                                    ),
+                                    backgroundImage: otherUser.imageUrl != null
+                                        ? CachedNetworkImageProvider(
+                                                otherUser.imageUrl!)
+                                            as ImageProvider<Object>
+                                        : const AssetImage(
+                                                'assets/images/user.png')
+                                            as ImageProvider<Object>,
                                   ),
-                                  const SizedBox(width: 10.0),
-                                  Expanded( // Wrap the column with text in Expanded
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    // Wrap the column with text in Expanded
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -182,7 +181,9 @@ String formatChatTimestamp(String isoDate) {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8.0), // Add a small spacing between the two sections
+                            const SizedBox(
+                                width:
+                                    8.0), // Add a small spacing between the two sections
                             Column(
                               children: <Widget>[
                                 Text(
@@ -205,7 +206,7 @@ String formatChatTimestamp(String isoDate) {
                                         ),
                                         alignment: Alignment.center,
                                         child: Text(
-                                          '${recentChat.unreadCount} NEW',
+                                          'NEW',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 12.0,
@@ -213,11 +214,13 @@ String formatChatTimestamp(String isoDate) {
                                           ),
                                         ),
                                       )
-                                    : recentChat.unreadCount > 0 && isLastMessageMine ? Icon(
-                                        Icons.done
-                                    ) :  recentChat.unreadCount > 0 && isLastMessageMine ? Icon(
-                                        Icons.done_all
-                                    ) : const SizedBox.shrink(),
+                                    : recentChat.unreadCount > 0 &&
+                                            isLastMessageMine
+                                        ? Icon(Icons.done)
+                                        : recentChat.unreadCount > 0 &&
+                                                isLastMessageMine
+                                            ? Icon(Icons.done_all)
+                                            : const SizedBox.shrink(),
                               ],
                             ),
                           ],

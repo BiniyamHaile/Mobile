@@ -1,4 +1,6 @@
 // main.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,12 +24,11 @@ import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 void main() async {
-  await dotenv.load(fileName: ".env");
-
 
   WidgetsFlutterBinding.ensureInitialized();
   setupServiceLocator();
@@ -127,8 +128,22 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    getIt<WebSocketService>().connect("68361f8c48f4ac1ea297fe70");
+    // extractUserId();
   }
+
+  
+// Future<void> extractUserId()async {
+//     final prefs = await SharedPreferences.getInstance();
+//    final token =  prefs.getString('token') ?? "";
+//   final parts = token.split('.');
+//   if (parts.length != 3) throw Exception('Invalid token');
+
+//   final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+//   final Map<String, dynamic> data = json.decode(payload);
+
+//   getIt<WebSocketService>().connect(data['userId']);
+
+// }
 
   @override
   Widget build(BuildContext context) {

@@ -555,33 +555,33 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
   }
 
   void _showMessageOptions(BuildContext context, types.Message message) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Wrap(
-          children: <Widget>[
-            if (message is types.TextMessage)
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Edit Message'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // _editMessage(message);
-                },
-              ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Message',
-                  style: TextStyle(color: Colors.red)),
-              onTap: () {
-                Navigator.pop(context);
-                // _deleteMessage(message);
-              },
-            ),
-          ],
-        );
-      },
-    );
+    // showModalBottomSheet(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return Wrap(
+    //       children: <Widget>[
+    //         if (message is types.TextMessage)
+    //           ListTile(
+    //             leading: const Icon(Icons.edit),
+    //             title: const Text('Edit Message'),
+    //             onTap: () {
+    //               Navigator.pop(context);
+    //               // _editMessage(message);
+    //             },
+    //           ),
+    //         ListTile(
+    //           leading: const Icon(Icons.delete, color: Colors.red),
+    //           title: const Text('Delete Message',
+    //               style: TextStyle(color: Colors.red)),
+    //           onTap: () {
+    //             Navigator.pop(context);
+    //             // _deleteMessage(message);
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
   }
 }
 

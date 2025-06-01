@@ -30,7 +30,7 @@ class _NotificationTileState extends State<NotificationTile> {
     _notification = widget.notification;
   }
 
-  void onReadAll(){}
+  void onReadAll() {}
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +52,19 @@ class _NotificationTileState extends State<NotificationTile> {
             children: [
               CircleAvatar(
                 radius: 26.5,
-                backgroundColor: (DateTime.now().millisecond.isEven)
+                backgroundColor: DateTime.now().millisecond.isEven
                     ? ColorScheme.of(context).greenColor2
                     : Colors.transparent,
-                child:  CircleAvatar(
+                child: CircleAvatar(
                   radius: 24.5,
-                  backgroundImage:
-              widget.notification.senders.isNotEmpty &&    widget.notification.senders[0].profilePic != null ?  CachedNetworkImageProvider(widget.notification.senders[0].profilePic!) :
-               const AssetImage(
-                    'assets/images/user.png',
-                  ),
+                  backgroundImage: (widget.notification.senders.isNotEmpty &&
+                          widget.notification.senders[0].profilePic != null)
+                      ? CachedNetworkImageProvider(
+                          widget.notification.senders[0].profilePic!,
+                        ) as ImageProvider<Object>
+                      : const AssetImage(
+                          'assets/images/user.png',
+                        ),
                   backgroundColor: Colors.transparent,
                 ),
               ),
@@ -110,7 +113,6 @@ class _NotificationTileState extends State<NotificationTile> {
               ],
             ),
           ),
-          
           Icon(Icons.more_horiz)
         ],
       ),
