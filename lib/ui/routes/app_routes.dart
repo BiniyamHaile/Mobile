@@ -12,6 +12,7 @@ import 'package:mobile/ui/pages/chat_page.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
+import 'package:mobile/ui/pages/post/report_page.dart';
 import 'package:mobile/ui/pages/profile_page.dart';
 import 'package:mobile/ui/pages/story/user_story_page.dart';
 import 'package:mobile/ui/routes/route_names.dart';

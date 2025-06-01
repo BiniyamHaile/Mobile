@@ -4,9 +4,9 @@ class PhoneNumberFailure extends Failure {
   const PhoneNumberFailure(super.message);
 
   factory PhoneNumberFailure.empty() {
-    return PhoneNumberFailure('This field is required.');
+    return const PhoneNumberFailure('This field is required.');
   }
   factory PhoneNumberFailure.invalid() {
-    return PhoneNumberFailure('Invalid Email.');
+    return const PhoneNumberFailure('Invalid Email.');
   }
 }

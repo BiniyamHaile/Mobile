@@ -50,7 +50,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
     if (controller == widget.nameController && _shouldValidate(controller)) {
       final nameError = context.read<AuthFormBloc>().state.nameError;
 
-      return nameError == null ? null : nameError;
+      return nameError;
     } else if (controller == widget.surnameController &&
         _shouldValidate(controller)) {
       final surnameError = context.read<AuthFormBloc>().state.surnameError;

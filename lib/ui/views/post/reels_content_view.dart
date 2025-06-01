@@ -7,7 +7,7 @@ import 'package:video_player/video_player.dart';
 class ReelsContentView extends StatefulWidget {
   final String? src;
 
-  const ReelsContentView({Key? key, this.src}) : super(key: key);
+  const ReelsContentView({super.key, this.src});
 
   @override
   _ReelsContentViewState createState() => _ReelsContentViewState();
@@ -59,7 +59,7 @@ class _ReelsContentViewState extends State<ReelsContentView> {
                   controller: _chewieController!,
                 ),
               )
-            : Column(
+            : const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(),

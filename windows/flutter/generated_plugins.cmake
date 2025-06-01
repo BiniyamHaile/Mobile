@@ -5,6 +5,10 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   emoji_picker_flutter
   file_selector_windows
+  app_links
+  connectivity_plus
+  file_selector_windows
+  flutter_secure_storage_windows
   share_plus
   url_launcher_windows
 )

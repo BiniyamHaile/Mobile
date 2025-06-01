@@ -41,7 +41,7 @@ class TermsAndPrivacyCheckbox extends StatelessWidget {
                   decorationColor: color,
                 ),
               ),
-              TextSpan(text: ' and '),
+              const TextSpan(text: ' and '),
               TextSpan(
                 text: 'privacy policy',
                 style: appTheme.textTheme.labelSmall?.copyWith(
