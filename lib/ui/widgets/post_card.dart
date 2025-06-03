@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
-import 'package:mobile/ui/pages/home_page.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/widgets/image_gallery.dart';

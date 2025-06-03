@@ -8,6 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
+import 'package:mobile/models/new_user.dart' as new_user;
+import 'package:flutter/gestures.dart';
 
 class CommentTile extends StatefulWidget {
   const CommentTile({
@@ -17,6 +19,7 @@ class CommentTile extends StatefulWidget {
     required this.isReplying,
     required this.showReplyButton,
     required this.onEdit,
+    required this.mentionableUsers,
   });
 
   final Comment comment;
@@ -24,6 +27,7 @@ class CommentTile extends StatefulWidget {
   final bool isReplying;
   final bool showReplyButton;
   final Function(String) onEdit;
+  final List<new_user.User> mentionableUsers;
 
   @override
   State<CommentTile> createState() => _CommentTileState();
@@ -51,7 +55,7 @@ class _CommentTileState extends State<CommentTile> {
         controller.setLooping(true);
         controller.pause();
         _videoControllers[file] = controller;
-        
+
         _chewieControllers[file] = ChewieController(
           videoPlayerController: controller,
           autoPlay: false,
@@ -105,7 +109,8 @@ class _CommentTileState extends State<CommentTile> {
             builder: (context) => Scaffold(
               backgroundColor: Colors.black,
               appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+                backgroundColor:
+                    const Color.fromRGBO(143, 148, 251, 1), // Add this lin
                 iconTheme: const IconThemeData(color: Colors.white),
               ),
               body: Center(
@@ -148,6 +153,95 @@ class _CommentTileState extends State<CommentTile> {
     }
   }
 
+  Widget _buildCommentContentWithMentions(BuildContext context) {
+    final text = _currentComment.content;
+    final mentions = _currentComment.mentions;
+    final spans = <TextSpan>[];
+
+    // Build a map of mentioned user ID to User object for quick lookup
+    final mentionedUsersMap = {
+      for (var user in widget.mentionableUsers)
+        if (mentions.contains(user.id)) user.id: user
+    };
+
+    // Split the text into words and process them
+    final words = text
+        .split(RegExp(r'(\s+)')); // Split by whitespace, keeping the whitespace
+
+    for (int i = 0; i < words.length; i++) {
+      final word = words[i];
+
+      if (word.startsWith('@') && word.length > 1) {
+        final potentialIdentifier = word.substring(1);
+
+        // Try to find a matching user by username or ID from the mentions list
+        new_user.User? mentionedUser;
+        for (var mentionId in mentions) {
+          final user = mentionedUsersMap[mentionId];
+          if (user != null) {
+            // Check if the potential identifier matches the user's username or part of their name
+            if (user.username?.toLowerCase() ==
+                potentialIdentifier.toLowerCase()) {
+              mentionedUser = user;
+              break; // Found by username, prioritize this
+            }
+            // Also check if the potential identifier is the user's ID (less likely to be typed, but possible)
+            if (user.id == potentialIdentifier) {
+              mentionedUser = user;
+              break; // Found by ID
+            }
+            // Add a check for first name and last name if username is not available or doesn't match
+            if (mentionedUser == null) {
+              // Only check names if not already matched by username or ID
+              final fullName =
+                  '${user.firstName} ${user.lastName}'.toLowerCase();
+              if (fullName.contains(potentialIdentifier.toLowerCase())) {
+                mentionedUser = user;
+                // Continue loop to see if a more specific match (like username) exists later
+              }
+            }
+          }
+        }
+
+        if (mentionedUser != null) {
+          // Found a mentioned user, create a clickable TextSpan
+          spans.add(TextSpan(
+            text: word, // Display the original mention text from the content
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue), // Style for mentions
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // Navigate to the user's profile
+                // You would replace '/profile' with your actual profile route and pass the user ID
+                // For example, using GoRouter:
+                // context.push('/profile/${mentionedUser.id}');
+                if (mentionedUser != null) {
+                  print('Navigating to user profile: ${mentionedUser.id}');
+                }
+              },
+          ));
+        } else {
+          // Not a recognized mention or just a standalone '@', treat as regular text
+          spans.add(TextSpan(
+            text: word,
+            style:
+                TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+          ));
+        }
+      } else {
+        // Regular word or whitespace, create a regular TextSpan
+        spans.add(TextSpan(
+          text: word,
+          style:
+              TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+        ));
+      }
+    }
+
+    return RichText(text: TextSpan(children: spans));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -175,7 +269,8 @@ class _CommentTileState extends State<CommentTile> {
               backgroundColor: Colors.grey.shade200,
               backgroundImage:
                   (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
-                      ? CachedNetworkImageProvider('${_currentComment.owner?.profilePic}')
+                      ? CachedNetworkImageProvider(
+                          '${_currentComment.owner?.profilePic}')
                       : null,
               child: (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
                   ? null
@@ -207,13 +302,7 @@ class _CommentTileState extends State<CommentTile> {
                       ),
                       const SizedBox(height: 8),
                       if (_currentComment.content.isNotEmpty)
-                        Text(
-                          _currentComment.content,
-                          style: TextStyle(
-                            color: theme.textTheme.bodyMedium?.color,
-                            fontSize: theme.textTheme.bodyLarge?.fontSize,
-                          ),
-                        ),
+                        _buildCommentContentWithMentions(context),
                       if (_currentComment.files.isNotEmpty)
                         _buildMediaAttachments(),
                       const SizedBox(height: 8),
@@ -332,7 +421,8 @@ class _CommentTileState extends State<CommentTile> {
         SizedBox(
           height: 300,
           child: AspectRatio(
-            aspectRatio: chewieController.videoPlayerController.value.aspectRatio,
+            aspectRatio:
+                chewieController.videoPlayerController.value.aspectRatio,
             child: Chewie(controller: chewieController),
           ),
         ),

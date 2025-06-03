@@ -114,7 +114,6 @@ class PostRepository extends BaseRepository {
     }
   }
 
-
   Future<void> deletePost({required String postId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -137,20 +136,31 @@ class PostRepository extends BaseRepository {
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      print('SharedPreferences: $prefs');
       var token = prefs.getString('token');
-      print('Token>>: $token');
+      final userId = prefs.getString('userId');
+
+      print('Token: $token');
+      print('User ID: $userId');
 
       final response = await dio.post(
         '/social/posts/$postId/toggleReaction',
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'multipart/form-data'
-        }),
+        data: {
+          'userId': userId,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+        ),
       );
 
+      print('Toggle reaction response: ${response.data}');
       return Post.fromJson(response.data);
     } on DioException catch (e) {
+      print('Error toggling reaction: ${e.message}');
+      print('Error response: ${e.response?.data}');
+      print('Error status code: ${e.response?.statusCode}');
       throw Exception('Failed to toggle reaction: ${e.message}');
     }
   }

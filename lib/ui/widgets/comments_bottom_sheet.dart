@@ -2,11 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/models/comment.dart';
+import 'package:mobile/models/new_user.dart';
+import 'package:mobile/models/post.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
-import 'package:mobile/models/models.dart';
 import 'package:mobile/repository/social/comment_repository.dart';
 import 'package:mobile/ui/widgets/comment_tile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mobile/core/network/api_endpoints.dart';
 
 class CommentsBottomSheet extends StatefulWidget {
   const CommentsBottomSheet({super.key, required this.post});
@@ -49,10 +55,166 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   String? _replyingToCommentId;
   String? _replyingToUsername;
   String? _editingCommentId;
+  final List<User> _mentionableUsers = [];
+  final List<String> _mentions = [];
+  final LayerLink _mentionLayerLink = LayerLink();
+  final FocusNode _textFocusNode = FocusNode();
+  OverlayEntry? _mentionOverlay;
+  String _currentMentionQuery = '';
+  bool _isLoadingMentions = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMentionableUsers().then((users) {
+      setState(() {
+        _mentionableUsers.addAll(users);
+      });
+    });
+    _textFocusNode.addListener(_onTextFocusChange);
+    _commentController.addListener(_onTextChanged);
+  }
+
+  Future<List<User>> _loadMentionableUsers() async {
+    var prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token') ?? '';
+
+    try {
+      final response = await Dio().get(
+        '${ApiEndpoints.baseUrl}/auth/following',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => User.fromJson(json)).toList();
+      } else {
+        print('Failed to fetch following users');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching following users: $e');
+      return [];
+    }
+  }
+
+  void _onTextFocusChange() {
+    if (!_textFocusNode.hasFocus && _mentionOverlay != null) {
+      _removeMentionOverlay();
+    }
+  }
+
+  void _onTextChanged() {
+    final text = _commentController.text;
+    final cursorPosition = _commentController.selection.baseOffset;
+
+    // Find the last @ symbol before the cursor position
+    final lastAtIndex = text.lastIndexOf('@', cursorPosition);
+    if (lastAtIndex != -1) {
+      // Check if there's a space after the @ symbol
+      final spaceAfterAtIndex = text.indexOf(' ', lastAtIndex);
+      if (spaceAfterAtIndex == -1 || spaceAfterAtIndex > cursorPosition) {
+        // Get the text between @ and cursor position
+        final mentionQuery = text.substring(lastAtIndex + 1, cursorPosition);
+        _currentMentionQuery = mentionQuery;
+        _showMentionOverlay();
+        return;
+      }
+    }
+
+    // If we get here, either there's no @ symbol or there's a space after it
+    _removeMentionOverlay();
+  }
+
+  void _removeMentionOverlay() {
+    if (_mentionOverlay != null) {
+      _mentionOverlay?.remove();
+      _mentionOverlay = null;
+    }
+  }
+
+  void _showMentionOverlay() {
+    _removeMentionOverlay();
+
+    final filteredUsers = _mentionableUsers.where((user) {
+      final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
+      final username = user.username?.toLowerCase() ?? '';
+      return fullName.contains(_currentMentionQuery.toLowerCase()) ||
+          username.contains(_currentMentionQuery.toLowerCase());
+    }).toList();
+
+    if (filteredUsers.isEmpty) return;
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    final overlay = OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx + 16, // Adjust left position as needed
+        bottom: MediaQuery.of(context).viewInsets.bottom +
+            100, // Position above the keyboard
+        width: renderBox.size.width - 32, // Match width of the text field area
+        child: Material(
+          elevation: 4,
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 200),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              itemCount: filteredUsers.length,
+              itemBuilder: (context, index) {
+                final user = filteredUsers[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: user.profilePic != null
+                        ? CachedNetworkImageProvider(user.profilePic!)
+                        : null,
+                    child: user.profilePic == null
+                        ? const Icon(Icons.person)
+                        : null,
+                  ),
+                  title: Text('${user.firstName} ${user.lastName}'),
+                  subtitle: Text('@${user.username}'),
+                  onTap: () => _insertMention(user),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    _mentionOverlay = overlay;
+    Overlay.of(context).insert(overlay);
+  }
+
+  void _insertMention(User user) {
+    final text = _commentController.text;
+    final mentionStart = text.lastIndexOf('@');
+    final newText = '${text.substring(0, mentionStart)}@${user.username} ';
+    _commentController.text = newText;
+    _commentController.selection = TextSelection.fromPosition(
+      TextPosition(offset: newText.length),
+    );
+
+    if (!_mentions.contains(user.id)) {
+      setState(() => _mentions.add(user.id));
+    }
+
+    _removeMentionOverlay();
+  }
 
   @override
   void dispose() {
     _commentController.dispose();
+    _textFocusNode.dispose();
+    _mentionOverlay?.remove();
     _videoControllers.forEach((_, controller) => controller.dispose());
     super.dispose();
   }
@@ -194,6 +356,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           }
           _setReplyingTo(null, null);
           _editingCommentId = null;
+          _mentions.clear();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -314,6 +477,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   );
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
+                mentionableUsers: _mentionableUsers,
               ),
               if (replies.isNotEmpty) ..._buildReplies(replies, indentLevel: 1),
             ],
@@ -374,6 +538,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 );
                 FocusScope.of(context).requestFocus(FocusNode());
               },
+              mentionableUsers: _mentionableUsers,
             ),
           ),
           if (nestedReplies.isNotEmpty)
@@ -454,6 +619,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       _editingCommentId = null;
                       _selectedMedia.clear();
                       _videoControllers.clear();
+                      _mentions.clear();
                     },
                   ),
                 ],
@@ -471,56 +637,61 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 onPressed: _pickVideo,
               ),
               Expanded(
+                child: CompositedTransformTarget(
+                  link: _mentionLayerLink,
                   child: TextField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  hintText: _editingCommentId != null
-                      ? 'Edit your comment...'
-                      : _replyingToCommentId != null
-                          ? 'Write a reply...'
-                          : 'Write a comment...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300, // Subtle border color
-                      width: 1.5,
+                    controller: _commentController,
+                    focusNode: _textFocusNode,
+                    decoration: InputDecoration(
+                      hintText: _editingCommentId != null
+                          ? 'Edit your comment...'
+                          : _replyingToCommentId != null
+                              ? 'Write a reply...'
+                              : 'Write a comment...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade300,
+                          width: 1.5,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade300,
+                          width: 1.5,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 16,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1.5,
+                    maxLines: 5,
+                    minLines: 1,
+                    style: TextStyle(
+                      color: Colors.grey.shade800,
+                      fontSize: 16,
+                      height: 1.4,
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      color: Colors.black, // Accent color when focused
-                      width: 1.5,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 16,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
+                    cursorColor: Colors.blue.shade600,
+                    textCapitalization: TextCapitalization.sentences,
                   ),
                 ),
-                maxLines: 5,
-                minLines: 1,
-                style: TextStyle(
-                  color: Colors.grey.shade800,
-                  fontSize: 16,
-                  height: 1.4, // Better line spacing
-                ),
-                cursorColor: Colors.blue.shade600,
-                textCapitalization: TextCapitalization.sentences,
-              )),
+              ),
               IconButton(
                 icon: const Icon(Icons.send),
                 onPressed: () => _submitComment(context),
@@ -547,6 +718,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               commentId: _editingCommentId!,
               content: _commentController.text,
               files: _selectedMedia,
+              mentions: _mentions,
             ),
           );
     } else {
@@ -556,6 +728,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               content: _commentController.text,
               parentId: _replyingToCommentId,
               files: _selectedMedia,
+              mentions: _mentions,
             ),
           );
     }
