@@ -101,8 +101,16 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     if (postIndex == -1) return;
 
     final originalPost = currentState.posts.data[postIndex];
-    final tempPost = originalPost.copyWith(
+    final tempPost = Post(
+      id: originalPost.id,
+      content: originalPost.content,
+      files: List.from(originalPost.files),
+      createdAt: originalPost.createdAt,
+      updatedAt: originalPost.updatedAt,
+      authorId: originalPost.authorId,
+      commentIds: List.from(originalPost.commentIds),
       likedBy: List.from(originalPost.likedBy),
+      owner: originalPost.owner,
     );
 
     final isLiked = tempPost.likedBy.contains(currentUserId);
@@ -127,7 +135,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         postId: event.postId,
       );
 
-      updatedPosts[postIndex] = updatedPost;
+      final finalPost = updatedPost.copyWith(owner: originalPost.owner);
+      updatedPosts[postIndex] = finalPost;
       emit(PostLoaded(
         posts: FindResult(
           data: updatedPosts,

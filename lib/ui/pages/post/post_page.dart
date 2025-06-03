@@ -134,20 +134,35 @@ class _PostingScreenState extends State<PostingScreen> {
 
   void _onTextChanged() {
     final text = _textController.text;
-    final mentionMatch = RegExp(r'@(\w*)$').firstMatch(text);
-    if (mentionMatch != null) {
-      _currentMentionQuery = mentionMatch.group(1) ?? '';
-      _showMentionOverlay();
-    } else if (_mentionOverlay != null) {
+    final cursorPosition = _textController.selection.baseOffset;
+
+    // Find the last @ symbol before the cursor position
+    final lastAtIndex = text.lastIndexOf('@', cursorPosition);
+    if (lastAtIndex != -1) {
+      // Check if there's a space after the @ symbol
+      final spaceAfterAtIndex = text.indexOf(' ', lastAtIndex);
+      if (spaceAfterAtIndex == -1 || spaceAfterAtIndex > cursorPosition) {
+        // Get the text between @ and cursor position
+        final mentionQuery = text.substring(lastAtIndex + 1, cursorPosition);
+        _currentMentionQuery = mentionQuery;
+        _showMentionOverlay();
+        return;
+      }
+    }
+
+    // If we get here, either there's no @ symbol or there's a space after it
+    _removeMentionOverlay();
+  }
+
+  void _removeMentionOverlay() {
+    if (_mentionOverlay != null) {
       _mentionOverlay?.remove();
       _mentionOverlay = null;
     }
   }
 
   void _showMentionOverlay() {
-    if (_mentionOverlay != null) {
-      _mentionOverlay?.remove();
-    }
+    _removeMentionOverlay();
 
     final filteredUsers = _mentionableUsers.where((user) {
       final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
@@ -158,7 +173,7 @@ class _PostingScreenState extends State<PostingScreen> {
 
     if (filteredUsers.isEmpty) return;
 
-    _mentionOverlay = OverlayEntry(
+    final overlay = OverlayEntry(
       builder: (context) => Positioned(
         width: 200,
         child: CompositedTransformFollower(
@@ -200,7 +215,8 @@ class _PostingScreenState extends State<PostingScreen> {
       ),
     );
 
-    Overlay.of(context).insert(_mentionOverlay!);
+    _mentionOverlay = overlay;
+    Overlay.of(context).insert(overlay);
   }
 
   void _insertMention(User user) {
@@ -216,8 +232,7 @@ class _PostingScreenState extends State<PostingScreen> {
       setState(() => _mentions.add(user.id));
     }
 
-    _mentionOverlay?.remove();
-    _mentionOverlay = null;
+    _removeMentionOverlay();
   }
 
   Future<void> _pickImage() async {
@@ -548,10 +563,10 @@ class _PostingScreenState extends State<PostingScreen> {
                   duration: Duration(seconds: 2),
                 ),
               );
-                Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
-                );
+              );
             } else if (state is PostUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -583,7 +598,8 @@ class _PostingScreenState extends State<PostingScreen> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+          backgroundColor:
+              const Color.fromRGBO(143, 148, 251, 1), // Add this lin
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
@@ -624,7 +640,9 @@ class _PostingScreenState extends State<PostingScreen> {
                         const SizedBox(width: 10),
                         Text(currentUserFullname,
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16,)),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            )),
                       ],
                     ),
                     const SizedBox(height: 16),
