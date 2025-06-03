@@ -1,21 +1,16 @@
-
 part of 'post_bloc.dart';
-
-
 
 abstract class PostState {
   const PostState();
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) || 
-        other.runtimeType == runtimeType;
+    return identical(this, other) || other.runtimeType == runtimeType;
   }
 
   @override
   int get hashCode => 0;
 }
-
 
 // Add these to your existing post_state.dart
 class PostCreationInProgress extends PostState {}
@@ -24,7 +19,7 @@ class PostCreationLoading extends PostState {}
 
 class PostCreationSuccess extends PostState {
   final Post createdPost;
-  
+
   const PostCreationSuccess(this.createdPost);
 
   @override
@@ -33,7 +28,7 @@ class PostCreationSuccess extends PostState {
 
 class PostCreationFailure extends PostState {
   final String error;
-  
+
   const PostCreationFailure(this.error);
 
   @override
@@ -46,17 +41,33 @@ class PostLoading extends PostState {}
 
 class PostLoaded extends PostState {
   final FindResult<Post> posts;
+  final bool hasMore;
+  final bool hasPrevious;
+  final int currentPage;
 
-  const PostLoaded({required this.posts});
+  const PostLoaded({
+    required this.posts,
+    required this.hasMore,
+    required this.hasPrevious,
+    required this.currentPage,
+  });
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is PostLoaded && other.posts == posts;
+    return other is PostLoaded &&
+        other.posts == posts &&
+        other.hasMore == hasMore &&
+        other.hasPrevious == hasPrevious &&
+        other.currentPage == currentPage;
   }
 
   @override
-  int get hashCode => posts.hashCode;
+  int get hashCode =>
+      posts.hashCode ^
+      hasMore.hashCode ^
+      hasPrevious.hashCode ^
+      currentPage.hashCode;
 }
 
 class PostError extends PostState {
@@ -73,7 +84,6 @@ class PostError extends PostState {
   @override
   int get hashCode => message.hashCode;
 }
-
 
 class PostUpdateInProgress extends PostState {}
 
@@ -97,7 +107,6 @@ class PostUpdateFailure extends PostState {
   List<Object?> get props => [error];
 }
 
-
 class PostDeleteLoading extends PostState {}
 
 class PostDeleteSuccess extends PostState {
@@ -117,7 +126,6 @@ class PostDeleteFailure extends PostState {
   @override
   List<Object?> get props => [error];
 }
-
 
 class PostReactionLoading extends PostState {
   final String postId;
@@ -149,4 +157,3 @@ class PostReactionFailure extends PostState {
   @override
   List<Object?> get props => [postId, error];
 }
-

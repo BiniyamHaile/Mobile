@@ -8,12 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PostRepository extends BaseRepository {
   Future<FindResult<Post>> fetchPosts({
     int? limit,
-    int? offset,
-    String? next,
-    String? previous,
+    int? page,
   }) async {
-    print(
-        'Fetching posts with limit: $limit, offset: $offset, next: $next, previous: $previous');
+    print('Fetching posts with limit: $limit, page: $page');
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -24,9 +21,7 @@ class PostRepository extends BaseRepository {
         '/social/posts',
         queryParameters: {
           if (limit != null) 'limit': limit,
-          if (offset != null) 'offset': offset,
-          if (next != null) 'next': next,
-          if (previous != null) 'previous': previous,
+          if (page != null) 'page': page,
         },
         options: Options(headers: {
           'Authorization': 'Bearer $token',

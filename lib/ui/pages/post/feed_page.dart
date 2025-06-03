@@ -18,27 +18,43 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+  bool _isLoadingPrevious = false;
+  late final PostBloc _postBloc;
+  static const double _scrollThreshold = 100.0;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _postBloc = PostBloc(postRepository: PostRepository())
+      ..add(const FetchPosts(limit: 10));
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _postBloc.close();
     super.dispose();
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
-        !_isLoadingMore) {
-      final state = context.read<PostBloc>().state;
-      if (state is PostLoaded && state.posts.next != null) {
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final delta = MediaQuery.of(context).size.height * 0.2;
+
+    if (maxScroll - currentScroll <= delta && !_isLoadingMore) {
+      final state = _postBloc.state;
+      if (state is PostLoaded && state.hasMore) {
         setState(() => _isLoadingMore = true);
-        context.read<PostBloc>().add(FetchPosts(next: state.posts.next));
+        _postBloc.add(LoadMorePosts());
+      }
+    } else if (currentScroll <= _scrollThreshold && !_isLoadingPrevious) {
+      final state = _postBloc.state;
+      if (state is PostLoaded && state.hasPrevious) {
+        setState(() => _isLoadingPrevious = true);
+        _postBloc.add(LoadPreviousPosts());
       }
     }
   }
@@ -47,16 +63,17 @@ class _FeedPageState extends State<FeedPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocProvider(
-      create: (context) => PostBloc(
-        postRepository: PostRepository(),
-      )..add(const FetchPosts()),
+    return BlocProvider.value(
+      value: _postBloc,
       child: Scaffold(
         appBar: _appBar(theme, context),
         body: BlocConsumer<PostBloc, PostState>(
           listener: (context, state) {
             if (state is PostLoaded) {
-              setState(() => _isLoadingMore = false);
+              setState(() {
+                _isLoadingMore = false;
+                _isLoadingPrevious = false;
+              });
             }
           },
           builder: (context, state) {
@@ -72,27 +89,37 @@ class _FeedPageState extends State<FeedPage> {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  context.read<PostBloc>().add(const FetchPosts());
+                  _postBloc.add(const FetchPosts(limit: 10));
                 },
                 child: ListView.builder(
                   controller: _scrollController,
-                  itemCount: state.posts.next != null
-                      ? posts.length + 1
-                      : posts.length,
+                  itemCount: posts.length +
+                      (_isLoadingMore ? 1 : 0) +
+                      (_isLoadingPrevious ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index < posts.length) {
+                    if (index == 0 && _isLoadingPrevious) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    final postIndex = index - (_isLoadingPrevious ? 1 : 0);
+                    if (postIndex < posts.length) {
                       return Column(
                         children: [
                           PostCard(
-                            post: posts[index],
+                            post: posts[postIndex],
                             onDeleted: () {
-                              // Update your state here to remove the deleted post
                               setState(() {
-                                posts.removeWhere((p) => p.id == posts[index].id);
+                                posts.removeWhere(
+                                    (p) => p.id == posts[postIndex].id);
                               });
                             },
                           ),
-                          if (index < posts.length - 1)
+                          if (postIndex < posts.length - 1)
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                             ),
@@ -121,7 +148,7 @@ class _FeedPageState extends State<FeedPage> {
     return AppBar(
       backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
       automaticallyImplyLeading: false,
-      
+
       flexibleSpace: ResponsivePadding(
         child: SafeArea(
           child: Padding(
