@@ -14,6 +14,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   PostBloc({required this.postRepository}) : super(PostInitial()) {
     on<FetchPosts>(_onFetchPosts);
+    on<LoadMorePosts>(_onLoadMorePosts);
+    on<LoadPreviousPosts>(_onLoadPreviousPosts);
     on<CreatePost>(_onCreatePost);
     on<UpdatePost>(_onUpdatePost);
     on<DeletePost>(_onDeletePost);
@@ -25,11 +27,76 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     try {
       final result = await postRepository.fetchPosts(
         limit: event.limit,
-        offset: event.offset,
-        next: event.next,
-        previous: event.previous,
+        page: event.page,
       );
-      emit(PostLoaded(posts: result));
+      emit(PostLoaded(
+        posts: result,
+        hasMore: result.data.length < result.total,
+        hasPrevious: event.page != null && event.page! > 1,
+        currentPage: event.page ?? 1,
+      ));
+    } catch (e) {
+      emit(PostError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadMorePosts(
+      LoadMorePosts event, Emitter<PostState> emit) async {
+    if (state is! PostLoaded) return;
+    final currentState = state as PostLoaded;
+    if (!currentState.hasMore) return;
+
+    try {
+      print('Loading more posts. Current page: ${currentState.currentPage}');
+      final nextPage = currentState.currentPage + 1;
+      final result = await postRepository.fetchPosts(
+        limit: 10,
+        page: nextPage,
+      );
+      print('Fetched ${result.data.length} more posts');
+
+      final updatedPosts = List<Post>.from(currentState.posts.data)
+        ..addAll(result.data);
+      emit(PostLoaded(
+        posts: FindResult(
+          data: updatedPosts,
+          total: result.total,
+        ),
+        hasMore: updatedPosts.length < result.total,
+        hasPrevious: true,
+        currentPage: nextPage,
+      ));
+      print('Updated state with ${updatedPosts.length} total posts');
+    } catch (e) {
+      print('Error loading more posts: $e');
+      emit(PostError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadPreviousPosts(
+      LoadPreviousPosts event, Emitter<PostState> emit) async {
+    if (state is! PostLoaded) return;
+    final currentState = state as PostLoaded;
+    if (!currentState.hasPrevious) return;
+
+    try {
+      final previousPage = currentState.currentPage - 1;
+      final result = await postRepository.fetchPosts(
+        limit: 10,
+        page: previousPage,
+      );
+
+      final updatedPosts = List<Post>.from(result.data)
+        ..addAll(currentState.posts.data);
+      emit(PostLoaded(
+        posts: FindResult(
+          data: updatedPosts,
+          total: result.total,
+        ),
+        hasMore: true,
+        hasPrevious: previousPage > 1,
+        currentPage: previousPage,
+      ));
     } catch (e) {
       emit(PostError(message: e.toString()));
     }
@@ -128,6 +195,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         data: updatedPosts,
         total: currentState.posts.total,
       ),
+      hasMore: currentState.hasMore,
+      hasPrevious: currentState.hasPrevious,
+      currentPage: currentState.currentPage,
     ));
 
     try {
@@ -142,6 +212,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           data: updatedPosts,
           total: currentState.posts.total,
         ),
+        hasMore: currentState.hasMore,
+        hasPrevious: currentState.hasPrevious,
+        currentPage: currentState.currentPage,
       ));
     } catch (e) {
       updatedPosts[postIndex] = originalPost;
@@ -150,6 +223,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           data: updatedPosts,
           total: currentState.posts.total,
         ),
+        hasMore: currentState.hasMore,
+        hasPrevious: currentState.hasPrevious,
+        currentPage: currentState.currentPage,
       ));
 
       emit(PostError(message: 'Failed to update like'));

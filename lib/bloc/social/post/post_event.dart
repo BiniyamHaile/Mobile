@@ -5,14 +5,12 @@ abstract class PostEvent {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) || 
-        other.runtimeType == runtimeType;
+    return identical(this, other) || other.runtimeType == runtimeType;
   }
 
   @override
   int get hashCode => 0;
 }
-
 
 class CreatePost extends PostEvent {
   final String? content;
@@ -24,7 +22,6 @@ class CreatePost extends PostEvent {
   @override
   List<Object?> get props => [content, mediaFiles];
 }
-
 
 class UpdatePost extends PostEvent {
   final String postId;
@@ -42,36 +39,26 @@ class UpdatePost extends PostEvent {
 
 class FetchPosts extends PostEvent {
   final int? limit;
-  final int? offset;
-  final String? next;
-  final String? previous;
+  final int? page;
 
   const FetchPosts({
     this.limit,
-    this.offset,
-    this.next,
-    this.previous,
+    this.page,
   });
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is FetchPosts &&
-        other.limit == limit &&
-        other.offset == offset &&
-        other.next == next &&
-        other.previous == previous;
+    return other is FetchPosts && other.limit == limit && other.page == page;
   }
 
   @override
   int get hashCode {
-    return limit.hashCode ^
-        offset.hashCode ^
-        next.hashCode ^
-        previous.hashCode;
+    return limit.hashCode ^ page.hashCode;
   }
 }
 
+class LoadMorePosts extends PostEvent {}
 
 class DeletePost extends PostEvent {
   final String postId;
@@ -92,3 +79,5 @@ class ToggleReaction extends PostEvent {
   @override
   List<Object?> get props => [postId];
 }
+
+class LoadPreviousPosts extends PostEvent {}
