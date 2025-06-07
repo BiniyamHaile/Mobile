@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  Color redColor = Colors.red;
+  Color greenColor = Colors.green;
+  Color whiteColor = Colors.white;
+  Color whiteColor50 = Colors.white.withOpacity(0.5);
+  Color whiteColor5 = Colors.white.withOpacity(0.05);
+  Color whiteColor3 = Colors.white.withOpacity(0.03);
+  Color whiteColor10 = Colors.white.withOpacity(0.1);
+  Color blackColor = Colors.black;
+  Color accent1 = const Color(0xFF9E9E9E);
+  Color accent2 = const Color.fromARGB(255, 110, 110, 110);
+  Color accent3 = const Color.fromARGB(255, 197, 197, 197);
+  Color accent4 = const Color.fromARGB(255, 233, 233, 233);
+  Color greyColor = const Color(0xFF565656);
+  Color darkGreyColor = const Color.fromARGB(255, 50, 50, 50);
+  Color darkGreyColor2 = const Color(0XFF101010);
+  Color darkGreyColor3 = const Color.fromARGB(255, 25, 25, 25);
+  Color yellowColor = const Color(0xFFEAB308);
+  Color brightYellowColor = const Color.fromARGB(255, 250, 196, 36);
+  Color brightYellow2 = const Color(0xFFE4B53D);
+  Color greyColor50 = const Color(0xFF565656).withOpacity(0.5);
+  Color lightGrey2 = const Color(0XFFBABABA);
+  Color lightGrey3 = const Color.fromARGB(255, 167, 165, 165);
+  Color darkGrey2 = const Color(0XFF4A4A4A);
+  Color greyColor70 = const Color(0XFF707070);
+  Color greyColor2 = const Color(0XFF212121);
+  Color brownYellowTransparent = const Color(0x7E554301);
+  Color goldenYellowColor = const Color(0xFFE0B92C);
+  Color lightGreenColor = const Color(0xFF86EFAC);
+  Color darkGreenColor = const Color(0xFF022C22);
+  Color darkRedColor = const Color(0xFF450A0A);
+  Color brightRedColor = const Color(0xFFEF4444);
+  Color vibrantRedColor = const Color(0xFFF35D4E);
+  Color lightGreyColor = const Color(0xFFEEEEEE);
+  Color mediumGreyColor = const Color(0xFFBDBDBD);
+  Color mediumGreyColor2 = const Color(0xFF989898);
+  Color mediumGreyColor3 = const Color(0xFF565656);
+  Color onlineColor = const Color(0xFF86EFAC);
+  Color lightGreyColor2 = const Color(0xFFE0E0DF);
+  Color lightGreyColor4 = const Color.fromARGB(255, 185, 185, 185);
+  Color lightGreyColor3 = const Color(0xFFDCDBDA);
+  Color darkGreyColor4 = const Color(0xFF404040);
+  Color yellowColor2 = const Color(0xffCFA200);
+  Color greyColor3 = const Color(0xFF333333);
+  Color greyColor4 = const Color(0xFF767675);
+  Color greyColor5 = const Color(0xFF303030);
+  Color greyColor6 = const Color(0xFF565656);
+  Color greyColor7 = const Color(0xFFD9D9D9).withOpacity(0.7);
+  Color greyColor8 = const Color(0xFFB0B0B0);
+  Color yellowColor3 = const Color(0xFFFDCC1E);
+  Color yellowColor4 = const Color(0XFFF0CA41);
+  Color darkGreyColor5 = const Color.fromARGB(255, 14, 14, 14);
+  Color transparentColor = const Color(0x00000000);
+  Color greenColor2 = const Color(0xFF296A35);
+  Color darkGoldenrod = const Color(0xFF9C802D);
+  Color greyColor9 = const Color(0xFF555555);
+  Color almostBlackColor = const Color(0xFF060606);
+  Color greyColor10 = const Color(0xFF505050);
+  Color darkCharcoalColor = const Color(0xFF1C1C1C);
+  Color pureBlackColor = const Color(0xFF131313);
+  Color greyColor11 = const Color(0x05E5E5E5);
+  Color vibrantGreenColor = const Color(0xFF35A823);
+  Color vibrantGreenColor3 = const Color(0xFF35A823).withOpacity(0.3);
+  Color brightRedColor2 = const Color(0xFFED3C28);
+  Color brightRedColor3 = const Color(0xFFED3C28).withOpacity(0.3);
+  Color deepRedColor = const Color(0xFFB91C1C);
+
+  // Password validation colors
+  Color passErrorColor5 = const Color.fromRGBO(229, 78, 78, 1);
+  Color passErrorColor4 = const Color.fromRGBO(218, 81, 82, 1);
+  Color passErrorColor3 = const Color.fromRGBO(220, 124, 86, 1);
+  Color passErrorColor2 = const Color.fromRGBO(225, 195, 97, 1);
+  Color passErrorColor1 = const Color.fromRGBO(227, 228, 105, 1);
+  Color passErrorColor0 = const Color.fromRGBO(73, 160, 47, 1);
+
+  // Event Card background colors
+  Color pinkEventColor = const Color(0xFFFF47BC);
+  Color purpleEventColor = const Color(0XFF9747FF);
+  Color greenEventColor = const Color(0XFF38B04A);
+  Color lightBlueEventColor = const Color(0XFF005867);
+}
