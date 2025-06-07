@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
@@ -31,13 +32,19 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+    print(".env loaded successfully");
+  } catch (e) {
+    print("Error loading .env file: $e");
+    // Handle the error - maybe exit or use default values
+  }
   injectionSetup();
   setupServiceLocator();
   await _initNotifications();
 
   final dio = Dio();
-  final apiEndpoints =
-      ApiEndpoints();
+  final apiEndpoints = ApiEndpoints();
   final walletRepository = WalletRepositoryImpl(
     dio: dio,
     apiEndpoints: apiEndpoints,

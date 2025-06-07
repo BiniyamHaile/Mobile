@@ -43,7 +43,6 @@ class _WalletScreenState extends State<WalletScreen> {
 
   void _connectWallet(BuildContext context) {
     final walletService = Provider.of<WalletService>(context, listen: false);
-    // The service itself handles creating/recreating the modal instance if needed
     walletService.connectWallet(context);
   }
 
@@ -157,13 +156,11 @@ class _WalletScreenState extends State<WalletScreen> {
     final bool isOutgoing =
         tx.from.toLowerCase() == currentAddress.toLowerCase();
 
-    // Calculate the amount
     final double amount = walletService.weiToStarsDouble(
       tx.value,
       tx.tokenDecimal,
     );
 
-    // --- Add Debugging and Safety Check Here ---
     print('--- Debug Transaction Item ---');
     print('Tx Hash: ${tx.hash}');
     print('Tx Value (BigInt): ${tx.value}');
@@ -172,21 +169,16 @@ class _WalletScreenState extends State<WalletScreen> {
     print('Amount Runtime Type: ${amount.runtimeType}');
 
     String formattedAmount;
-    // Check if the calculated amount is actually a number before formatting
     if (amount is num) {
-      // Check if it's any number type (int or double)
       formattedAmount = NumberFormat('#,##0.####').format(amount);
     } else {
-      // If it's not a number, handle the unexpected type
       print(
         "!!! ALERT: amount is NOT a number. It is ${amount.runtimeType} !!!",
       );
-      formattedAmount = 'Invalid Amount'; // Display an error placeholder
-      // You might also want to broadcast an error or handle this malformed item explicitly
+      formattedAmount = 'Invalid Amount';
     }
     print('Formatted Amount: $formattedAmount');
     print('--- End Debug Transaction Item ---');
-    // --- End Debugging ---
 
     final bool isExpanded = _expandedTxHash == tx.hash;
 
@@ -209,12 +201,10 @@ class _WalletScreenState extends State<WalletScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Amount and Symbol (Always visible)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    // Icon and Amount/Direction
                     children: [
                       Icon(
                         isOutgoing ? Icons.north_east : Icons.south_west,
@@ -223,7 +213,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        '${isOutgoing ? '-' : '+'}${formattedAmount} ${tx.tokenSymbol}', // Use the potentially 'Invalid Amount' string
+                        '${isOutgoing ? '-' : '+'}${formattedAmount} ${tx.tokenSymbol}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isOutgoing
@@ -239,9 +229,7 @@ class _WalletScreenState extends State<WalletScreen> {
               Visibility(
                 visible: isExpanded,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                  ), // Add padding if expanded
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -261,7 +249,6 @@ class _WalletScreenState extends State<WalletScreen> {
                         style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                       ),
                       SizedBox(height: 4),
-                      // Check if the transaction hash is valid before creating a link
                       if (tx.hash.isNotEmpty)
                         GestureDetector(
                           onTap: () async {
@@ -281,7 +268,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             }
                           },
                           child: Text(
-                            'Tx Hash: ${tx.hash}', // Show full hash when expanded
+                            'Tx Hash: ${tx.hash}',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.blue,
@@ -306,23 +293,22 @@ class _WalletScreenState extends State<WalletScreen> {
     required VoidCallback? onPressed,
   }) {
     return Expanded(
-      // Use Expanded to distribute space
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(30), // Make it circular
+            borderRadius: BorderRadius.circular(30),
             child: CircleAvatar(
               radius: 30,
               backgroundColor: onPressed != null
                   ? Colors.deepPurple.shade50
-                  : Colors.grey.shade300, // Different color when disabled
+                  : Colors.grey.shade300,
               child: Icon(
                 icon,
                 color: onPressed != null
                     ? Colors.deepPurple
-                    : Colors.grey.shade500, // Different color when disabled
+                    : Colors.grey.shade500,
                 size: 24,
               ),
             ),
@@ -361,10 +347,9 @@ class _WalletScreenState extends State<WalletScreen> {
 
     final bool enableBuyButton = enableTxActions;
 
-    // Calculate and format the user's Stars balance for display using service helpers
     final double currentStarsBalanceDouble = walletService.weiToStarsDouble(
-      walletService.currentStarsBalanceWei, // Access service state
-      walletService.starsTokenDecimals, // Access service state
+      walletService.currentStarsBalanceWei,
+      walletService.starsTokenDecimals,
     );
     String formattedStarsBalance = currentStarsBalanceDouble.toStringAsFixed(4);
     if (formattedStarsBalance.contains('.')) {
@@ -381,7 +366,7 @@ class _WalletScreenState extends State<WalletScreen> {
     }
 
     final double currentNativeBalanceDouble = walletService.weiToNativeDouble(
-      walletService.currentNativeBalanceWei, // Access service state
+      walletService.currentNativeBalanceWei,
     );
     String formattedNativeBalance = currentNativeBalanceDouble.toStringAsFixed(
       4,
@@ -400,20 +385,18 @@ class _WalletScreenState extends State<WalletScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white, // Apply light background
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.indigoAccent, // Match background
-        elevation: 0, // No shadow
-        // AppBar title removed to match image layout
+        backgroundColor: Colors.indigoAccent,
+        elevation: 0,
         leading: isConnected
             ? Builder(
-                // Show drawer icon only when connected
                 builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu), // Standard menu icon for drawer
+                  icon: const Icon(Icons.menu),
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               )
-            : null, // No leading icon when not connected
+            : null,
       ),
       drawer: isConnected
           ? Drawer(
@@ -428,45 +411,36 @@ class _WalletScreenState extends State<WalletScreen> {
                   //       ? walletService.getStarsBalance
                   //       : null,
                   //   enabled:
-                  //       enableTxActions, // Enable only when connected to Sepolia
+                  //       enableTxActions,
                   // ),
                   ListTile(
-                    leading: Icon(Icons.token), // Or a custom STARS icon
+                    leading: Icon(Icons.token),
                     title: Text('Add STARS Token to Wallet'),
                     onTap: enableTxActions
                         ? walletService.addStarsTokenToWallet
                         : null,
-                    enabled:
-                        enableTxActions, // Enable only when connected to Sepolia
+                    enabled: enableTxActions,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 8.0,
-                    ), // Add horizontal padding to center the elevated button look
+                    ),
                     child: Material(
-                      elevation: isConnected
-                          ? 4.0
-                          : 0.0, // Add elevation when enabled, 0 when disabled
-                      // Use a rounded rectangle shape for the button look
+                      elevation: isConnected ? 4.0 : 0.0,
+
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8.0,
-                        ), // Adjust border radius as needed
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      // Set the color to transparent or a subtle color if you want a background
-                      // Setting it to the drawer background color makes it look like a lifted area
-                      color: Theme.of(
-                        context,
-                      ).canvasColor, // Use the standard drawer background color
+
+                      color: Theme.of(context).canvasColor,
                       child: ListTile(
-                        // Remove or adjust contentPadding if horizontal padding is on Material
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
-                        ), // Keep padding inside ListTile content
+                        ),
                         leading: Icon(
                           Icons.logout,
-                          // Make the icon red when enabled, grey when disabled
+
                           color: isConnected
                               ? Colors.red[700]
                               : Colors.grey[500],
@@ -474,35 +448,29 @@ class _WalletScreenState extends State<WalletScreen> {
                         title: Text(
                           'Disconnect',
                           style: TextStyle(
-                            // Make the text red and bold when enabled, grey when disabled
                             color: isConnected
                                 ? Colors.red[700]
                                 : Colors.grey[500],
-                            fontWeight: FontWeight.bold, // Make the text bold
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        // The onTap logic remains the same: call disconnect and close the drawer
+
                         onTap: isConnected
                             ? () {
-                                walletService
-                                    .disconnect(); // Call the service method
-                                Navigator.pop(
-                                  context,
-                                ); // Close the drawer after initiating disconnect
+                                walletService.disconnect();
+                                Navigator.pop(context);
                               }
-                            : null, // onTap is null when not connected, handled by 'enabled'
-                        enabled:
-                            isConnected, // The ListTile is only enabled when connected
+                            : null,
+                        enabled: isConnected,
                       ),
                     ),
                   ),
                 ],
               ),
             )
-          : null, // No drawer when not connected
+          : null,
       body: !isConnected
           ? Center(
-              // Show welcome message and connect button when not connected
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -537,7 +505,6 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Show initialization/connection status if needed
                   if (walletService.status == ReownAppKitModalStatus.error)
                     Text(
                       'Connection failed.',
@@ -547,7 +514,6 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                     ),
                   SizedBox(height: 20),
-                  // Show initialization status if needed
                   if (walletService.status ==
                       ReownAppKitModalStatus.initializing)
                     Text(
@@ -569,7 +535,7 @@ class _WalletScreenState extends State<WalletScreen> {
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
                 vertical: 8.0,
-              ), // Adjust padding
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -577,21 +543,18 @@ class _WalletScreenState extends State<WalletScreen> {
                   SizedBox(height: 8),
 
                   Card(
-                    margin:
-                        EdgeInsets.zero, // No margin if using outside padding
-                    elevation: 1.0, // Subtle elevation
+                    margin: EdgeInsets.zero,
+                    elevation: 1.0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                    ), // Rounded corners
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Row for STARS token balance
                           Row(
                             children: [
-                              // Placeholder icon for STARS (replace with actual asset if available)
                               CircleAvatar(
                                 backgroundColor: Colors.deepPurple.shade100,
                                 radius: 18,
@@ -602,8 +565,6 @@ class _WalletScreenState extends State<WalletScreen> {
                                     color: Colors.deepPurple,
                                   ),
                                 ),
-                                // Or use a custom image asset:
-                                // backgroundImage: AssetImage('assets/stars_icon.png'),
                               ),
                               SizedBox(width: 12),
                               Expanded(
@@ -648,7 +609,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30), // Space before transactions
+                  SizedBox(height: 30), 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -657,7 +618,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         label: 'Buy',
                         onPressed: enableBuyButton ? _showBuyStarsModal : null,
                       ),
-                      SizedBox(width: 8), // Space between buttons
+                      SizedBox(width: 8),
                       _buildActionButton(
                         icon: Icons.card_giftcard,
                         label: 'Gift',
@@ -665,10 +626,10 @@ class _WalletScreenState extends State<WalletScreen> {
                             ? _showStarReactionModal
                             : null,
                       ),
-                      SizedBox(width: 8), // Space between buttons
+                      SizedBox(width: 8), 
                     ],
                   ),
-                  SizedBox(height: 30), // More space after buttons
+                  SizedBox(height: 30), 
                   const Padding(
                     padding: EdgeInsets.only(bottom: 10.0),
                     child: Text(
@@ -677,7 +638,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
-                      textAlign: TextAlign.center, // Center the header
+                      textAlign: TextAlign.center, 
                     ),
                   ),
 
@@ -698,7 +659,6 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   SizedBox(height: 8),
 
-                  // Display status or list
                   if (walletService.transactionListStatus.isNotEmpty)
                     Center(
                       child: Padding(
@@ -729,17 +689,14 @@ class _WalletScreenState extends State<WalletScreen> {
                     )
                   else if (walletService.transactions.isEmpty &&
                       !walletService.isLoadingTransactions)
-                    // Show 'No transactions' only if not loading and list is empty
                     const Center(child: Text('No recent transactions found.'))
                   else if (walletService.transactions.isNotEmpty)
-                    // Use a Column to list transaction items
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: walletService.transactions.map((tx) {
-                        // Ensure connectedAddress is not null before building item
                         final currentAddress = walletService.connectedAddress;
                         if (currentAddress == null)
-                          return SizedBox.shrink(); // Should not happen here if isConnected is true
+                          return SizedBox.shrink(); 
                         return _buildTransactionItem(
                           tx,
                           currentAddress,
@@ -747,7 +704,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         );
                       }).toList(),
                     ),
-                  SizedBox(height: 40), // Final spacing
+                  SizedBox(height: 40),
                 ],
               ),
             ),

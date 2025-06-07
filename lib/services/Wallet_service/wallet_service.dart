@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:mobile/models/token.dart';
 import 'package:mobile/services/api/wallet/wallet_repository.dart';
@@ -11,7 +12,7 @@ import 'package:reown_appkit/modal/services/coinbase_service/i_coinbase_service.
 import 'package:reown_appkit/modal/services/third_party_wallet_service.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 
-const String _etherscanApiKey = 'DUGGC885HI87T28EAFB4WECBS57X1JGQKN';
+final String _etherscanApiKey = dotenv.env['ETHERSCAN_API_KEY'] ?? '';
 
 const double _STARS_PER_NATIVE_TOKEN = 100.0;
 const double _NATIVE_PER_STAR = 1.0 / _STARS_PER_NATIVE_TOKEN;
@@ -42,10 +43,9 @@ class WalletService extends ChangeNotifier {
   String _starsBalanceDisplay = 'Connect to see balance';
 
   final String _sepoliaChainId = 'eip155:11155111';
-  final String _starsTokenAddress =
-      '0x185239e90BBb3810c27671aaCFA7d9b3c26Da22C';
+  final String _starsTokenAddress = dotenv.env['STARS_TOKEN_ADDRESS'] ?? 'DefaultTokenAddress';
   final String _starsPlatformAddress =
-      '0xA14536b87f485F266560b218f6f19D0eCAB070d1';
+      dotenv.env['STARS_PLATFORM_ADDRESS'] ?? 'DefaultPlatformAddress';
   final int _starsTokenDecimals = 18;
   final String _starsTokenSymbol = 'STR';
 
