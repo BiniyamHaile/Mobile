@@ -1,10 +1,6 @@
 // main.dart
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
@@ -20,19 +16,19 @@ import 'package:mobile/bloc/notifications/retrieve-notifications/retrieve_notifi
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_bloc.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
-import 'package:mobile/core/injections/get_it.dart';
+import 'package:mobile/core/dependency_injector/dependency_injector.dart';
+import 'package:mobile/core/injections/get_it.dart' hide getIt;
 import 'package:mobile/repository/social/post_repository.dart';
-import 'package:mobile/services/socket/websocket-service.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  injectionSetup();
   setupServiceLocator();
   await _initNotifications();
 
@@ -80,6 +76,19 @@ void main() async {
             BlocProvider<CommentBloc>(
               create: (context) => getIt<CommentBloc>(),
             ),
+            BlocProvider(create: (_) => RetrieveNotificationsBloc()),
+            BlocProvider(
+                create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent())),
+            BlocProvider(create: (_) => RetrieveMessagesBloc()),
+            BlocProvider(create: (_) => SendMessageBloc()),
+            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
+            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+            BlocProvider<ResetPasswordBloc>(
+                create: (context) => ResetPasswordBloc()),
+            BlocProvider<ForgotPasswordBloc>(
+                create: (context) => ForgotPasswordBloc()),
           ],
           child: App(),
         ),
