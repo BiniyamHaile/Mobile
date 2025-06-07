@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/common/common.dart';
-import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/pages.dart';
-import 'package:mobile/ui/pages/post/reels_page.dart';
+import 'package:mobile/ui/pages/post/feed_page.dart';
+import 'package:mobile/ui/views/reel/profile/profile_view.dart';
+import 'package:mobile/ui/views/reel/video_feed_view.dart';
 
 
 const String channelId = 'aladia_notifications';
@@ -111,11 +112,11 @@ Future<void> initNotifications() async {
     return PageView(
       controller: _pageController,
       onPageChanged: _pageChanged,
-      children: [
-        const FeedPage(),
-        const NotificationsPage(),
-        ProfilePage(),
-        ReelsPage()
+      children: const [
+        FeedPage(),
+        VideoFeedView(),
+        NotificationsPage(),
+        ProfileView(),
       ],
     );
   }
@@ -146,6 +147,14 @@ Future<void> initNotifications() async {
           label: const Text('Home'),
         ),
         NavigationRailDestination(
+          icon: const Icon(Icons.videocam),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label: const Text('Reels'),
+        ),
+        NavigationRailDestination(
           icon: const Icon(Icons.notifications_outlined),
           selectedIcon: Icon(
             Icons.notifications,
@@ -160,14 +169,6 @@ Future<void> initNotifications() async {
             color: theme.colorScheme.primary,
           ),
           label: const Text('Profile'),
-        ),
-                NavigationRailDestination(
-          icon: const Icon(Icons.person_outlined),
-          selectedIcon: Icon(
-            Icons.photo_camera,
-            color: theme.colorScheme.primary,
-          ),
-          label: const Text('Reels'),
         ),
       ],
     );
@@ -191,6 +192,14 @@ Future<void> initNotifications() async {
           label: 'Home',
         ),
         NavigationDestination(
+          icon: Icon(Icons.videocam),
+          selectedIcon: Icon(
+            Icons.photo_camera,
+            color: theme.colorScheme.primary,
+          ),
+          label: 'Reels',
+        ),
+        NavigationDestination(
           icon: const Icon(Icons.notifications_outlined),
           selectedIcon: Icon(
             Icons.notifications,
@@ -205,14 +214,6 @@ Future<void> initNotifications() async {
             color: theme.colorScheme.primary,
           ),
           label: 'Profile',
-        ),
-                   NavigationDestination(
-          icon:  const Icon(Icons.person_outlined),
-          selectedIcon: Icon(
-            Icons.photo_camera,
-            color: theme.colorScheme.primary,
-          ),
-          label:'Reels',
         ),
       ],
     );

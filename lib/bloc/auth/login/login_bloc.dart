@@ -48,8 +48,9 @@ Future<void> connectSocket()async {
 
         final token = response.data['accessToken'] as String?;
 
-        final prefs = await SharedPreferences.getInstance();
         if (token != null) {
+          final prefs = await SharedPreferences.getInstance();
+
           await prefs.setString('token', token);
           await prefs.setString("userId", response.data['userId']);
         }

@@ -60,6 +60,11 @@ dependencies:
   http: ^0.13.5
   equatable: ^2.0.5
   top_snackbar_flutter: ^3.2.0
+  video_thumbnail: ^0.5.6
+  preload_page_view: ^0.2.0
+  lucide_icons_flutter: ^3.0.3
+  emoji_picker_flutter: ^4.3.0
+  camera: ^0.11.1
   photo_view: ^0.15.0
   carousel_slider: ^5.0.0
   flutter_dotenv: ^5.1.0
@@ -71,8 +76,6 @@ dependencies:
   convert: ^3.1.1 # For hex utilities if needed, though flutter_web3 handles much of this
   shimmer: ^2.0.0
   flutter_cache_manager: ^3.3.1
-  intl: ^0.18.1
-
 
 dev_dependencies:
   flutter_test:
