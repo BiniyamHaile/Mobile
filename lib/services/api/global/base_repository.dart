@@ -7,16 +7,27 @@ class BaseRepository {
     dio.interceptors.add(AuthInterceptor());
   }
 
-  final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+  final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl, sendTimeout: const Duration(seconds: 30)));
 
-  Future<Response> get(String url,
-      {Map<String, dynamic>? headers, Options? options}) async {
-    return await dio.get(
+  Future<Response> get(
+    String url, {
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+    Options? options,  
+  }) async {
+    print('Fetching data from: $url');
+      print('Dio instance created with base URL: ${ApiEndpoints.baseUrl}');
+
+    var response = await dio.get(
       url,
+      queryParameters: queryParameters,
       options: options ?? Options(headers: headers),
     );
+
+    print('Response: ${response.data}');
+    return response;
   }
- 
+
   Future<Response> post(
     String url, {
     Map<String, dynamic>? headers,

@@ -5,10 +5,10 @@ class ConfirmPasswordFailure extends Failure {
   const ConfirmPasswordFailure(super.message);
 
   factory ConfirmPasswordFailure.empty() {
-    return ConfirmPasswordFailure( 'This field is required.');
+    return const ConfirmPasswordFailure( 'This field is required.');
   }
 
   factory ConfirmPasswordFailure.misMatch() {
-    return ConfirmPasswordFailure('Passwords do not match.');
+    return const ConfirmPasswordFailure('Passwords do not match.');
   }
 }

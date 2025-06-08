@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- If you ever use "localhost" in your app, you might want to add it too -->
+         <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+    <!--
+         If you need to allow ALL cleartext traffic for debugging (less secure),
+         you could use this instead of domain-config, but the domain-config
+         is generally preferred for targeting specific IPs.
+    -->
+    <!-- <base-config cleartextTrafficPermitted="true"> </base-config> -->
+</network-security-config>

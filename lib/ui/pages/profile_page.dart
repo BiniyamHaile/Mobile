@@ -6,19 +6,17 @@ import 'package:mobile/ui/widgets/image.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
 
 class ProfilePage extends StatelessWidget {
-  ProfilePage({
-    super.key,
-    this.isNavigatorPushed = false,
-  });
+  const ProfilePage({super.key, this.isNavigatorPushed = false});
 
   final bool isNavigatorPushed;
 
   @override
   Widget build(BuildContext context) {
-  final User owner = User.dummyUsers[0];
-  final story = UserStory.dummyUserStories.firstWhere((e) => e.owner == owner);
-  final posts = Post.dummyPosts.where((e) => e.owner == owner).toList();
-
+    final User owner = User.dummyUsers[0];
+    final story = UserStory.dummyUserStories.firstWhere(
+      (e) => e.owner == owner,
+    );
+    final posts = [];
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -30,7 +28,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             _bannerAndProfilePicture(context, owner, story),
             _userBio(context, owner),
-            UserPostsTabView(posts: posts),
+            const UserPostsTabView(posts: []),
           ],
         ),
       ),
@@ -53,8 +51,9 @@ class ProfilePage extends StatelessWidget {
                     ? IconButton.filledTonal(
                         onPressed: () => context.pop(),
                         style: IconButton.styleFrom(
-                          backgroundColor:
-                              theme.colorScheme.primary.withAlpha(75),
+                          backgroundColor: theme.colorScheme.primary.withAlpha(
+                            75,
+                          ),
                         ),
                         icon: const Icon(
                           Icons.arrow_back_ios_new,
@@ -80,7 +79,11 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _bannerAndProfilePicture(BuildContext context, User user , UserStory story) {
+  Widget _bannerAndProfilePicture(
+    BuildContext context,
+    User user,
+    UserStory story,
+  ) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return Stack(
@@ -91,7 +94,7 @@ class ProfilePage extends StatelessWidget {
             ConstrainedBox(
               constraints: const BoxConstraints.expand(height: 200),
               child: CustomImage(
-                imageUrl:  user.bannerImage,
+                imageUrl: user.bannerImage,
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -143,9 +146,7 @@ class ProfilePage extends StatelessWidget {
               child: UserStoryAvatar(
                 userStory: story,
                 onTap: () {
-                  context.push(
-                    RouteNames.stories,
-                  );
+                  context.push(RouteNames.stories);
                 },
               ),
             ),
@@ -164,9 +165,7 @@ class ProfilePage extends StatelessWidget {
         children: [
           Text(
             user.fullname,
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           Text('@${user.username}', style: textTheme.bodyMedium),
           const SizedBox(height: 4),
@@ -190,20 +189,14 @@ class ProfilePage extends StatelessWidget {
           FilledButton(
             onPressed: () {},
             child: const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Text('Follow'),
             ),
           ),
           OutlinedButton(
             onPressed: () {},
             child: const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 10,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               child: Text('Message'),
             ),
           ),
