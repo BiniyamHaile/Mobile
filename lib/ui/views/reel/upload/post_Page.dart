@@ -11,6 +11,7 @@ import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/models/reel/mentioned_user.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 
 import 'widgets/more_options_sheet_content.dart';
@@ -67,6 +68,7 @@ class _PostScreenState extends State<PostScreen> {
     showModalBottomSheet<PrivacyOption>(
       context: context,
       isScrollControlled: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
@@ -91,6 +93,7 @@ class _PostScreenState extends State<PostScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
@@ -205,6 +208,7 @@ class _PostScreenState extends State<PostScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -230,7 +234,7 @@ class _PostScreenState extends State<PostScreen> {
                 .read<ReelFeedAndActionBloc>()
                 .add(const MarkMoreVideosAvailable());
 
-            context.go(RouterEnum.videoFeedView.routeName);
+            context.go(RouteNames.home);
           } else if (state.actionStatus == ReelActionStatus.postFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -264,6 +268,8 @@ class _PostScreenState extends State<PostScreen> {
                           maxLines: null,
                           textAlignVertical: TextAlignVertical.top,
                           decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             hintText: 'Add description...',
                             border: OutlineInputBorder(),
                             isDense: true,
@@ -428,7 +434,7 @@ class _PostScreenState extends State<PostScreen> {
                           ? const Text('Posting...')
                           : const Text('Post'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
                         foregroundColor: Colors.white,
                       ),
                     );

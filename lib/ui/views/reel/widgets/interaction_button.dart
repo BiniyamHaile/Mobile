@@ -13,7 +13,8 @@ class InteractionButton extends StatelessWidget {
     this.color = Colors.white,
     this.onTap,
     this.shareLink = '',
-    this.outlineColor = Colors.black,
+    // Changed default outlineColor here
+    this.outlineColor = const Color.fromRGBO(143, 148, 251, 1),
     this.outlineWidth = 1.5,
   });
 
@@ -31,31 +32,43 @@ class InteractionButton extends StatelessWidget {
       return [];
     }
 
+    // Generate shadows to create the outline effect
+    // We iterate around the center (0,0) to create the shadow in all directions
+    // The step size determines the density of the shadow points
     final double step = outlineWidth / 2.0;
     final List<Shadow> shadows = [];
 
-    for (double x = -outlineWidth; x <= outlineWidth; x += step) {
-      for (double y = -outlineWidth; y <= outlineWidth; y += step) {
-        if (x != 0 || y != 0) {
-           shadows.add(
-             Shadow(
-               color: outlineColor,
-               offset: Offset(x, y),
-               blurRadius: 0,
-             ),
-           );
-        }
-      }
-    }
+    // Basic outline points
     shadows.add(Shadow(color: outlineColor, offset: Offset(outlineWidth, 0), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(-outlineWidth, 0), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(0, outlineWidth), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(0, -outlineWidth), blurRadius: 0));
+
+    // Diagonal points
     shadows.add(Shadow(color: outlineColor, offset: Offset(outlineWidth, outlineWidth), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(-outlineWidth, outlineWidth), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(outlineWidth, -outlineWidth), blurRadius: 0));
     shadows.add(Shadow(color: outlineColor, offset: Offset(-outlineWidth, -outlineWidth), blurRadius: 0));
 
+     // Add intermediate points for a thicker/smoother outline if needed
+     // This loop adds points between the main directions
+     for (double x = -outlineWidth; x <= outlineWidth; x += step) {
+        for (double y = -outlineWidth; y <= outlineWidth; y += step) {
+           // Avoid adding the center (0,0) or points already added
+           if ((x.abs() != outlineWidth || y.abs() != outlineWidth) && (x != 0 || y != 0) && (x.abs() != outlineWidth && y.abs() != outlineWidth)) {
+              shadows.add(
+                Shadow(
+                  color: outlineColor,
+                  offset: Offset(x, y),
+                  blurRadius: 0,
+                ),
+              );
+           }
+        }
+     }
+
+
+     // Use a Set to ensure unique shadows and remove duplicates
      final uniqueShadows = <Shadow>{};
      for (var s in shadows) {
        uniqueShadows.add(s);
@@ -63,6 +76,7 @@ class InteractionButton extends StatelessWidget {
 
     return uniqueShadows.toList();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +87,7 @@ class InteractionButton extends StatelessWidget {
         if (onTap != null) {
           onTap!();
         }
+        // Check if shareLink is provided before attempting to share
         if (shareLink.isNotEmpty) {
           await Share.share(shareLink);
         }
@@ -86,6 +101,7 @@ class InteractionButton extends StatelessWidget {
             size: 36,
             shadows: outlineShadows,
           ),
+          // Only show count if it's not -1
           if (count != -1)
             Text(
               count.toString(),

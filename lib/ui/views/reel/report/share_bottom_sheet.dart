@@ -54,8 +54,8 @@ class ShareBottomSheet extends StatelessWidget {
       ShareGridActionItem(
         icon: Icons.flag_outlined,
         label: 'Report',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
+        bgColor: Color.fromRGBO(143, 148, 251, 1),
+        iconColor: Colors.white,
         onTap: () {
           print('Tapped action: Report');
           Navigator.pop(context); 
@@ -70,21 +70,21 @@ class ShareBottomSheet extends StatelessWidget {
         },
       ),
     
-      ShareGridActionItem(
-        icon: Icons.file_download_outlined,
-        label: 'Save',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
-        onTap: () {
-          print('Tapped action: Save');
-          Navigator.pop(context);
-        },
-      ),
+      // ShareGridActionItem(
+      //   icon: Icons.file_download_outlined,
+      //   label: 'Save',
+      //   bgColor: Color.fromRGBO(143, 148, 251, 1),
+      //   iconColor: Colors.white,
+      //   onTap: () {
+      //     print('Tapped action: Save');
+      //     Navigator.pop(context);
+      //   },
+      // ),
       ShareGridActionItem(
         icon: Icons.edit,
         label: 'Edit',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
+        bgColor: Color.fromRGBO(143, 148, 251, 1),
+        iconColor: Colors.white,
         onTap: () {
           print('Tapped action: Edit (reelid: $reelid)');
 
@@ -146,8 +146,8 @@ class ShareBottomSheet extends StatelessWidget {
       ShareGridActionItem(
         icon: Icons.delete_outline,
         label: 'Delete',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
+        bgColor: Color.fromRGBO(143, 148, 251, 1),
+        iconColor: Colors.white,
         onTap: () {
           final deleteEvent = DeleteReel(reelId: reelid);
           context.read<ReelFeedAndActionBloc>().add(deleteEvent);
@@ -157,8 +157,8 @@ class ShareBottomSheet extends StatelessWidget {
       ShareGridActionItem(
         icon: Icons.copy, 
         label: 'Copy\nLink',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
+        bgColor: Color.fromRGBO(143, 148, 251, 1),
+        iconColor: Colors.white,
         onTap: () {
           print('Tapped action: Copy Link for reelid: $reelid');
           // TODO: Implement copy link functionality
@@ -168,8 +168,8 @@ class ShareBottomSheet extends StatelessWidget {
       ShareGridActionItem(
         icon: Icons.share, 
         label: 'Share\nto..',
-        bgColor: Colors.grey.shade300,
-        iconColor: Colors.black87,
+        bgColor: Color.fromRGBO(143, 148, 251, 1),
+        iconColor: Colors.white,
         onTap: () {
           print('Tapped action: Share to for reelid: $reelid');
           // TODO: Implement platform share functionality
@@ -200,17 +200,17 @@ class ShareBottomSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(width: 48),
-                const Expanded(
-                  child: Text(
-                    'Send to',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
+                // const Expanded(
+                //   child: Text(
+                //     'Send to',
+                //     textAlign: TextAlign.center,
+                //     style: TextStyle(
+                //       fontSize: 18,
+                //       fontWeight: FontWeight.bold,
+                //       color: Colors.black87,
+                //     ),
+                //   ),
+                // ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
@@ -224,78 +224,78 @@ class ShareBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16.0),
-          SizedBox(
-            height: 100.0, 
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: _shareProfileItems.length,
-              itemBuilder: (context, index) {
-                final profile = _shareProfileItems[index];
-                return GestureDetector(
-                  onTap: () {
-                    print('Tapped profile/app: ${profile.name}');
-                    // TODO: Implement logic to share directly to this profile/app
-                    Navigator.pop(context); 
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 12.0),
-                    width: 60, 
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        profile.imageUrl.isNotEmpty
-                            ? CircleAvatar(
-                              radius: 30,
-                              backgroundImage: CachedNetworkImageProvider(
-                                profile.imageUrl,
-                              ),
-                              onBackgroundImageError: (e, stack) {
-                                print('Error loading image: $e');
-                              },
-                            )
-                            : CircleAvatar(
-                              radius: 30,
-                              backgroundColor:
-                                  profile.bgColor ??
-                                  Colors.grey, 
-                              child:
-                                  profile.icon !=
-                                          null 
-                                      ? Icon(
-                                        profile.icon,
-                                        color:
-                                            profile.iconColor ?? Colors.white,
-                                        size: 30,
-                                      )
-                                      : null, 
-                            ),
-                        const SizedBox(height: 4),
-                        Text(
-                          profile.name,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          // SizedBox(
+          //   height: 100.0, 
+          //   child: ListView.builder(
+          //     scrollDirection: Axis.horizontal,
+          //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //     itemCount: _shareProfileItems.length,
+          //     itemBuilder: (context, index) {
+          //       final profile = _shareProfileItems[index];
+          //       return GestureDetector(
+          //         onTap: () {
+          //           print('Tapped profile/app: ${profile.name}');
+          //           // TODO: Implement logic to share directly to this profile/app
+          //           Navigator.pop(context); 
+          //         },
+          //         child: Container(
+          //           margin: const EdgeInsets.only(right: 12.0),
+          //           width: 60, 
+          //           child: Column(
+          //             mainAxisAlignment: MainAxisAlignment.start,
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             children: [
+          //               profile.imageUrl.isNotEmpty
+          //                   ? CircleAvatar(
+          //                     radius: 30,
+          //                     backgroundImage: CachedNetworkImageProvider(
+          //                       profile.imageUrl,
+          //                     ),
+          //                     onBackgroundImageError: (e, stack) {
+          //                       print('Error loading image: $e');
+          //                     },
+          //                   )
+          //                   : CircleAvatar(
+          //                     radius: 30,
+          //                     backgroundColor:
+          //                         profile.bgColor ??
+          //                         Colors.grey, 
+          //                     child:
+          //                         profile.icon !=
+          //                                 null 
+          //                             ? Icon(
+          //                               profile.icon,
+          //                               color:
+          //                                   profile.iconColor ?? Colors.white,
+          //                               size: 30,
+          //                             )
+          //                             : null, 
+          //                   ),
+          //               const SizedBox(height: 4),
+          //               Text(
+          //                 profile.name,
+          //                 textAlign: TextAlign.center,
+          //                 maxLines: 2,
+          //                 overflow: TextOverflow.ellipsis,
+          //                 style: const TextStyle(
+          //                   fontSize: 12,
+          //                   color: Colors.black87,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
 
-          const Divider(
-            height: 32.0,
-            thickness: 0.5,
-            indent: 16.0,
-            endIndent: 16.0,
-          ),
+          // const Divider(
+          //   height: 32.0,
+          //   thickness: 0.5,
+          //   indent: 16.0,
+          //   endIndent: 16.0,
+          // ),
 
           SizedBox(
             height: actionListHeight, 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_event.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_bloc.dart';
@@ -14,9 +15,8 @@ import 'package:mobile/ui/views/reel/upload/widgets/more_options_sheet_content.d
 import 'package:mobile/ui/views/reel/upload/widgets/post_options_section.dart';
 import 'package:mobile/ui/views/reel/upload/widgets/privacy_settings_sheet_content.dart';
 import 'package:mobile/ui/views/reel/upload/widgets/suggestion_list_view.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 bool isWhitespace(String s) {
   return s == ' ' || s == '\n' || s == '\r' || s == '\t';
@@ -214,6 +214,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
     showModalBottomSheet<PrivacyOption>(
       context: context,
       isScrollControlled: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
@@ -221,8 +222,10 @@ class _EditPostScreenState extends State<EditPostScreen> {
         return BlocProvider.value(
           value: context.read<PostDetailsBloc>(),
           child: PrivacySettingsSheetContent(
-            initialPrivacy:
-                sheetContext.read<PostDetailsBloc>().state.selectedPrivacy,
+            initialPrivacy: sheetContext
+                .read<PostDetailsBloc>()
+                .state
+                .selectedPrivacy,
             onPrivacySelected: (newPrivacy) {
               sheetContext.read<PostDetailsBloc>().add(
                 UpdatePrivacyOption(newPrivacy as PrivacyOption),
@@ -238,6 +241,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
@@ -245,40 +249,39 @@ class _EditPostScreenState extends State<EditPostScreen> {
         return BlocProvider.value(
           value: context.read<PostDetailsBloc>(),
           child: StatefulBuilder(
-            builder: (
-              BuildContext innerSheetContext,
-              StateSetter sheetSetState,
-            ) {
-              final detailsState =
-                  innerSheetContext.watch<PostDetailsBloc>().state;
+            builder:
+                (BuildContext innerSheetContext, StateSetter sheetSetState) {
+                  final detailsState = innerSheetContext
+                      .watch<PostDetailsBloc>()
+                      .state;
 
-              return MoreOptionsSheetContent(
-                allowComments: detailsState.allowComments,
-                saveToDevice: detailsState.saveToDevice,
-                saveWithWatermark: detailsState.saveWithWatermark,
-                audienceControls: detailsState.audienceControls,
-                onAllowCommentsChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
-                    UpdateAllowCommentsOption(newValue),
+                  return MoreOptionsSheetContent(
+                    allowComments: detailsState.allowComments,
+                    saveToDevice: detailsState.saveToDevice,
+                    saveWithWatermark: detailsState.saveWithWatermark,
+                    audienceControls: detailsState.audienceControls,
+                    onAllowCommentsChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
+                        UpdateAllowCommentsOption(newValue),
+                      );
+                    },
+                    onSaveToDeviceChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
+                        UpdateSaveToDeviceOption(newValue),
+                      );
+                    },
+                    onSaveWithWatermarkChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
+                        UpdateSaveWithWatermarkOption(newValue),
+                      );
+                    },
+                    onAudienceControlsChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
+                        UpdateAudienceControlsOption(newValue),
+                      );
+                    },
                   );
                 },
-                onSaveToDeviceChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
-                    UpdateSaveToDeviceOption(newValue),
-                  );
-                },
-                onSaveWithWatermarkChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
-                    UpdateSaveWithWatermarkOption(newValue),
-                  );
-                },
-                onAudienceControlsChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
-                    UpdateAudienceControlsOption(newValue),
-                  );
-                },
-              );
-            },
           ),
         );
       },
@@ -315,6 +318,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -330,14 +334,22 @@ class _EditPostScreenState extends State<EditPostScreen> {
         listener: (context, state) {
           if (state.actionStatus == ReelActionStatus.updateSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Reel updated successfully!')),
+              const SnackBar(
+                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                content: Text(
+                  'Reel updated successfully!',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             );
             context.pop(true);
           } else if (state.actionStatus == ReelActionStatus.updateFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
                 content: Text(
                   'Failed to update reel: ${state.lastActionError}',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             );
@@ -370,6 +382,8 @@ class _EditPostScreenState extends State<EditPostScreen> {
                           maxLines: null,
                           textAlignVertical: TextAlignVertical.top,
                           decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
                             hintText: 'Edit description...',
                             border: OutlineInputBorder(),
                             isDense: true,
@@ -475,23 +489,21 @@ class _EditPostScreenState extends State<EditPostScreen> {
                         debugPrint("buttonIsLoading $buttonIsLoading");
                         return ElevatedButton.icon(
                           onPressed: buttonIsLoading ? null : _saveChanges,
-                          icon:
-                              buttonIsLoading
-                                  ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 3,
-                                    ),
-                                  )
-                                  : const Icon(Icons.save),
-                          label:
-                              buttonIsLoading
-                                  ? const Text('Saving...')
-                                  : const Text('Save Changes'),
+                          icon: buttonIsLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
+                                )
+                              : const Icon(Icons.save),
+                          label: buttonIsLoading
+                              ? const Text('Saving...')
+                              : const Text('Save Changes'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent,
+                            backgroundColor: Color.fromRGBO(143, 148, 251, 1),
                             foregroundColor: Colors.white,
                           ),
                         );

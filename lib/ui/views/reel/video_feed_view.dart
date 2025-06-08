@@ -335,6 +335,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
     return
      Scaffold(
       appBar: AppBar(
+        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
         actions: [
           IconButton(
             icon: const Icon(Icons.videocam , color: Colors.white),

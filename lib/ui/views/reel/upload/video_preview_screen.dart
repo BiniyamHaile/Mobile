@@ -195,7 +195,7 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
               child: IgnorePointer(
                 ignoring: !_showControls,
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color:  Color.fromRGBO(143, 148, 251, 1),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12.0,
                     vertical: 16.0,
@@ -214,11 +214,11 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     Navigator.pop(context);
                                   }
                                 : null,
-                            icon: const Icon(Icons.videocam),
+                            icon: const Icon(Icons.videocam , color: Colors.white,),
                             label: const Text(
                               'Record Again',
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
+                                  TextStyle(color: Colors.white, fontSize: 12 , fontWeight: FontWeight.bold),
                             ),
                             style: ElevatedButton.styleFrom(),
                           ),
@@ -243,11 +243,11 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     );
                                   }
                                 : null,
-                            icon: const Icon(Icons.send),
+                            icon: const Icon(Icons.send , color: Colors.white,),
                             label: const Text(
                               'Next',
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
+                                  TextStyle(color: Colors.white, fontSize: 12 , fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),

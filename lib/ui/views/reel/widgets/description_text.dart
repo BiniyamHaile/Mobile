@@ -58,7 +58,7 @@ class _DescriptionTextState extends State<DescriptionText> {
     textSpan.add(
       TextSpan(
         text: displayDescription,
-        style: TextStyle(color: appColors.blackColor, fontSize: 18),
+        style: TextStyle(color: appColors.whiteColor, fontSize: 18),
       ),
     );
 

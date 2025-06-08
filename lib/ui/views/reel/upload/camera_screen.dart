@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as video_thumbnail;
@@ -433,7 +434,7 @@ class _CameraScreenState extends State<CameraScreen> {
       return;
     }
     if (mounted) {
-      GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);
+      GoRouter.of(context).go(RouteNames.home);
     }
   }
 

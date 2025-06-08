@@ -93,14 +93,6 @@ class InteractionButtons extends StatelessWidget {
           ),
           InteractionButton(
             id: reelid,
-            icon: LucideIcons.send,
-            count: shareCount,
-            color: appColors.whiteColor,
-            onTap: onShareTap,
-            shareLink: shareLink,
-          ),
-          InteractionButton(
-            id: reelid,
             icon: LucideIcons.menu,
             count: -1,
             color: appColors.whiteColor,
