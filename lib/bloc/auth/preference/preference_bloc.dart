@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'preference_event.dart';
 part 'preference_state.dart';
@@ -80,6 +81,8 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
       emit(PreferencesSubmitting(categories: currentState.categories));
 
       try {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
         // Get all selected preference IDs
         final selectedPreferences = currentState.categories
             .expand((category) => category.options)
@@ -87,25 +90,26 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
             .map((option) => option.id)
             .toList();
 
-        // Make API call to save preferences
-        final response = await Dio().post(
-          '${ApiEndpoints.baseUrl}/user/preferences',
+        // Make API call to update profile with preferences
+        final response = await Dio().put(
+          '${ApiEndpoints.baseUrl}/auth/updateprofile',
           data: {
             'preferences': selectedPreferences,
           },
-          // options: Options(
-          //   headers: {
-          //     'Authorization': 'Bearer ${YOUR_AUTH_TOKEN}', // Add if needed
-          //     'Content-Type': 'application/json',
-          //   },
-          // ),
+          options: Options(
+            headers: {
+              // 'Content-Type': 'application/json',
+              // Add authorization header if needed
+              'Authorization': 'Bearer $token',
+            },
+          ),
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(PreferencesSubmitted(selectedPreferences: selectedPreferences));
         } else {
           emit(PreferencesError(
-            error: 'Failed to save preferences: ${response.statusMessage}',
+            error: 'Failed to update profile: ${response.statusMessage}',
             categories: currentState.categories,
           ));
         }

@@ -16,7 +16,7 @@ import 'package:mobile/ui/routes/route_names.dart';
 
 class AppRoutes {
   static final router = GoRouter(
-    initialLocation: RouteNames.login,
+    initialLocation: RouteNames.profileSetting,
     routes: [
     GoRoute(path: RouteNames.home, builder: (context, state) => const HomePage()
     ),

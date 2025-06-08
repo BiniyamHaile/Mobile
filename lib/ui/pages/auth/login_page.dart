@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/profile-setting');
+          context.go('/preferences');
         }
       },
       builder: (context, state) {
