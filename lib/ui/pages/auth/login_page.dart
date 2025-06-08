@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:mobile/bloc/auth/login/login_bloc.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
+import 'package:mobile/core/validators/auth_validator.dart';
+import 'package:mobile/ui/views/auth/validation_indicator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,7 +21,12 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   bool _initialized = false;
 
-   @override
+  // Password validation state
+  double _strengthPercentage = 0.0;
+  String? _errorText;
+  Color? _indicatorColor;
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
@@ -43,6 +50,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void _updatePasswordStrength(String password) {
+    final validator = Validator(context);
+    final maxStrength = validator.maxErrorStrength;
+    final validation = validator.validateNewPassword(password);
+    setState(() {
+      _errorText = validation.message;
+      _strengthPercentage = (maxStrength - (validation.errorStrength)) * 100 / maxStrength;
+      _indicatorColor = validation.color;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LoginBloc, LoginState>(
@@ -64,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/');
+          context.go('/preferences');
         }
       },
       builder: (context, state) {
@@ -195,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
-								                  labelStyle:
+                                  labelStyle:
                                       TextStyle(color: Colors.grey[600]),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   border: OutlineInputBorder(
@@ -204,9 +222,16 @@ class _LoginPageState extends State<LoginPage> {
                                   filled: true,
                                   fillColor: Colors.grey[50],
                                 ),
-                                validator: (val) => val == null || val.isEmpty
-                                    ? 'Email is required'
-                                    : null,
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) {
+                                    return 'Email is required';
+                                  }
+                                  final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+\u0000?');
+                                  if (!emailRegex.hasMatch(val)) {
+                                    return 'Enter a valid email address';
+                                  }
+                                  return null;
+                                },
                                 keyboardType: TextInputType.emailAddress,
                               ),
                               const SizedBox(height: 16),
@@ -216,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Password',
-								  labelStyle:
+                                  labelStyle:
                                       TextStyle(color: Colors.grey[600]),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
@@ -237,9 +262,30 @@ class _LoginPageState extends State<LoginPage> {
                                   filled: true,
                                   fillColor: Colors.grey[50],
                                 ),
-                                validator: (val) => val == null || val.isEmpty
-                                    ? 'Password is required'
-                                    : null,
+                                onChanged: (value) => _updatePasswordStrength(value),
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) {
+                                    return 'Password is required';
+                                  }
+                                  if (val.length < 8) {
+                                    return 'Password must be at least 8 characters';
+                                  }
+                                  if (!RegExp(r'[A-Z]').hasMatch(val)) {
+                                    return 'Password must contain an uppercase letter';
+                                  }
+                                  if (!RegExp(r'[0-9]').hasMatch(val)) {
+                                    return 'Password must contain a number';
+                                  }
+                                  if (!RegExp(r'[(@$!%*?&)]').hasMatch(val)) {
+                                    return 'Password must contain a special character';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              ValidationIndicator(
+                                fillColor: _indicatorColor,
+                                message: _errorText,
+                                fillPercentage: _strengthPercentage,
                               ),
                               const SizedBox(height: 16),
                               Align(
