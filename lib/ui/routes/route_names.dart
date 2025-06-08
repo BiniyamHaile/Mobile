@@ -23,4 +23,5 @@ class RouteNames {
   static const String preferences = '/preferences';
   static const String resetPassword = '/reset-password';
   static const String forgotPassword = '/forgot-password';
+  static const String profileSetting = '/profile-setting';
 }

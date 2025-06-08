@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/preference/preference_bloc.dart';
 
 
@@ -32,14 +33,16 @@ class PreferencesPage extends StatelessWidget {
                     ),
                   );
                 } else if (state is PreferencesSubmitted) {
-                  // Navigate to home page after successful submission
-                  // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
+                  // Show success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Preferences saved successfully!'),
+                      content: Text('Profile updated successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
+                  
+                  // Navigate to home page after successful submission
+                  context.go('/home');
                 }
               },
               builder: (context, state) {
