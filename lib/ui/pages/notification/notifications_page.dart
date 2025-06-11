@@ -38,6 +38,7 @@ class _NotificationsPageState extends State<NotificationsPage>
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor:Color.fromRGBO(143, 148, 251, 1) ,
         automaticallyImplyLeading: false,
         flexibleSpace: ResponsivePadding(
           child: SafeArea(

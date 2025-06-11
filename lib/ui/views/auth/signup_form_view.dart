@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -133,6 +134,33 @@ class _SignupFormViewState extends State<SignupFormView> {
                 },
               ),
             ),
+
+            CustomSpacer(height: screen.scaledLongestScreenSide(0.03)),
+
+            RichText(
+              textAlign: TextAlign.center, 
+              text: TextSpan(
+                text: 'Already have an account? ',
+                style: appTheme.textTheme.bodyMedium?.copyWith(
+                  color: appTheme.colorScheme.onSurface.withOpacity(0.7), // Match nearby text color
+                ),
+                children: [
+                  TextSpan(
+                    text: 'Log In',
+                    style: appTheme.textTheme.bodyMedium?.copyWith( 
+                      color: Color.fromRGBO(143, 148, 251, 1),
+                      fontWeight: FontWeight.bold, 
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        context.go(RouteNames.login);
+                      },
+                  ),
+                ],
+              ),
+            ),
+
+            CustomSpacer(height: screen.scaledLongestScreenSide(0.03)),
           ],
         ),
       ),

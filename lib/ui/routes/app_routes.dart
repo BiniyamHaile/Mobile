@@ -9,12 +9,13 @@ import 'package:mobile/ui/pages/auth/preference_page.dart';
 import 'package:mobile/ui/pages/auth/reset-password-page.dart';
 import 'package:mobile/ui/pages/auth/signup_page.dart';
 import 'package:mobile/ui/pages/chat_page.dart';
-import 'package:mobile/ui/pages/home_page.dart';
+import 'package:mobile/ui/pages/notification/notifications_page.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/pages/profile/profile-setting-page.dart';
-import 'package:mobile/ui/pages/profile_page.dart';
+import 'package:mobile/ui/pages/search/search_page.dart';
 import 'package:mobile/ui/pages/story/user_story_page.dart';
+import 'package:mobile/ui/pages/wallet_screen.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:mobile/ui/views/reel/edit_post_screen.dart';
@@ -24,17 +25,22 @@ import 'package:mobile/ui/views/reel/upload/camera_screen.dart';
 import 'package:mobile/ui/views/reel/upload/post_Page.dart';
 import 'package:mobile/ui/views/reel/upload/video_preview_screen.dart';
 import 'package:mobile/ui/views/reel/video_feed_view.dart';
+import 'package:mobile/ui/widgets/bottom_navigation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+
+final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'shell',
+);
 
 class AppRoutes {
   static final router = GoRouter(
-    initialLocation: RouteNames.preferences,
-    // Add the root-level redirect function here
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: RouteNames.login,
     redirect: (context, state) async {
-      // This redirect runs before ANY route is matched or navigated to.
-      // It's the perfect place to check auth state on startup or when
-      // a new route is requested.
-
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final isAuthenticated = token != null && token.isNotEmpty;
@@ -43,30 +49,21 @@ class AppRoutes {
         'Root Redirect Check: IsAuthenticated: $isAuthenticated, Target Path: ${state.uri.path}',
       );
 
-      // Define the paths that are accessible *without* authentication
       const unauthenticatedPaths = [
         RouteNames.login,
         RouteNames.register,
         RouteNames.forgotPassword,
         RouteNames.resetPassword,
-        RouteNames.otp, // Assuming OTP is part of the signup flow
-        RouteNames
-            .preferences, // Assuming preferences is part of the signup flow
-        // Add any other public pages here (e.g., a landing page)
+        RouteNames.otp,
+        RouteNames.preferences,
       ];
 
-      // Check if the user is trying to navigate to a path that requires authentication
       final isGoingToAuthenticatedPath = !unauthenticatedPaths.contains(
         state.uri.path,
       );
 
-      // Check if the user is explicitly trying to go to the login page
       final isGoingToLogin = state.uri.path == RouteNames.login;
 
-      // --- Redirection Logic ---
-
-      // 1. If the user is NOT authenticated AND they are trying to access
-      //    a page that requires authentication, redirect them to the login page.
       if (!isAuthenticated && isGoingToAuthenticatedPath) {
         print(
           'Redirecting to Login: Not authenticated and trying to access ${state.uri.path}',
@@ -74,31 +71,95 @@ class AppRoutes {
         return RouteNames.login;
       }
 
-      // 2. If the user IS authenticated AND they are trying to access the login page,
-      //    redirect them to the home page. (Prevents logged-in users from seeing login).
       if (isAuthenticated && isGoingToLogin) {
         print('Redirecting to Home: Authenticated and trying to access Login');
-        return RouteNames.home;
+        return RouteNames.feed;
       }
 
-      // 3. Otherwise, allow the navigation to the requested path.
-      //    This covers:
-      //    - Authenticated users going to authenticated paths (home, profile, feed, etc.)
-      //    - Unauthenticated users going to unauthenticated paths (login, register, forgot password, etc.)
       print('Allowing navigation to: ${state.uri.path}');
-      return null; // Return null to allow navigation to the original path
+      return null;
     },
     routes: [
-      GoRoute(path: RouteNames.profileSetting, builder: (context, state) =>  SettingsPage()),
-      GoRoute(path: RouteNames.preferences, builder: (context, state) => const PreferencesPage()),
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        // Replace customPageBuilderWidget with MaterialPage
+        pageBuilder: (context, state, child) => MaterialPage(
+          key: state.pageKey, // Recommended to use state.pageKey
+          child: BottomNavigationWidget(
+            location: state.uri.toString(),
+            child: child,
+            backgroundColor:
+                state.uri.toString() == RouterEnum.videoFeedView.routeName
+                ? Colors
+                      .black // Assuming 'black' is defined (e.g., Colors.black)
+                : null,
+          ),
+        ),
+        routes: [
+          GoRoute(
+            path: RouteNames.feed,
+            // Replace customPageBuilderWidget with MaterialPage
+            pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey, // Recommended to use state.pageKey
+              child: const FeedPage(), // Assuming DashboardView is imported
+            ),
+          ),
+          GoRoute(
+            path: RouterEnum.videoFeedView.routeName,
+            // Replace customPageBuilderWidget with MaterialPage
+            pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey, // Recommended to use state.pageKey
+              child:
+                  const VideoFeedView(), // Assuming VideoFeedView is imported
+            ),
+          ),
+          // Add other routes here that should be inside the shell
+          GoRoute(
+            path: RouteNames.search,
+            pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: SearchPage(), //
+            ),
+          ),
+          GoRoute(
+            path: RouterEnum
+                .profileView
+                .routeName, // Assuming you have this route
+            pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const ProfileView(), // Assuming ProfileView is imported
+            ),
+          ),
+          GoRoute(
+            path: RouteNames.wallet, // Assuming you have this route
+            pageBuilder: (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const WalletScreen(), // Assuming WalletScreen is imported
+            ),
+          ),
+        ],
+      ),
+
       GoRoute(
-        path: RouteNames.home,
-        builder: (context, state) => const HomePage(),
+        path: RouteNames.profileSetting,
+        builder: (context, state) => SettingsPage(),
       ),
       GoRoute(
-        path: RouteNames.feed,
-        builder: (context, state) => const FeedPage(),
+        path: RouteNames.notifications,
+        builder: (context, state) => NotificationsPage(),
       ),
+      GoRoute(
+        path: RouteNames.preferences,
+        builder: (context, state) => const PreferencesPage(),
+      ),
+      // GoRoute(
+      //   path: RouteNames.home,
+      //   builder: (context, state) => const HomePage(),
+      // ),
+      // GoRoute(
+      //   path: RouteNames.feed,
+      //   builder: (context, state) => const FeedPage(),
+      // ),
       GoRoute(
         path: RouteNames.post,
         builder: (context, state) => PostingScreen(),
@@ -112,8 +173,12 @@ class AppRoutes {
       ),
       GoRoute(
         path: RouteNames.profile,
-        builder: (context, state) => ProfilePage(),
+        builder: (context, state) => ProfileView(),
       ),
+      // GoRoute(
+      //   path: RouteNames.wallet,
+      //   builder: (context, state) => WalletScreen(),
+      // ),
       GoRoute(
         path: RouteNames.register,
         builder: (context, state) => const SignupPage(),
@@ -133,29 +198,21 @@ class AppRoutes {
       GoRoute(
         path: RouteNames.login,
         builder: (context, state) => const LoginPage(),
-        // --- ADD THE REDIRECT LOGIC HERE ---
         redirect: (context, state) async {
-          // This redirect runs *before* navigating to the login page.
-
-          // Get the SharedPreferences instance (asynchronous)
           final prefs = await SharedPreferences.getInstance();
 
-          // Read the authentication token using your defined key
           final token = prefs.getString('token');
 
           print(
             'Checking auth token in redirect. Token found: ${token != null && token.isNotEmpty}',
           );
 
-          // If a token is found (not null and not empty), redirect to the home route.
           if (token != null && token.isNotEmpty) {
-            // Return the path you want to redirect to
-            return RouteNames.home; // Or your defined home route name
+            return RouteNames.feed;
           }
 
           return null;
         },
-        // ------------------------------------
       ),
       GoRoute(
         path: RouteNames.resetPassword,
@@ -170,18 +227,18 @@ class AppRoutes {
         builder: (context, state) => const SignupPage(),
       ),
       GoRoute(path: RouteNames.chat, builder: (context, state) => ChatPage()),
-      GoRoute(
-        path: RouterEnum.videoFeedView.routeName,
-        builder: (context, state) => const VideoFeedView(),
-      ),
+      // GoRoute(
+      //   path: RouterEnum.videoFeedView.routeName,
+      //   builder: (context, state) => const VideoFeedView(),
+      // ),
       GoRoute(
         path: RouterEnum.cameraScreen.routeName,
         builder: (context, state) => const CameraScreen(),
       ),
-      GoRoute(
-        path: RouterEnum.profileView.routeName,
-        builder: (context, state) => const ProfileView(),
-      ),
+      // GoRoute(
+      //   path: RouterEnum.profileView.routeName,
+      //   builder: (context, state) => const ProfileView(),
+      // ),
       GoRoute(
         path: RouterEnum.videoPreviewScreen.routeName,
         pageBuilder: (context, state) {

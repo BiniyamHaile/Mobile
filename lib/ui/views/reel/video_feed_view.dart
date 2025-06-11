@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_event.dart';
 import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/models/reel/video_item.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:mobile/ui/views/reel/widgets/video_feed_item.dart';
 import 'package:preload_page_view/preload_page_view.dart';
@@ -110,7 +112,8 @@ class _VideoFeedViewState extends State<VideoFeedView>
       }
     } catch (e) {
       debugPrint(
-          'Error fetching userId from SharedPreferences in VideoFeedView: $e');
+        'Error fetching userId from SharedPreferences in VideoFeedView: $e',
+      );
       if (mounted) {
         setState(() {
           _currentUserId = null;
@@ -186,8 +189,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
   }
 
   Future<void> _pauseAllControllers() async {
-    final controllers =
-        List<VideoPlayerController>.from(_controllerCache.values);
+    final controllers = List<VideoPlayerController>.from(
+      _controllerCache.values,
+    );
 
     for (final controller in controllers) {
       try {
@@ -229,10 +233,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
     while (_controllerCache.length > _maxCacheSize && _accessOrder.isNotEmpty) {
       final oldestId = _accessOrder.first;
       if (_videos.isNotEmpty && _currentPage < _videos.length) {
-        final windowStart = (_currentPage - 1)
-            .clamp(0, _videos.length > 0 ? _videos.length - 1 : 0);
-        final windowEnd = (_currentPage + 1)
-            .clamp(0, _videos.length > 0 ? _videos.length - 1 : 0);
+        final windowStart = (_currentPage - 1).clamp(
+          0,
+          _videos.length > 0 ? _videos.length - 1 : 0,
+        );
+        final windowEnd = (_currentPage + 1).clamp(
+          0,
+          _videos.length > 0 ? _videos.length - 1 : 0,
+        );
         final idsInWindow = <String>{};
         for (int i = windowStart; i <= windowEnd; i++) {
           if (i >= 0 && i < _videos.length) idsInWindow.add(_videos[i].id);
@@ -257,10 +265,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
   Future<void> _manageControllerWindow(int currentPage) async {
     if (_videos.isEmpty) return;
 
-    final windowStart =
-        (currentPage - 1).clamp(0, _videos.length > 0 ? _videos.length - 1 : 0);
-    final windowEnd =
-        (currentPage + 1).clamp(0, _videos.length > 0 ? _videos.length - 1 : 0);
+    final windowStart = (currentPage - 1).clamp(
+      0,
+      _videos.length > 0 ? _videos.length - 1 : 0,
+    );
+    final windowEnd = (currentPage + 1).clamp(
+      0,
+      _videos.length > 0 ? _videos.length - 1 : 0,
+    );
 
     final idsToKeep = <String>{};
     for (int i = windowStart; i <= windowEnd; i++) {
@@ -269,8 +281,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
       }
     }
 
-    final idsToDispose =
-        _controllerCache.keys.where((id) => !idsToKeep.contains(id)).toList();
+    final idsToDispose = _controllerCache.keys
+        .where((id) => !idsToKeep.contains(id))
+        .toList();
     for (final id in idsToDispose) {
       await _removeController(id);
     }
@@ -332,17 +345,22 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
   @override
   Widget build(BuildContext context) {
-    return
-     Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
         actions: [
           IconButton(
-            icon: const Icon(Icons.videocam , color: Colors.white),
+            icon: const Icon(Icons.videocam, color: Colors.white),
             tooltip: 'Create Reel',
             onPressed: () {
               GoRouter.of(context).go(RouterEnum.cameraScreen.routeName);
             },
+          ),
+          IconButton(
+            onPressed: () {
+              context.push(RouteNames.notifications);
+            },
+            icon: Icon(LucideIcons.bell, color: Colors.white),
           ),
         ],
       ),
@@ -410,7 +428,10 @@ class _VideoFeedViewState extends State<VideoFeedView>
                 _lastHandledActionStatus != ReelActionStatus.deleteSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Reel deleted successfully.'),
+                  content: Text(
+                    'Reel deleted successfully.',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   backgroundColor: Colors.green,
                   duration: const Duration(seconds: 3),
                 ),

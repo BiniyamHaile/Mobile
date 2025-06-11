@@ -1,19 +1,18 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
+import 'package:mobile/models/post.dart';
 import 'package:mobile/ui/pages/home_page.dart';
-import 'package:mobile/ui/routes/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import 'package:mobile/bloc/social/post/post_bloc.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:mobile/models/post.dart';
 
 class PostingScreen extends StatefulWidget {
   final dynamic post;
@@ -61,9 +60,7 @@ class _PostingScreenState extends State<PostingScreen> {
     try {
       final response = await Dio().get(
         '${ApiEndpoints.baseUrl}/auth/following',
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       if (response.statusCode == 200) {
@@ -86,9 +83,7 @@ class _PostingScreenState extends State<PostingScreen> {
     try {
       final loggedUser = await Dio().get(
         '${ApiEndpoints.baseUrl}/auth/profile',
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       currentProfilePic = loggedUser.data['profilePic'] ?? '';
@@ -223,8 +218,9 @@ class _PostingScreenState extends State<PostingScreen> {
   Future<void> _pickImage() async {
     if (!mounted) return;
     try {
-      final List<XFile> pickedFiles =
-          await _picker.pickMultiImage(imageQuality: 85);
+      final List<XFile> pickedFiles = await _picker.pickMultiImage(
+        imageQuality: 85,
+      );
       if (pickedFiles.isNotEmpty && mounted) {
         setState(() => _selectedMedia.addAll(pickedFiles));
       }
@@ -266,8 +262,10 @@ class _PostingScreenState extends State<PostingScreen> {
   Future<void> _takePhoto() async {
     if (!mounted) return;
     try {
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.camera, imageQuality: 85);
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
       if (pickedFile != null && mounted) {
         setState(() => _selectedMedia.add(pickedFile));
       }
@@ -310,25 +308,32 @@ class _PostingScreenState extends State<PostingScreen> {
     print("mentions here>>> ${_mentions}");
 
     if (_editingPost != null) {
-      postBloc.add(UpdatePost(
-        postId: _editingPost!.id,
-        content: content,
-        mediaFiles: _selectedMedia,
-        mentions: _mentions,
-      ));
+      postBloc.add(
+        UpdatePost(
+          postId: _editingPost!.id,
+          content: content,
+          mediaFiles: _selectedMedia,
+          mentions: _mentions,
+        ),
+      );
     } else {
-      postBloc.add(CreatePost(
-        content: content,
-        mediaFiles: _selectedMedia,
-        mentions: _mentions,
-      ));
+      postBloc.add(
+        CreatePost(
+          content: content,
+          mediaFiles: _selectedMedia,
+          mentions: _mentions,
+        ),
+      );
     }
   }
 
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(message, style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 
@@ -357,7 +362,8 @@ class _PostingScreenState extends State<PostingScreen> {
               final path = isUrl
                   ? _existingMediaUrls[index]
                   : _selectedMedia[index - _existingMediaUrls.length].path;
-              final isVideo = path.toLowerCase().endsWith('.mp4') ||
+              final isVideo =
+                  path.toLowerCase().endsWith('.mp4') ||
                   path.toLowerCase().endsWith('.mov');
 
               Widget mediaWidget;
@@ -366,10 +372,17 @@ class _PostingScreenState extends State<PostingScreen> {
                     ? Stack(
                         children: [
                           Container(
-                              width: 120, height: 120, color: Colors.black12),
+                            width: 120,
+                            height: 120,
+                            color: Colors.black12,
+                          ),
                           const Center(
-                              child: Icon(Icons.play_circle_fill,
-                                  color: Colors.white, size: 40)),
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
                         ],
                       )
                     : CachedNetworkImage(
@@ -381,8 +394,9 @@ class _PostingScreenState extends State<PostingScreen> {
                           width: 120,
                           height: 120,
                           color: Colors.grey[200],
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           width: 120,
@@ -394,22 +408,31 @@ class _PostingScreenState extends State<PostingScreen> {
               } else {
                 mediaWidget = isVideo
                     ? (_videoControllers.containsKey(path)
-                        ? AspectRatio(
-                            aspectRatio:
-                                _videoControllers[path]!.value.aspectRatio,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                VideoPlayer(_videoControllers[path]!),
-                                Container(color: Colors.black.withOpacity(0.4)),
-                                const Icon(Icons.play_circle_fill,
-                                    size: 40, color: Colors.white),
-                              ],
-                            ),
-                          )
-                        : const Center(child: CircularProgressIndicator()))
-                    : Image.file(File(path),
-                        width: 120, height: 120, fit: BoxFit.cover);
+                          ? AspectRatio(
+                              aspectRatio:
+                                  _videoControllers[path]!.value.aspectRatio,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  VideoPlayer(_videoControllers[path]!),
+                                  Container(
+                                    color: Colors.black.withOpacity(0.4),
+                                  ),
+                                  const Icon(
+                                    Icons.play_circle_fill,
+                                    size: 40,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Center(child: CircularProgressIndicator()))
+                    : Image.file(
+                        File(path),
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      );
               }
 
               return Padding(
@@ -418,8 +441,11 @@ class _PostingScreenState extends State<PostingScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child:
-                          SizedBox(width: 120, height: 120, child: mediaWidget),
+                      child: SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: mediaWidget,
+                      ),
                     ),
                     Positioned(
                       top: 5,
@@ -432,8 +458,11 @@ class _PostingScreenState extends State<PostingScreen> {
                             color: Colors.black.withOpacity(0.6),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.close,
-                              size: 16, color: Colors.white),
+                          child: const Icon(
+                            Icons.close,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -466,8 +495,9 @@ class _PostingScreenState extends State<PostingScreen> {
         Wrap(
           spacing: 8,
           children: _mentions.map((userId) {
-            final userIndex =
-                _mentionableUsers.indexWhere((u) => u.id == userId);
+            final userIndex = _mentionableUsers.indexWhere(
+              (u) => u.id == userId,
+            );
 
             // User not found case
             if (userIndex == -1) {
@@ -514,8 +544,9 @@ class _PostingScreenState extends State<PostingScreen> {
   }
 
   void _removeMentionFromText(String usernameOrId) {
-    final username =
-        usernameOrId.startsWith('@') ? usernameOrId.substring(1) : usernameOrId;
+    final username = usernameOrId.startsWith('@')
+        ? usernameOrId.substring(1)
+        : usernameOrId;
     _textController.text = _textController.text
         .replaceAll('@$username ', '')
         .replaceAll('@$username', '');
@@ -543,19 +574,22 @@ class _PostingScreenState extends State<PostingScreen> {
             if (state is PostCreationSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Post created successfully'),
+                  content: Text(
+                    'Post created successfully',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   backgroundColor: Colors.green,
                   duration: Duration(seconds: 2),
                 ),
               );
-                Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
-                );
+              );
             } else if (state is PostUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Post updated successfully'),
+                  content: Text('Post updated successfully' ,  style: TextStyle(color: Colors.white)),
                   backgroundColor: Colors.green,
                   duration: Duration(seconds: 2),
                 ),
@@ -570,8 +604,10 @@ class _PostingScreenState extends State<PostingScreen> {
               _mentions.clear();
             }
 
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const HomePage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
           }
         } else if (state is PostCreationFailure || state is PostUpdateFailure) {
           if (mounted) {
@@ -583,7 +619,12 @@ class _PostingScreenState extends State<PostingScreen> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+          backgroundColor: const Color.fromRGBO(
+            143,
+            148,
+            251,
+            1,
+          ), // Add this lin
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
@@ -622,9 +663,13 @@ class _PostingScreenState extends State<PostingScreen> {
                               : Icon(Icons.person, color: Colors.grey.shade800),
                         ),
                         const SizedBox(width: 10),
-                        Text(currentUserFullname,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16,)),
+                        Text(
+                          currentUserFullname,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -697,7 +742,8 @@ class _PostingScreenState extends State<PostingScreen> {
                   child: _isSubmitting
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                          _editingPost != null ? 'Update Post' : 'Create Post'),
+                          _editingPost != null ? 'Update Post' : 'Create Post',
+                        ),
                 ),
               ),
             ),

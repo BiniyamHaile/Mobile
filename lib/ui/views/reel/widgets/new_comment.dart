@@ -99,6 +99,8 @@ class _NewMessageState extends State<NewMessage> {
                   controller: widget.controller,
                   decoration: InputDecoration(
                     hintText: widget.inputLabel,
+                    filled: true,
+                    fillColor: Colors.white,
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 8.0,
@@ -115,6 +117,7 @@ class _NewMessageState extends State<NewMessage> {
                 ),
               ),
               IconButton(
+                color: Color.fromRGBO(143, 148, 251, 1),
                 icon: const Icon(Icons.emoji_emotions),
                 onPressed: () {
                   setState(() {
@@ -123,7 +126,8 @@ class _NewMessageState extends State<NewMessage> {
                 },
               ),
               IconButton(
-                icon: Icon(sendButtonIcon, color: sendButtonColor),
+                color: Color.fromRGBO(143, 148, 251, 1),
+                icon: Icon(sendButtonIcon, color: Color.fromRGBO(143, 148, 251, 1),),
                 onPressed: hasText ? _handleSendOrUpdate : null,
               ),
             ],

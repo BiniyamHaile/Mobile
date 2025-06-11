@@ -12,7 +12,6 @@ import 'package:mobile/models/reel/mentioned_user.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
 import 'package:mobile/ui/routes/route_names.dart';
-import 'package:mobile/ui/routes/router_enum.dart';
 
 import 'widgets/more_options_sheet_content.dart';
 import 'widgets/post_options_section.dart';
@@ -39,22 +38,22 @@ class _PostScreenState extends State<PostScreen> {
   void initState() {
     super.initState();
     context.read<PostDetailsBloc>().add(
-          LoadInitialDetails(
-            videoUrlForThumbnail: widget.videoPath,
-            videoPath: widget.videoPath,
-          ),
-        );
+      LoadInitialDetails(
+        videoUrlForThumbnail: widget.videoPath,
+        videoPath: widget.videoPath,
+      ),
+    );
 
     _descriptionController.addListener(_onDescriptionControllerChanged);
   }
 
   void _onDescriptionControllerChanged() {
     context.read<PostDetailsBloc>().add(
-          DescriptionChanged(
-            _descriptionController.text,
-            _descriptionController.selection,
-          ),
-        );
+      DescriptionChanged(
+        _descriptionController.text,
+        _descriptionController.selection,
+      ),
+    );
   }
 
   @override
@@ -76,12 +75,14 @@ class _PostScreenState extends State<PostScreen> {
         return BlocProvider.value(
           value: context.read<PostDetailsBloc>(),
           child: PrivacySettingsSheetContent(
-            initialPrivacy:
-                sheetContext.read<PostDetailsBloc>().state.selectedPrivacy,
+            initialPrivacy: sheetContext
+                .read<PostDetailsBloc>()
+                .state
+                .selectedPrivacy,
             onPrivacySelected: (newPrivacy) {
               sheetContext.read<PostDetailsBloc>().add(
-                    UpdatePrivacyOption(newPrivacy),
-                  );
+                UpdatePrivacyOption(newPrivacy),
+              );
             },
           ),
         );
@@ -101,40 +102,39 @@ class _PostScreenState extends State<PostScreen> {
         return BlocProvider.value(
           value: context.read<PostDetailsBloc>(),
           child: StatefulBuilder(
-            builder: (
-              BuildContext innerSheetContext,
-              StateSetter sheetSetState,
-            ) {
-              final detailsState =
-                  innerSheetContext.watch<PostDetailsBloc>().state;
+            builder:
+                (BuildContext innerSheetContext, StateSetter sheetSetState) {
+                  final detailsState = innerSheetContext
+                      .watch<PostDetailsBloc>()
+                      .state;
 
-              return MoreOptionsSheetContent(
-                allowComments: detailsState.allowComments,
-                saveToDevice: detailsState.saveToDevice,
-                saveWithWatermark: detailsState.saveWithWatermark,
-                audienceControls: detailsState.audienceControls,
-                onAllowCommentsChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
+                  return MoreOptionsSheetContent(
+                    allowComments: detailsState.allowComments,
+                    saveToDevice: detailsState.saveToDevice,
+                    saveWithWatermark: detailsState.saveWithWatermark,
+                    audienceControls: detailsState.audienceControls,
+                    onAllowCommentsChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
                         UpdateAllowCommentsOption(newValue),
                       );
-                },
-                onSaveToDeviceChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
+                    },
+                    onSaveToDeviceChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
                         UpdateSaveToDeviceOption(newValue),
                       );
-                },
-                onSaveWithWatermarkChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
+                    },
+                    onSaveWithWatermarkChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
                         UpdateSaveWithWatermarkOption(newValue),
                       );
-                },
-                onAudienceControlsChanged: (newValue) {
-                  innerSheetContext.read<PostDetailsBloc>().add(
+                    },
+                    onAudienceControlsChanged: (newValue) {
+                      innerSheetContext.read<PostDetailsBloc>().add(
                         UpdateAudienceControlsOption(newValue),
                       );
+                    },
+                  );
                 },
-              );
-            },
           ),
         );
       },
@@ -161,7 +161,8 @@ class _PostScreenState extends State<PostScreen> {
     int wordStartIndex = _findWordStartIndex(currentText, cursorPosition);
 
     String finalSuggestionText = textToInsert;
-    bool shouldAddSpace = !finalSuggestionText.endsWith(' ') &&
+    bool shouldAddSpace =
+        !finalSuggestionText.endsWith(' ') &&
         (cursorPosition == currentText.length ||
             (cursorPosition < currentText.length &&
                 isWhitespace(currentText[cursorPosition])) ||
@@ -192,8 +193,8 @@ class _PostScreenState extends State<PostScreen> {
     _descriptionController.addListener(_onDescriptionControllerChanged);
 
     context.read<PostDetailsBloc>().add(
-          SuggestionSelected(textToInsert, userSuggestion: userSuggestion),
-        );
+      SuggestionSelected(textToInsert, userSuggestion: userSuggestion),
+    );
   }
 
   @override
@@ -208,7 +209,7 @@ class _PostScreenState extends State<PostScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -227,19 +228,29 @@ class _PostScreenState extends State<PostScreen> {
         listener: (context, state) {
           if (state.actionStatus == ReelActionStatus.postSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Reel posted successfully!')),
+              const SnackBar(
+                backgroundColor: Colors.green,
+                content: Text(
+                  'Reel posted successfully!',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             );
 
-            context
-                .read<ReelFeedAndActionBloc>()
-                .add(const MarkMoreVideosAvailable());
+            context.read<ReelFeedAndActionBloc>().add(
+              const MarkMoreVideosAvailable(),
+            );
 
             context.go(RouteNames.home);
           } else if (state.actionStatus == ReelActionStatus.postFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content:
-                      Text('Failed to post reel: ${state.lastActionError}')),
+                backgroundColor: Colors.red,
+                content: Text(
+                  'Failed to post reel: ${state.lastActionError}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             );
           }
         },
@@ -247,8 +258,8 @@ class _PostScreenState extends State<PostScreen> {
           onTap: () {
             FocusScope.of(context).unfocus();
             context.read<PostDetailsBloc>().add(
-                  const HideSuggestions(suggestionType: ''),
-                );
+              const HideSuggestions(suggestionType: ''),
+            );
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -317,7 +328,8 @@ class _PostScreenState extends State<PostScreen> {
                 const SizedBox(height: 16),
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height -
+                    maxHeight:
+                        MediaQuery.of(context).size.height -
                         MediaQuery.of(context).padding.top -
                         AppBar().preferredSize.height -
                         16.0 -
@@ -368,8 +380,7 @@ class _PostScreenState extends State<PostScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child:
-                    BlocBuilder<ReelFeedAndActionBloc, ReelFeedAndActionState>(
+                child: BlocBuilder<ReelFeedAndActionBloc, ReelFeedAndActionState>(
                   builder: (context, state) {
                     final bool buttonIsLoading =
                         state.actionStatus == ReelActionStatus.loading;
@@ -378,14 +389,17 @@ class _PostScreenState extends State<PostScreen> {
                       onPressed: buttonIsLoading
                           ? null
                           : () {
-                              final currentDetailsState =
-                                  context.read<PostDetailsBloc>().state;
+                              final currentDetailsState = context
+                                  .read<PostDetailsBloc>()
+                                  .state;
 
                               if (currentDetailsState.durationInSeconds == 0) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
+                                    backgroundColor: Colors.red,
                                     content: Text(
                                       'Please wait, video duration is loading...',
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 );
@@ -400,25 +414,25 @@ class _PostScreenState extends State<PostScreen> {
                               );
 
                               context.read<ReelFeedAndActionBloc>().add(
-                                    PostReel(
-                                      videoPath: widget.videoPath,
-                                      description: _descriptionController.text,
-                                      duration:
-                                          currentDetailsState.durationInSeconds,
-                                      isPremiumContent: false,
-                                      mentionedUsers: mentionedUsersToPost,
-                                      selectedPrivacy:
-                                          currentDetailsState.selectedPrivacy,
-                                      allowComments:
-                                          currentDetailsState.allowComments,
-                                      allowSaveToDevice:
-                                          currentDetailsState.saveToDevice,
-                                      saveWithWatermark:
-                                          currentDetailsState.saveWithWatermark,
-                                      audienceControlUnder18:
-                                          currentDetailsState.audienceControls,
-                                    ),
-                                  );
+                                PostReel(
+                                  videoPath: widget.videoPath,
+                                  description: _descriptionController.text,
+                                  duration:
+                                      currentDetailsState.durationInSeconds,
+                                  isPremiumContent: false,
+                                  mentionedUsers: mentionedUsersToPost,
+                                  selectedPrivacy:
+                                      currentDetailsState.selectedPrivacy,
+                                  allowComments:
+                                      currentDetailsState.allowComments,
+                                  allowSaveToDevice:
+                                      currentDetailsState.saveToDevice,
+                                  saveWithWatermark:
+                                      currentDetailsState.saveWithWatermark,
+                                  audienceControlUnder18:
+                                      currentDetailsState.audienceControls,
+                                ),
+                              );
                             },
                       icon: buttonIsLoading
                           ? const SizedBox(
@@ -434,7 +448,7 @@ class _PostScreenState extends State<PostScreen> {
                           ? const Text('Posting...')
                           : const Text('Post'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  Color.fromRGBO(143, 148, 251, 1),
+                        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
                         foregroundColor: Colors.white,
                       ),
                     );

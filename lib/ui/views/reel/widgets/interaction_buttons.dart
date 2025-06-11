@@ -68,6 +68,7 @@ class InteractionButtons extends StatelessWidget {
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                backgroundColor: Colors.white,
                 isScrollControlled: true,
                 builder: (BuildContext context) {
                   return CommentSection(

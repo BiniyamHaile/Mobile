@@ -1,7 +1,7 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 
@@ -19,10 +19,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void _submitForgotPassword() {
     if (_formKey.currentState!.validate()) {
       context.read<ForgotPasswordBloc>().add(
-            ForgotPasswordSubmitted(
-              email: _emailController.text.trim(),
-            ),
-          );
+        ForgotPasswordSubmitted(email: _emailController.text.trim()),
+      );
     }
   }
 
@@ -33,7 +31,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         if (state is ForgotPasswordFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.red,
             ),
@@ -41,14 +39,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         } else if (state is ForgotPasswordSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: TextStyle(color: Colors.white),
+              ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.green,
             ),
           );
-          // Navigate to OTP page with the email
-          context.go('/otp',
-              extra: OtpParams(email: _emailController.text.trim()));
+
+          context.go(
+            '/otp',
+            extra: OtpParams(email: _emailController.text.trim()),
+          );
         }
       },
       builder: (context, state) {
@@ -166,12 +169,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             children: [
                               Text(
                                 'Enter your email to receive a password reset code',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 24),
                               TextFormField(
@@ -179,8 +178,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -198,11 +198,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 width: double.infinity,
                                 height: 52,
                                 child: ElevatedButton(
-                                  onPressed:
-                                      isLoading ? null : _submitForgotPassword,
+                                  onPressed: isLoading
+                                      ? null
+                                      : _submitForgotPassword,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(143, 148, 251, 1),
+                                    backgroundColor: const Color.fromRGBO(
+                                      143,
+                                      148,
+                                      251,
+                                      1,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),

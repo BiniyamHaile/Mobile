@@ -335,7 +335,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
           if (state.actionStatus == ReelActionStatus.updateSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                backgroundColor: Colors.green,
                 content: Text(
                   'Reel updated successfully!',
                   style: TextStyle(color: Colors.white),
@@ -346,7 +346,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
           } else if (state.actionStatus == ReelActionStatus.updateFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                backgroundColor: Colors.green,
                 content: Text(
                   'Failed to update reel: ${state.lastActionError}',
                   style: TextStyle(color: Colors.white),

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -58,18 +57,14 @@ class ShareBottomSheet extends StatelessWidget {
         iconColor: Colors.white,
         onTap: () {
           print('Tapped action: Report');
-          Navigator.pop(context); 
-          
+          Navigator.pop(context);
+
           final postReelBloc = context.read<ReelFeedAndActionBloc>();
 
-          showReportFlow(
-            context: context, 
-            reelId: reelid, 
-            bloc: postReelBloc, 
-          );
+          showReportFlow(context: context, reelId: reelid, bloc: postReelBloc);
         },
       ),
-    
+
       // ShareGridActionItem(
       //   icon: Icons.file_download_outlined,
       //   label: 'Save',
@@ -93,8 +88,9 @@ class ShareBottomSheet extends StatelessWidget {
           final Iterable<VideoItem> matchingVideos = videoFeedState.videos
               .where((video) => video.id == reelid);
 
-          final VideoItem? videoToEdit =
-              matchingVideos.isNotEmpty ? matchingVideos.first : null;
+          final VideoItem? videoToEdit = matchingVideos.isNotEmpty
+              ? matchingVideos.first
+              : null;
 
           if (videoToEdit != null) {
             print('Found video to edit: ${videoToEdit.id}');
@@ -104,8 +100,8 @@ class ShareBottomSheet extends StatelessWidget {
               'videoUrl': videoToEdit.videoUrl,
               'initialDescription': videoToEdit.description,
               'initialPrivacy': videoToEdit.privacy,
-              'initialAllowComments': videoToEdit.allowComments, 
-              'initialSaveToDevice': videoToEdit.allowSaveToDevice, 
+              'initialAllowComments': videoToEdit.allowComments,
+              'initialSaveToDevice': videoToEdit.allowSaveToDevice,
               'initialSaveWithWatermark': videoToEdit.saveWithWatermark,
               'initialAudienceControls': videoToEdit.audienceControlUnder18,
             };
@@ -113,8 +109,8 @@ class ShareBottomSheet extends StatelessWidget {
             print(videoToEdit);
             print(initialEditData);
 
-            Navigator.pop(context); 
-            
+            Navigator.pop(context);
+
             context
                 .push(
                   RouterEnum.editPostScreen.routeName,
@@ -135,7 +131,11 @@ class ShareBottomSheet extends StatelessWidget {
             print('Video with id $reelid not found in state. Cannot edit.');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Could not find video details to edit.'),
+                backgroundColor: Colors.red,
+                content: Text(
+                  'Could not find video details to edit.',
+                  style: TextStyle(color: Colors.white),
+                ),
                 duration: Duration(seconds: 2),
               ),
             );
@@ -155,7 +155,7 @@ class ShareBottomSheet extends StatelessWidget {
         },
       ),
       ShareGridActionItem(
-        icon: Icons.copy, 
+        icon: Icons.copy,
         label: 'Copy\nLink',
         bgColor: Color.fromRGBO(143, 148, 251, 1),
         iconColor: Colors.white,
@@ -166,7 +166,7 @@ class ShareBottomSheet extends StatelessWidget {
         },
       ),
       ShareGridActionItem(
-        icon: Icons.share, 
+        icon: Icons.share,
         label: 'Share\nto..',
         bgColor: Color.fromRGBO(143, 148, 251, 1),
         iconColor: Colors.white,
@@ -224,8 +224,9 @@ class ShareBottomSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16.0),
+
           // SizedBox(
-          //   height: 100.0, 
+          //   height: 100.0,
           //   child: ListView.builder(
           //     scrollDirection: Axis.horizontal,
           //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -236,11 +237,11 @@ class ShareBottomSheet extends StatelessWidget {
           //         onTap: () {
           //           print('Tapped profile/app: ${profile.name}');
           //           // TODO: Implement logic to share directly to this profile/app
-          //           Navigator.pop(context); 
+          //           Navigator.pop(context);
           //         },
           //         child: Container(
           //           margin: const EdgeInsets.only(right: 12.0),
-          //           width: 60, 
+          //           width: 60,
           //           child: Column(
           //             mainAxisAlignment: MainAxisAlignment.start,
           //             crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,17 +260,17 @@ class ShareBottomSheet extends StatelessWidget {
           //                     radius: 30,
           //                     backgroundColor:
           //                         profile.bgColor ??
-          //                         Colors.grey, 
+          //                         Colors.grey,
           //                     child:
           //                         profile.icon !=
-          //                                 null 
+          //                                 null
           //                             ? Icon(
           //                               profile.icon,
           //                               color:
           //                                   profile.iconColor ?? Colors.white,
           //                               size: 30,
           //                             )
-          //                             : null, 
+          //                             : null,
           //                   ),
           //               const SizedBox(height: 4),
           //               Text(
@@ -296,13 +297,11 @@ class ShareBottomSheet extends StatelessWidget {
           //   indent: 16.0,
           //   endIndent: 16.0,
           // ),
-
           SizedBox(
-            height: actionListHeight, 
+            height: actionListHeight,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              physics:
-                  const AlwaysScrollableScrollPhysics(), 
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               itemCount: _shareGridActionItems.length,
               itemBuilder: (context, index) {

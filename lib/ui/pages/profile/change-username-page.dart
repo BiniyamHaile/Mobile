@@ -68,7 +68,9 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
 
   void _onUsernameChanged(BuildContext context, String username) {
     if (username.isNotEmpty && username.length >= 3) {
-      context.read<UsernamesettingsBloc>().add(UsernameAvailabilityChecked(username: username));
+      context.read<UsernamesettingsBloc>().add(
+        UsernameAvailabilityChecked(username: username),
+      );
     } else {
       setState(() {
         _usernameError = null;
@@ -79,7 +81,9 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
 
   void _onSubmit(BuildContext context) {
     if (_formKey.currentState!.validate() && _isUsernameAvailable) {
-      context.read<UsernamesettingsBloc>().add(UsernameChanged(newUsername: _usernameController.text.trim()));
+      context.read<UsernamesettingsBloc>().add(
+        UsernameChanged(newUsername: _usernameController.text.trim()),
+      );
     }
   }
 
@@ -90,7 +94,10 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
         if (state is UsernameUpdateSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Username updated successfully'),
+              content: Text(
+                'Username updated successfully',
+                style: TextStyle(color: Colors.white),
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -99,7 +106,7 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
         if (state is UsernameUpdateFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -137,23 +144,31 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
                   decoration: InputDecoration(
                     labelText: 'New Username',
                     labelStyle: TextStyle(color: Colors.grey[600]),
-                    prefixIcon: Icon(Icons.person_outline, color: Colors.grey[600]),
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: Colors.grey[600],
+                    ),
                     suffixIcon: state is UsernameAvailabilityChecking
                         ? SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Color.fromRGBO(143, 148, 251, 1)),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Color.fromRGBO(143, 148, 251, 1),
+                            ),
                           )
                         : _isUsernameAvailable
-                            ? Icon(Icons.check_circle, color: Colors.green)
-                            : _usernameError != null
-                                ? Icon(Icons.error, color: Colors.red)
-                                : null,
+                        ? Icon(Icons.check_circle, color: Colors.green)
+                        : _usernameError != null
+                        ? Icon(Icons.error, color: Colors.red)
+                        : null,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+                      borderSide: BorderSide(
+                        color: Color.fromRGBO(143, 148, 251, 1),
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     filled: true,
@@ -185,13 +200,13 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: state is UsernameUpdateInProgress || !_isUsernameAvailable
+                    onPressed:
+                        state is UsernameUpdateInProgress ||
+                            !_isUsernameAvailable
                         ? null
                         : () => _onSubmit(context),
                     child: state is UsernameUpdateInProgress
-                        ? CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                        ? CircularProgressIndicator(color: Colors.white)
                         : Text(
                             'UPDATE USERNAME',
                             style: TextStyle(
@@ -209,4 +224,4 @@ class _ChangeUsernameFormState extends State<ChangeUsernameForm> {
       ),
     );
   }
-} 
+}

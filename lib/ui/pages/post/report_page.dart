@@ -29,7 +29,7 @@ class _ReportPageState extends State<ReportPage> {
       'Racist',
       'Sexist',
       'Religious',
-      'LGBTQ+ targeted'
+      'LGBTQ+ targeted',
     ],
     'Harassment or Bullying': ['Repeated insults', 'Name calling', 'Stalking'],
     'Nudity or Sexual Content': ['Explicit photos', 'Sexual language'],
@@ -49,9 +49,7 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    _postReportBloc = PostReportBloc(
-      repository: PostReportRepository(),
-    );
+    _postReportBloc = PostReportBloc(repository: PostReportRepository());
   }
 
   @override
@@ -73,15 +71,21 @@ class _ReportPageState extends State<ReportPage> {
           if (state is PostReportSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Report submitted successfully'),
+                content: Text(
+                  'Report submitted successfully',
+                  style: TextStyle(color: Colors.white),
+                ),
                 backgroundColor: Colors.green,
               ),
             );
-            context.push(RouteNames.home);
+            context.push(RouteNames.feed);
           } else if (state is PostReportFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text(
+                  state.message,
+                  style: TextStyle(color: Colors.white),
+                ),
                 backgroundColor: Colors.red,
               ),
             );
@@ -95,8 +99,12 @@ class _ReportPageState extends State<ReportPage> {
               style: TextStyle(color: Colors.white),
             ),
             centerTitle: true,
-            backgroundColor:
-                const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+            backgroundColor: const Color.fromRGBO(
+              143,
+              148,
+              251,
+              1,
+            ), // Add this lin
             foregroundColor: isDark ? Colors.white : Colors.black,
             elevation: 1,
           ),
@@ -179,7 +187,8 @@ class _ReportPageState extends State<ReportPage> {
                       decoration: InputDecoration(
                         labelText: 'Custom Reason',
                         labelStyle: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black87),
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -187,7 +196,8 @@ class _ReportPageState extends State<ReportPage> {
                         fillColor: isDark ? Colors.grey[850] : Colors.white,
                       ),
                       style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black87),
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                       maxLines: 3,
                     ),
                   ),
@@ -222,8 +232,9 @@ class _ReportPageState extends State<ReportPage> {
                         : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor:
-                          _isFormValid ? theme.primaryColor : Colors.grey[400],
+                      backgroundColor: _isFormValid
+                          ? theme.primaryColor
+                          : Colors.grey[400],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),

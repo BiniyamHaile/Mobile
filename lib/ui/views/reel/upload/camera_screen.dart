@@ -52,7 +52,11 @@ class _CameraScreenState extends State<CameraScreen> {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('No cameras available on this device.'),
+                backgroundColor: Colors.red,
+                content: Text(
+                  'No cameras available on this device.',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             );
           });
@@ -78,36 +82,47 @@ class _CameraScreenState extends State<CameraScreen> {
       final Completer<void> completer = Completer<void>();
       _initializeControllerFuture = completer.future;
 
-      _controller!.initialize().then((_) {
-        if (!mounted) {
-          completer.complete();
-          return;
-        }
-        setState(() {});
-        completer.complete();
-      }).catchError((e, stackTrace) {
-        print("Error initializing camera: $e \n StackTrace: $stackTrace");
-        if (!mounted) {
-          completer.completeError(e, stackTrace);
-          return;
-        }
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error initializing camera: ${e.toString()}'),
-            ),
-          );
-        });
-        setState(() {});
-        completer.completeError(e, stackTrace);
-      });
+      _controller!
+          .initialize()
+          .then((_) {
+            if (!mounted) {
+              completer.complete();
+              return;
+            }
+            setState(() {});
+            completer.complete();
+          })
+          .catchError((e, stackTrace) {
+            print("Error initializing camera: $e \n StackTrace: $stackTrace");
+            if (!mounted) {
+              completer.completeError(e, stackTrace);
+              return;
+            }
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    'Error initializing camera: ${e.toString()}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            });
+            setState(() {});
+            completer.completeError(e, stackTrace);
+          });
     } catch (e, stackTrace) {
       print("Fatal error listing cameras: $e \n StackTrace: $stackTrace");
       if (mounted) {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Fatal error accessing cameras: ${e.toString()}'),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Fatal error accessing cameras: ${e.toString()}',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           );
         });
@@ -127,7 +142,8 @@ class _CameraScreenState extends State<CameraScreen> {
         _countdownValue > 0 ||
         _cameras == null ||
         _cameras!.isEmpty ||
-        _cameras!.length < 2) return;
+        _cameras!.length < 2)
+      return;
 
     final CameraDescription newCamera = _isFrontCamera
         ? _cameras!.firstWhere(
@@ -170,27 +186,36 @@ class _CameraScreenState extends State<CameraScreen> {
       _isFrontCamera = !_isFrontCamera;
     });
 
-    _controller!.initialize().then((_) {
-      if (!mounted) {
-        completer.complete();
-        return;
-      }
-      setState(() {});
-      completer.complete();
-    }).catchError((e, stackTrace) {
-      print("Error toggling camera: $e \n StackTrace: $stackTrace");
-      if (!mounted) {
-        completer.completeError(e, stackTrace);
-        return;
-      }
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error switching camera: ${e.toString()}')),
-        );
-      });
-      setState(() {});
-      completer.completeError(e, stackTrace);
-    });
+    _controller!
+        .initialize()
+        .then((_) {
+          if (!mounted) {
+            completer.complete();
+            return;
+          }
+          setState(() {});
+          completer.complete();
+        })
+        .catchError((e, stackTrace) {
+          print("Error toggling camera: $e \n StackTrace: $stackTrace");
+          if (!mounted) {
+            completer.completeError(e, stackTrace);
+            return;
+          }
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.red,
+                content: Text(
+                  'Error switching camera: ${e.toString()}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            );
+          });
+          setState(() {});
+          completer.completeError(e, stackTrace);
+        });
   }
 
   Future<void> _generateAndSetThumbnail(String videoPath) async {
@@ -344,8 +369,12 @@ class _CameraScreenState extends State<CameraScreen> {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content:
-                    Text('Stop recording/countdown before picking a file')),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Stop recording/countdown before picking a file',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           );
         });
       }
@@ -368,7 +397,8 @@ class _CameraScreenState extends State<CameraScreen> {
           if (mounted) {
             GoRouter.of(context).push(
               RouterEnum.videoPreviewScreen.routeName.replaceAll(
-                ':videoPath', Uri.encodeComponent(videoPath),
+                ':videoPath',
+                Uri.encodeComponent(videoPath),
               ),
             );
           }
@@ -378,7 +408,14 @@ class _CameraScreenState extends State<CameraScreen> {
         if (mounted) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('File picking cancelled')));
+              const SnackBar(
+                backgroundColor: Colors.green,
+                content: Text(
+                  'File picking cancelled',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            );
           });
         }
       }
@@ -387,7 +424,13 @@ class _CameraScreenState extends State<CameraScreen> {
       if (mounted) {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error picking file: ${e.toString()}')),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                'Error picking file: ${e.toString()}',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           );
         });
       }
@@ -403,13 +446,20 @@ class _CameraScreenState extends State<CameraScreen> {
       if (mounted) {
         GoRouter.of(context).push(
           RouterEnum.videoPreviewScreen.routeName.replaceAll(
-            ':videoPath', Uri.encodeComponent(_lastVideoPath!),
+            ':videoPath',
+            Uri.encodeComponent(_lastVideoPath!),
           ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No video recorded or picked yet')),
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'No video recorded or picked yet',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
     }
   }
@@ -429,12 +479,17 @@ class _CameraScreenState extends State<CameraScreen> {
     if (_isRecording || _countdownValue > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Stop recording/countdown before closing')),
+          backgroundColor: Colors.red,
+          content: Text(
+            'Stop recording/countdown before closing',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
       return;
     }
     if (mounted) {
-      GoRouter.of(context).go(RouteNames.home);
+      GoRouter.of(context).go(RouteNames.feed);
     }
   }
 
@@ -496,8 +551,9 @@ class _CameraScreenState extends State<CameraScreen> {
                 : _toggleCamera,
             onPickVideo: isBusy ? null : _pickVideo,
             onToggleRecord: (_countdownValue > 0) ? null : _onToggleRecord,
-            onGoToLastPreview:
-                (isBusy || _lastVideoPath == null) ? null : _goToLastPreview,
+            onGoToLastPreview: (isBusy || _lastVideoPath == null)
+                ? null
+                : _goToLastPreview,
             formatDuration: _formatDuration,
           );
         },

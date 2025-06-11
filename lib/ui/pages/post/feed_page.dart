@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/repository/social/post_repository.dart';
 import 'package:mobile/ui/routes/route_names.dart';
@@ -138,7 +139,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         Icons.post_add_outlined,
-                        color: theme.colorScheme.primary,
+                        color: Colors.white,
                         size: 30,
                       ),
                     ),
@@ -148,7 +149,16 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         Icons.send_sharp,
-                        color: theme.colorScheme.primary,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        context.push(RouteNames.notifications);
+                      },
+                      icon: Icon(
+                        LucideIcons.bell,
+                        color: Colors.white,
                       ),
                     ),
                   ],

@@ -1,36 +1,25 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
 import 'package:mobile/bloc/chat/retrieve_messages/retrieve_messages_bloc.dart';
 import 'package:mobile/bloc/chat/send_message/send_message_bloc.dart';
 import 'package:mobile/core/injections/get_it.dart';
 import 'package:mobile/models/chat/chat_messages.dart';
-import 'package:mobile/services/socket/socket-service.dart';
 import 'package:mobile/services/socket/websocket-service.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
-
-// import http
-import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage(
-      {super.key,
-      required this.user,
-      required this.friend,
-      required this.roomId});
+  const ChatPage({
+    super.key,
+    required this.user,
+    required this.friend,
+    required this.roomId,
+  });
 
   final types.User user;
   final types.User friend;
@@ -46,37 +35,38 @@ class _ChatPageState extends State<ChatPage> {
   types.TextMessage? _editingMessage;
   final TextEditingController _editingController = TextEditingController();
   late StreamSubscription<dynamic> _messageSub;
-late StreamSubscription<void> _typingSub;
-late StreamSubscription<void> _stopTypingSub;
+  late StreamSubscription<void> _typingSub;
+  late StreamSubscription<void> _stopTypingSub;
 
-// define a boolean to track typing status
+  // define a boolean to track typing status
   bool isTyping = false;
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-final socket = getIt<WebSocketService>();
+    final socket = getIt<WebSocketService>();
 
-socket.joinRoom(widget.roomId);
+    socket.joinRoom(widget.roomId);
 
-_messageSub = socket.newMessageStream.listen((data) {
-  final message = ChatMessage.fromJson(data);
-  context.read<RetrieveMessagesBloc>().add(AddMessageToQueue(message: message));
-});
-
-_typingSub = socket.typingStream.listen((_) {
-  setState(() => isTyping = true);
-});
-
-_stopTypingSub = socket.stopTypingStream.listen((_) {
-  setState(() => isTyping = false);
-});
-
-
-  context.read<RetrieveMessagesBloc>().add(
-        RetrieveMessages(roomId: widget.roomId),
+    _messageSub = socket.newMessageStream.listen((data) {
+      final message = ChatMessage.fromJson(data);
+      context.read<RetrieveMessagesBloc>().add(
+        AddMessageToQueue(message: message),
       );
-}
+    });
+
+    _typingSub = socket.typingStream.listen((_) {
+      setState(() => isTyping = true);
+    });
+
+    _stopTypingSub = socket.stopTypingStream.listen((_) {
+      setState(() => isTyping = false);
+    });
+
+    context.read<RetrieveMessagesBloc>().add(
+      RetrieveMessages(roomId: widget.roomId),
+    );
+  }
 
   @override
   void dispose() {
@@ -85,22 +75,22 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
   }
 
   void _addMessage(ChatMessage message) {
-    context
-        .read<RetrieveMessagesBloc>()
-        .add(AddMessageToQueue(message: message));
+    context.read<RetrieveMessagesBloc>().add(
+      AddMessageToQueue(message: message),
+    );
   }
 
   void _sendMessage(String content, String receiverId, String? replyTo) {
-    context.read<SendMessageBloc>().add(SendMessage(
-          receiverId: receiverId,
-          text: content,
-          replyTo: replyTo,
-        ));
+    context.read<SendMessageBloc>().add(
+      SendMessage(receiverId: receiverId, text: content, replyTo: replyTo),
+    );
   }
 
   Widget _buildVideoMessage(types.VideoMessage message, int messageWidth) {
     return _VideoPlayerWidget(
-        videoUrl: message.uri, width: messageWidth.toDouble());
+      videoUrl: message.uri,
+      width: messageWidth.toDouble(),
+    );
   }
 
   void _handleAttachmentPressed() {
@@ -177,11 +167,9 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
 
     print("Sending files: $filePaths");
 
-    context.read<SendMessageBloc>().add(SendMessage(
-          receiverId: widget.friend.id,
-          text: '',
-          filePaths: filePaths,
-        ));
+    context.read<SendMessageBloc>().add(
+      SendMessage(receiverId: widget.friend.id, text: '', filePaths: filePaths),
+    );
   }
 
   void _handleImageSelection() async {
@@ -194,11 +182,13 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
     if (result != null) {
       print("Picked image: ${result.path}");
 
-      context.read<SendMessageBloc>().add(SendMessage(
-            receiverId: widget.friend.id,
-            text: '',
-            filePaths: [result.path],
-          ));
+      context.read<SendMessageBloc>().add(
+        SendMessage(
+          receiverId: widget.friend.id,
+          text: '',
+          filePaths: [result.path],
+        ),
+      );
     } else {
       print("No image selected.");
     }
@@ -328,7 +318,6 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
   //   }
   // }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -363,7 +352,13 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
             // _addMessage(state.message);
           } else if (state is SendMessageFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to send message: ${state.error}')),
+              SnackBar(
+                backgroundColor: Colors.red,
+                content: Text(
+                  'Failed to send message: ${state.error}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             );
           }
         },
@@ -378,41 +373,44 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
                   .map((message) => message.toFlutterMessage())
                   .toList();
 
-              final senderIds = chatMessages
-                  .map((message) => message.author.id);
+              final senderIds = chatMessages.map(
+                (message) => message.author.id,
+              );
 
               print("Sender IDs: $senderIds");
               print("user ID: ${widget.user.id}");
               print("Friend ID: ${widget.friend.id}");
-              print(
-                "roomId: ${widget.roomId}",
-              );
+              print("roomId: ${widget.roomId}");
               return Chat(
                 messages: chatMessages,
                 onAttachmentPressed: _handleAttachmentPressed,
                 // onMessageTap: _handleMessageTap,
-                videoMessageBuilder: (types.VideoMessage message,
-                    {required int messageWidth}) {
-                  return _buildVideoMessage(message, messageWidth);
-                },
+                videoMessageBuilder:
+                    (types.VideoMessage message, {required int messageWidth}) {
+                      return _buildVideoMessage(message, messageWidth);
+                    },
                 // onPreviewDataFetched: _handlePreviewDataFetched,
                 onSendPressed: (types.PartialText partialText) =>
                     _handleSendPressed(partialText),
                 showUserAvatars: true,
                 showUserNames: true,
                 user: widget.user,
-                textMessageBuilder: (types.TextMessage message,
-                    {required int messageWidth, required bool showName}) {
-                  return _buildTextMessage(message, messageWidth, showName);
-                },
-                imageMessageBuilder: (types.ImageMessage message,
-                    {required int messageWidth}) {
-                  return _buildImageMessage(message, messageWidth);
-                },
-                fileMessageBuilder: (types.FileMessage message,
-                    {required int messageWidth}) {
-                  return _buildFileMessage(message, messageWidth);
-                },
+                textMessageBuilder:
+                    (
+                      types.TextMessage message, {
+                      required int messageWidth,
+                      required bool showName,
+                    }) {
+                      return _buildTextMessage(message, messageWidth, showName);
+                    },
+                imageMessageBuilder:
+                    (types.ImageMessage message, {required int messageWidth}) {
+                      return _buildImageMessage(message, messageWidth);
+                    },
+                fileMessageBuilder:
+                    (types.FileMessage message, {required int messageWidth}) {
+                      return _buildFileMessage(message, messageWidth);
+                    },
                 customBottomWidget: _editingMessage != null
                     ? Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -430,9 +428,7 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
                             IconButton(
                               icon: const Icon(Icons.send),
                               // onPressed: _handleEditSendPressed,
-                              onPressed: () {
-                                
-                              },
+                              onPressed: () {},
                             ),
                             IconButton(
                               icon: const Icon(Icons.cancel),
@@ -458,7 +454,10 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
   }
 
   Widget _buildTextMessage(
-      types.TextMessage message, int messageWidth, bool showName) {
+    types.TextMessage message,
+    int messageWidth,
+    bool showName,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -507,8 +506,8 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
                   // int index = _messages.indexWhere((m) => m.id == message.id);
                   // if (index != -1) {
                   //   setState(() {
-                      // _messages.removeAt(index);
-                    // });
+                  // _messages.removeAt(index);
+                  // });
                   // }
                 },
                 child: Container(
@@ -517,11 +516,7 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
                     color: Colors.grey.withOpacity(0.7),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.close,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.close, size: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -534,9 +529,7 @@ _stopTypingSub = socket.stopTypingStream.listen((_) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(
-          child: FileMessage(message: message),
-        ),
+        Flexible(child: FileMessage(message: message)),
         if (message.author.id == widget.user.id)
           _buildOptionsButton(context, message),
       ],
