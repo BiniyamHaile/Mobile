@@ -121,14 +121,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  buffer:
-    dependency: transitive
-    description:
-      name: buffer
-      sha256: "389da2ec2c16283c8787e0adaede82b1842102f8c8aae2f49003a766c5c6b3d1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.3"
   build:
     dependency: transitive
     description:
@@ -221,18 +213,18 @@ packages:
     dependency: "direct main"
     description:
       name: camera
-      sha256: "413d2b34fe28496c35c69ede5b232fb9dd5ca2c3a4cb606b14efc1c7546cc8cb"
+      sha256: dfa8fc5a1adaeb95e7a54d86a5bd56f4bb0e035515354c8ac6d262e35cec2ec8
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.1"
-  camera_android_camerax:
+    version: "0.10.6"
+  camera_android:
     dependency: transitive
     description:
-      name: camera_android_camerax
-      sha256: "68d7ec97439108ac22cfba34bb74d0ab53adbc017175116d2cbc5a3d8fc8ea5e"
+      name: camera_android
+      sha256: "08808be7e26fc3c7426c81b3fa387564b8e9c22e6fe9cb5675ce3ab7017d8203"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.18+2"
+    version: "0.10.10+3"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -505,14 +497,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
-  eth_sig_util:
-    dependency: transitive
-    description:
-      name: eth_sig_util
-      sha256: "20fdc5ce3864e70e5ade1c1cd03cce4ef01018db00adab107303f9055d26b01a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.9"
   ethereum:
     dependency: "direct main"
     description:
@@ -787,14 +771,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_web3:
-    dependency: "direct main"
-    description:
-      name: flutter_web3
-      sha256: d8bdcbead96352d9e4ee58ede7965f09a541472692ad61e72b0bd317005c08e9
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.9"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1008,6 +984,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+  jwt_decoder:
+    dependency: "direct main"
+    description:
+      name: jwt_decoder
+      sha256: "54774aebf83f2923b99e6416b4ea915d47af3bde56884eb622de85feabbc559f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -1104,6 +1088,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  msgpack_dart:
+    dependency: transitive
+    description:
+      name: msgpack_dart
+      sha256: c2d235ed01f364719b5296aecf43ac330f0d7bc865fa134d0d7910a40454dffb
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   nested:
     dependency: transitive
     description:
@@ -1340,42 +1332,26 @@ packages:
     dependency: "direct main"
     description:
       name: reown_appkit
-      sha256: e6618a017cea67295ce95029e5009fa779b16bc04c45e693ff78616899a450f0
+      sha256: e6dea00010c9ed52e2e5c8696ad476a5037f72334376e3d7d9c78638bdee3842
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.3+1"
+    version: "1.4.5"
   reown_core:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: reown_core
-      sha256: "171ce977b563b7b2fe0a17393517a4743ab758152d6c0c5158921a7ed3746326"
+      sha256: "3fe69935afc39fa9bf3ba6721dfde5396d1880c61803feadc217bed1859e2184"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.5"
+    version: "1.1.6"
   reown_sign:
     dependency: transitive
     description:
       name: reown_sign
-      sha256: eb24d5b201635b0adbe15182c4cd2f831642dde05f59f033dac8de3bd423495d
+      sha256: "9401c7c74f29b35b65b47113bbb95e653276a122dc685f1aa07c3150a8dad6fd"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.6"
-  reown_walletkit:
-    dependency: "direct main"
-    description:
-      name: reown_walletkit
-      sha256: e639dbfac019270380b8f80105e11364f4962ff78fdc95d01aee16ea6f27fb2a
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.5+1"
-  reown_yttrium:
-    dependency: "direct main"
-    description:
-      name: reown_yttrium
-      sha256: e59d9e8dbad8e2c420c201719da12bca528c38ecab9571364d5b6d18715ce773
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
+    version: "1.1.7"
   rxdart:
     dependency: transitive
     description:
@@ -1761,10 +1737,10 @@ packages:
     dependency: transitive
     description:
       name: vector_graphics
-      sha256: "44cc7104ff32563122a929e4620cf3efd584194eec6d1d913eb5ba593dbcf6de"
+      sha256: a4f059dc26fc8295b5921376600a194c4ec7d55e72f2fe4c7d2831e103d461e6
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.18"
+    version: "1.1.19"
   vector_graphics_codec:
     dependency: transitive
     description:
@@ -1937,10 +1913,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter_platform_interface
-      sha256: "7cb32b21825bd65569665c32bb00a34ded5779786d6201f5350979d2d529940d"
+      sha256: f0dc2dc3a2b1e3a6abdd6801b9355ebfeb3b8f6cde6b9dc7c9235909c4a1f147
       url: "https://pub.dev"
     source: hosted
-    version: "2.13.0"
+    version: "2.13.1"
   webview_flutter_wkwebview:
     dependency: transitive
     description:

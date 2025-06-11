@@ -3,17 +3,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
 import 'package:mobile/ui/pages/home_page.dart';
-import 'package:mobile/ui/routes/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:mobile/models/post.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 class PostingScreen extends StatefulWidget {
   final dynamic post;
@@ -61,9 +60,7 @@ class _PostingScreenState extends State<PostingScreen> {
     try {
       final response = await Dio().get(
         '${ApiEndpoints.baseUrl}/auth/following',
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       if (response.statusCode == 200) {
@@ -86,9 +83,7 @@ class _PostingScreenState extends State<PostingScreen> {
     try {
       final loggedUser = await Dio().get(
         '${ApiEndpoints.baseUrl}/auth/profile',
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       currentProfilePic = loggedUser.data['profilePic'] ?? '';
@@ -158,6 +153,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
     if (filteredUsers.isEmpty) return;
 
+    final theme = AppTheme.getTheme(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     _mentionOverlay = OverlayEntry(
       builder: (context) => Positioned(
         width: 200,
@@ -170,7 +168,7 @@ class _PostingScreenState extends State<PostingScreen> {
             child: Container(
               constraints: const BoxConstraints(maxHeight: 200),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListView.builder(
@@ -181,15 +179,22 @@ class _PostingScreenState extends State<PostingScreen> {
                   final user = filteredUsers[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: user.profilePic != null
-                          ? CachedNetworkImageProvider(user.profilePic!)
-                          : null,
-                      child: user.profilePic == null
-                          ? const Icon(Icons.person)
-                          : null,
+                      backgroundColor: isDark
+                          ? AppTheme.appColors.darkGreyColor5
+                          : AppTheme.appColors.accent2,
+                      child: Icon(
+                        Icons.person,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
-                    title: Text('${user.firstName} ${user.lastName}'),
-                    subtitle: Text('@${user.username}'),
+                    title: Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: TextStyle(color: theme.colorScheme.onSurface),
+                    ),
+                    subtitle: Text(
+                      '@${user.username}',
+                      style: TextStyle(color: theme.hintColor),
+                    ),
                     onTap: () => _insertMention(user),
                   );
                 },
@@ -223,8 +228,9 @@ class _PostingScreenState extends State<PostingScreen> {
   Future<void> _pickImage() async {
     if (!mounted) return;
     try {
-      final List<XFile> pickedFiles =
-          await _picker.pickMultiImage(imageQuality: 85);
+      final List<XFile> pickedFiles = await _picker.pickMultiImage(
+        imageQuality: 85,
+      );
       if (pickedFiles.isNotEmpty && mounted) {
         setState(() => _selectedMedia.addAll(pickedFiles));
       }
@@ -266,8 +272,10 @@ class _PostingScreenState extends State<PostingScreen> {
   Future<void> _takePhoto() async {
     if (!mounted) return;
     try {
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.camera, imageQuality: 85);
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
       if (pickedFile != null && mounted) {
         setState(() => _selectedMedia.add(pickedFile));
       }
@@ -307,47 +315,51 @@ class _PostingScreenState extends State<PostingScreen> {
       return;
     }
 
-    print("mentions here>>> ${_mentions}");
-
     if (_editingPost != null) {
-      postBloc.add(UpdatePost(
-        postId: _editingPost!.id,
-        content: content,
-        mediaFiles: _selectedMedia,
-        mentions: _mentions,
-      ));
+      postBloc.add(
+        UpdatePost(
+          postId: _editingPost!.id,
+          content: content,
+          mediaFiles: _selectedMedia,
+          mentions: _mentions,
+        ),
+      );
     } else {
-      postBloc.add(CreatePost(
-        content: content,
-        mediaFiles: _selectedMedia,
-        mentions: _mentions,
-      ));
+      postBloc.add(
+        CreatePost(
+          content: content,
+          mediaFiles: _selectedMedia,
+          mentions: _mentions,
+        ),
+      );
     }
   }
 
   void _showError(String message) {
     if (!mounted) return;
+    final theme = AppTheme.getTheme(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: theme.colorScheme.onError),
+        ),
+        backgroundColor: theme.colorScheme.error,
+      ),
     );
   }
 
-  Widget _buildMediaPreview() {
+  Widget _buildMediaPreview(bool isDark) {
     final totalItems = _existingMediaUrls.length + _selectedMedia.length;
     if (totalItems == 0) return const SizedBox();
+
+    final theme = AppTheme.getTheme(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text(
-          'Media Preview',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Media Preview', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -357,7 +369,8 @@ class _PostingScreenState extends State<PostingScreen> {
               final path = isUrl
                   ? _existingMediaUrls[index]
                   : _selectedMedia[index - _existingMediaUrls.length].path;
-              final isVideo = path.toLowerCase().endsWith('.mp4') ||
+              final isVideo =
+                  path.toLowerCase().endsWith('.mp4') ||
                   path.toLowerCase().endsWith('.mov');
 
               Widget mediaWidget;
@@ -366,10 +379,19 @@ class _PostingScreenState extends State<PostingScreen> {
                     ? Stack(
                         children: [
                           Container(
-                              width: 120, height: 120, color: Colors.black12),
-                          const Center(
-                              child: Icon(Icons.play_circle_fill,
-                                  color: Colors.white, size: 40)),
+                            width: 120,
+                            height: 120,
+                            color: isDark
+                                ? AppTheme.appColors.darkGreyColor5
+                                : AppTheme.appColors.accent2,
+                          ),
+                          Center(
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              color: theme.colorScheme.onSurface,
+                              size: 40,
+                            ),
+                          ),
                         ],
                       )
                     : CachedNetworkImage(
@@ -380,36 +402,60 @@ class _PostingScreenState extends State<PostingScreen> {
                         placeholder: (context, url) => Container(
                           width: 120,
                           height: 120,
-                          color: Colors.grey[200],
-                          child:
-                              const Center(child: CircularProgressIndicator()),
+                          color: isDark
+                              ? AppTheme.appColors.darkGreyColor5
+                              : AppTheme.appColors.accent2,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           width: 120,
                           height: 120,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.broken_image),
+                          color: isDark
+                              ? AppTheme.appColors.darkGreyColor5
+                              : AppTheme.appColors.accent2,
+                          child: Icon(
+                            Icons.broken_image,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                       );
               } else {
                 mediaWidget = isVideo
                     ? (_videoControllers.containsKey(path)
-                        ? AspectRatio(
-                            aspectRatio:
-                                _videoControllers[path]!.value.aspectRatio,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                VideoPlayer(_videoControllers[path]!),
-                                Container(color: Colors.black.withOpacity(0.4)),
-                                const Icon(Icons.play_circle_fill,
-                                    size: 40, color: Colors.white),
-                              ],
-                            ),
-                          )
-                        : const Center(child: CircularProgressIndicator()))
-                    : Image.file(File(path),
-                        width: 120, height: 120, fit: BoxFit.cover);
+                          ? AspectRatio(
+                              aspectRatio:
+                                  _videoControllers[path]!.value.aspectRatio,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  VideoPlayer(_videoControllers[path]!),
+                                  Container(
+                                    color: theme.colorScheme.surface
+                                        .withOpacity(0.4),
+                                  ),
+                                  Icon(
+                                    Icons.play_circle_fill,
+                                    size: 40,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ))
+                    : Image.file(
+                        File(path),
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      );
               }
 
               return Padding(
@@ -418,8 +464,11 @@ class _PostingScreenState extends State<PostingScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child:
-                          SizedBox(width: 120, height: 120, child: mediaWidget),
+                      child: SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: mediaWidget,
+                      ),
                     ),
                     Positioned(
                       top: 5,
@@ -432,8 +481,11 @@ class _PostingScreenState extends State<PostingScreen> {
                             color: Colors.black.withOpacity(0.6),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.close,
-                              size: 16, color: Colors.white),
+                          child: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -447,65 +499,86 @@ class _PostingScreenState extends State<PostingScreen> {
     );
   }
 
-  Widget _buildMentionsPreview() {
+  Widget _buildMentionsPreview(bool isDark) {
     if (_mentions.isEmpty) return const SizedBox();
+
+    final theme = AppTheme.getTheme(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text(
-          'Mentioned Users',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Mentioned Users', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           children: _mentions.map((userId) {
-            final userIndex =
-                _mentionableUsers.indexWhere((u) => u.id == userId);
+            final userIndex = _mentionableUsers.indexWhere(
+              (u) => u.id == userId,
+            );
 
-            // User not found case
             if (userIndex == -1) {
               return Chip(
-                avatar: const CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person_off, size: 16, color: Colors.white),
+                avatar: CircleAvatar(
+                  backgroundColor: theme.hintColor,
+                  child: Icon(
+                    Icons.person_off,
+                    size: 16,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 label: Text(
                   'User not found',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: theme.colorScheme.onSurface),
                 ),
-                deleteIcon: const Icon(Icons.close, size: 16),
+                deleteIcon: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: theme.colorScheme.onSurface,
+                ),
                 onDeleted: () {
                   setState(() => _mentions.remove(userId));
                   _removeMentionFromText(userId);
                 },
-                backgroundColor: Colors.grey[200],
+                backgroundColor: isDark
+                    ? AppTheme.appColors.darkGreyColor5
+                    : AppTheme.appColors.accent2,
               );
             }
 
-            // User found case
             final user = _mentionableUsers[userIndex];
             return Chip(
               avatar: CircleAvatar(
                 backgroundImage: user.profilePic != null
                     ? CachedNetworkImageProvider(user.profilePic!)
                     : null,
+                backgroundColor: isDark
+                    ? AppTheme.appColors.darkGreyColor5
+                    : AppTheme.appColors.accent2,
                 child: user.profilePic == null
-                    ? const Icon(Icons.person, size: 16)
+                    ? Icon(
+                        Icons.person,
+                        size: 16,
+                        color: theme.colorScheme.onSurface,
+                      )
                     : null,
               ),
-              label: Text('@${user.username}'),
-              deleteIcon: const Icon(Icons.close, size: 16),
+              label: Text(
+                '@${user.username}',
+                style: TextStyle(color: theme.colorScheme.onSurface),
+              ),
+              deleteIcon: Icon(
+                Icons.close,
+                size: 16,
+                color: theme.colorScheme.onSurface,
+              ),
               onDeleted: () {
                 setState(() => _mentions.remove(userId));
                 _removeMentionFromText(user.username!);
               },
+              backgroundColor: isDark
+                  ? AppTheme.appColors.darkGreyColor5
+                  : AppTheme.appColors.accent2,
             );
           }).toList(),
         ),
@@ -514,8 +587,9 @@ class _PostingScreenState extends State<PostingScreen> {
   }
 
   void _removeMentionFromText(String usernameOrId) {
-    final username =
-        usernameOrId.startsWith('@') ? usernameOrId.substring(1) : usernameOrId;
+    final username = usernameOrId.startsWith('@')
+        ? usernameOrId.substring(1)
+        : usernameOrId;
     _textController.text = _textController.text
         .replaceAll('@$username ', '')
         .replaceAll('@$username', '');
@@ -532,6 +606,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.getTheme(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
         if (state is PostCreationSuccess || state is PostUpdateSuccess) {
@@ -540,27 +617,20 @@ class _PostingScreenState extends State<PostingScreen> {
 
             ScaffoldMessenger.of(context).clearSnackBars();
 
-            if (state is PostCreationSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Post created successfully'),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
+            final message = state is PostCreationSuccess
+                ? 'Post created successfully'
+                : 'Post updated successfully';
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  message,
+                  style: TextStyle(color: theme.colorScheme.onPrimary),
                 ),
-              );
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-            } else if (state is PostUpdateSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Post updated successfully'),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
+                backgroundColor: theme.colorScheme.primary,
+                duration: const Duration(seconds: 2),
+              ),
+            );
 
             if (_editingPost != null) {
               _editingPost = null;
@@ -570,22 +640,28 @@ class _PostingScreenState extends State<PostingScreen> {
               _mentions.clear();
             }
 
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const HomePage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
           }
         } else if (state is PostCreationFailure || state is PostUpdateFailure) {
           if (mounted) {
             setState(() => _isSubmitting = false);
-            _showError("Post creation failed: ${state}");
+            _showError(
+              state is PostCreationFailure
+                  ? 'Post creation failed'
+                  : 'Post update failed',
+            );
           }
         }
       },
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+          backgroundColor: theme.colorScheme.primary,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
             onPressed: () {
               if (_isSubmitting) return;
               Navigator.pop(context);
@@ -593,115 +669,138 @@ class _PostingScreenState extends State<PostingScreen> {
           ),
           title: Text(
             _editingPost != null ? 'Edit Post' : 'Create Post',
-            style: const TextStyle(
-              fontSize: 30,
+            style: TextStyle(
+              color: theme.colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
-              backgroundColor: Color.fromRGBO(143, 148, 251, 1),
             ),
           ),
+         
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: (currentProfilePic.isNotEmpty)
-                              ? CachedNetworkImageProvider(currentProfilePic)
-                              : null,
-                          child: (currentProfilePic.isNotEmpty)
-                              ? null
-                              : Icon(Icons.person, color: Colors.grey.shade800),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(currentUserFullname,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16,)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    CompositedTransformTarget(
-                      link: _mentionLayerLink,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+        body: Container(
+          color: theme.colorScheme.surface,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: isDark
+                                ? AppTheme.appColors.darkGreyColor5
+                                : AppTheme.appColors.accent2,
+                            backgroundImage: currentProfilePic.isNotEmpty
+                                ? CachedNetworkImageProvider(currentProfilePic)
+                                : null,
+                            child: currentProfilePic.isEmpty
+                                ? Icon(
+                                    Icons.person,
+                                    color: theme.colorScheme.onSurface,
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            currentUserFullname,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      CompositedTransformTarget(
+                        link: _mentionLayerLink,
                         child: TextField(
                           controller: _textController,
                           focusNode: _textFocusNode,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "What's on your mind?",
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16),
-                            fillColor: Colors.white,
-                            filled: true,
+                            hintStyle: TextStyle(
+                              color: theme.colorScheme.primary,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.all(16),
                           ),
                           maxLines: 8,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
                           minLines: 4,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _MediaButton(
-                          icon: Icons.photo_library,
-                          label: 'Gallery',
-                          color: Colors.blue,
-                          onPressed: _pickImage,
-                        ),
-                        _MediaButton(
-                          icon: Icons.video_library,
-                          label: 'Video',
-                          color: Colors.purple,
-                          onPressed: _pickVideos,
-                        ),
-                        _MediaButton(
-                          icon: Icons.camera_alt,
-                          label: 'Camera',
-                          color: Colors.green,
-                          onPressed: _takePhoto,
-                        ),
-                      ],
-                    ),
-                    _buildMediaPreview(),
-                    _buildMentionsPreview(),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitPost,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _MediaButton(
+                            icon: Icons.photo_library,
+                            label: 'Gallery',
+                            color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _pickImage,
+                          ),
+                          _MediaButton(
+                            icon: Icons.video_library,
+                            label: 'Video',
+                            color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _pickVideos,
+                          ),
+                          _MediaButton(
+                            icon: Icons.camera_alt,
+                            label: 'Camera',
+                            color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _takePhoto,
+                          ),
+                        ],
+                      ),
+                      _buildMediaPreview(isDark),
+                      _buildMentionsPreview(isDark),
+                    ],
                   ),
-                  child: _isSubmitting
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          _editingPost != null ? 'Update Post' : 'Create Post'),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submitPost,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                          width: 1.5,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: _isSubmitting
+                        ? CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          )
+                        : Text(
+                            _editingPost != null
+                                ? 'Update Post'
+                                : 'Create Post',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -712,12 +811,14 @@ class _MediaButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final Color iconColor;
   final VoidCallback onPressed;
 
   const _MediaButton({
     required this.icon,
     required this.label,
     required this.color,
+    required this.iconColor,
     required this.onPressed,
   });
 
@@ -726,11 +827,11 @@ class _MediaButton extends StatelessWidget {
     return Column(
       children: [
         IconButton(
-          icon: Icon(icon, size: 40),
+          icon: Icon(icon, size: 30),
           color: color,
           onPressed: onPressed,
         ),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
+        Text(label, style: TextStyle(color: iconColor)),
       ],
     );
   }

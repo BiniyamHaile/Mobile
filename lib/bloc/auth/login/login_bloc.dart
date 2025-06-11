@@ -34,6 +34,7 @@ Future<void> connectSocket()async {
       LoginSubmitted event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
     try {
+      print("Logging in with email: ${event.email} and password: ${event.password}");
       final response = await Dio().post(
         '${ApiEndpoints.baseUrl}/auth/login',
         data: {
@@ -42,11 +43,15 @@ Future<void> connectSocket()async {
         },
       );
 
+      print("Response: ${response.data}");
+
       if (response.statusCode == 201) {
         // Handle successful login
         // You might want to save the token and user data here
 
         final token = response.data['accessToken'] as String?;
+
+        print("Token:${response}");
 
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();

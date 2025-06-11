@@ -3,10 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
-<<<<<<< HEAD
-import 'package:shared_preferences/shared_preferences.dart';
-=======
->>>>>>> 3caf1377c8e6acf894ba855e6244553e0b63682a
 
 part 'preference_event.dart';
 part 'preference_state.dart';
@@ -84,11 +80,6 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
       emit(PreferencesSubmitting(categories: currentState.categories));
 
       try {
-<<<<<<< HEAD
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
-=======
->>>>>>> 3caf1377c8e6acf894ba855e6244553e0b63682a
         // Get all selected preference IDs
         final selectedPreferences = currentState.categories
             .expand((category) => category.options)
@@ -96,21 +87,6 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
             .map((option) => option.id)
             .toList();
 
-<<<<<<< HEAD
-        // Make API call to update profile with preferences
-        final response = await Dio().put(
-          '${ApiEndpoints.baseUrl}/auth/updateprofile',
-          data: {
-            'preferences': selectedPreferences,
-          },
-          options: Options(
-            headers: {
-              // 'Content-Type': 'application/json',
-              // Add authorization header if needed
-              'Authorization': 'Bearer $token',
-            },
-          ),
-=======
         // Make API call to save preferences
         final response = await Dio().post(
           '${ApiEndpoints.baseUrl}/user/preferences',
@@ -123,18 +99,13 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
           //     'Content-Type': 'application/json',
           //   },
           // ),
->>>>>>> 3caf1377c8e6acf894ba855e6244553e0b63682a
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(PreferencesSubmitted(selectedPreferences: selectedPreferences));
         } else {
           emit(PreferencesError(
-<<<<<<< HEAD
-            error: 'Failed to update profile: ${response.statusMessage}',
-=======
             error: 'Failed to save preferences: ${response.statusMessage}',
->>>>>>> 3caf1377c8e6acf894ba855e6244553e0b63682a
             categories: currentState.categories,
           ));
         }
