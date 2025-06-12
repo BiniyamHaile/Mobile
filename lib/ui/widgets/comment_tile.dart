@@ -1,13 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
 
 class CommentTile extends StatefulWidget {
   const CommentTile({
@@ -51,7 +51,7 @@ class _CommentTileState extends State<CommentTile> {
         controller.setLooping(true);
         controller.pause();
         _videoControllers[file] = controller;
-        
+
         _chewieControllers[file] = ChewieController(
           videoPlayerController: controller,
           autoPlay: false,
@@ -105,7 +105,12 @@ class _CommentTileState extends State<CommentTile> {
             builder: (context) => Scaffold(
               backgroundColor: Colors.black,
               appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+                backgroundColor: const Color.fromRGBO(
+                  143,
+                  148,
+                  251,
+                  1,
+                ), // Add this lin
                 iconTheme: const IconThemeData(color: Colors.white),
               ),
               body: Center(
@@ -136,10 +141,7 @@ class _CommentTileState extends State<CommentTile> {
                 panEnabled: true,
                 minScale: 0.5,
                 maxScale: 4.0,
-                child: CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.contain,
-                ),
+                child: CachedNetworkImage(imageUrl: url, fit: BoxFit.contain),
               ),
             ),
           ),
@@ -175,8 +177,10 @@ class _CommentTileState extends State<CommentTile> {
               backgroundColor: Colors.grey.shade200,
               backgroundImage:
                   (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
-                      ? CachedNetworkImageProvider('${_currentComment.owner?.profilePic}')
-                      : null,
+                  ? CachedNetworkImageProvider(
+                      '${_currentComment.owner?.profilePic}',
+                    )
+                  : null,
               child: (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
                   ? null
                   : Icon(Icons.person, color: Colors.grey.shade800),
@@ -194,14 +198,16 @@ class _CommentTileState extends State<CommentTile> {
                         children: [
                           Text(
                             "${_currentComment.owner?.firstName} ${_currentComment.owner?.lastName}",
-                            style: theme.textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const Spacer(),
                           Text(
                             _formatDate(_currentComment.createdAt),
-                            style: theme.textTheme.bodySmall
-                                ?.copyWith(color: Colors.grey),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -332,7 +338,8 @@ class _CommentTileState extends State<CommentTile> {
         SizedBox(
           height: 300,
           child: AspectRatio(
-            aspectRatio: chewieController.videoPlayerController.value.aspectRatio,
+            aspectRatio:
+                chewieController.videoPlayerController.value.aspectRatio,
             child: Chewie(controller: chewieController),
           ),
         ),
@@ -340,11 +347,7 @@ class _CommentTileState extends State<CommentTile> {
           Container(
             height: 300,
             color: Colors.black.withOpacity(0.3),
-            child: const Icon(
-              Icons.play_arrow,
-              size: 50,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.play_arrow, size: 50, color: Colors.white),
           ),
       ],
     );
@@ -379,7 +382,10 @@ class _CommentTileState extends State<CommentTile> {
                 commentBloc.add(DeleteComment(_currentComment.id));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Comment deleted successfully'),
+                    content: Text(
+                      'Comment deleted successfully',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     backgroundColor: Colors.green,
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -434,9 +440,9 @@ class __CommentLikeButtonState extends State<_CommentLikeButton> {
           _likeCount = _isLiked ? _likeCount + 1 : _likeCount - 1;
         });
 
-        context
-            .read<CommentBloc>()
-            .add(ToggleReaction(commentId: widget.commentId));
+        context.read<CommentBloc>().add(
+          ToggleReaction(commentId: widget.commentId),
+        );
       },
     );
   }

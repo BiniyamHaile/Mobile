@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_event.dart';
 import 'package:mobile/bloc/reel/reel_state.dart';
@@ -7,6 +9,7 @@ import 'package:mobile/models/reel/like/like_dto.dart';
 import 'package:mobile/models/reel/like/likeable_type.dart';
 import 'package:mobile/models/reel/video_item.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/views/reel/widgets/optimized_video_player.dart';
 import 'package:mobile/ui/views/reel/widgets/video_overlay_section.dart';
 import 'package:mobile/ui/widgets/wallet/star_reaction_modal.dart';
@@ -26,43 +29,159 @@ class VideoFeedItem extends StatelessWidget {
   final String currentUserId;
   final VideoPlayerController? controller;
 
-  // Function to show the Star Reaction Modal
-  void _showStarReactionModal(BuildContext context , String recipientAddressString) {
-    // Access WalletService using Provider
+  void _showStarReactionModal(
+    BuildContext context,
+    String recipientAddressString,
+  ) {
     final walletService = Provider.of<WalletService>(context, listen: false);
 
-    if (!walletService.isConnected ||
-        walletService.currentSession == null ||
-        !walletService.areContractsLoaded ||
+    // Check wallet connection first
+    if (!walletService.isConnected || walletService.currentSession == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            contentPadding: EdgeInsets.zero,
+            content: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white, Color.fromRGBO(143, 148, 251, 0.1)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color.fromRGBO(143, 148, 251, 0.1),
+                          Color.fromRGBO(143, 148, 251, 0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(143, 148, 251, 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            LucideIcons.wallet,
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            size: 24,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Connect Wallet',
+                          style: TextStyle(
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      'Please connect your wallet to send star reactions.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            GoRouter.of(context).go(RouteNames.wallet);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: Text(
+                            'Connect Wallet',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    // Check network and contracts after wallet connection
+    if (!walletService.areContractsLoaded ||
         walletService.connectedAddress == null ||
         walletService.connectedNetwork?.chainId !=
             walletService.sepoliaChainId) {
-      // Use the modal error mechanism provided by WalletService
       walletService.appKitModal.onModalError.broadcast(
         ModalError('Please connect to Sepolia network to gift stars.'),
       );
       return;
     }
 
-    // Get recipient address. This originally came from a controller.
-    // ASSUMPTION: The recipient address is available in the videoItem, e.g., videoItem.authorWalletAddress.
-    // If not, you will need to find another way to get the recipient's wallet address.
-    // final recipientAddressString =
-    //     videoItem.authorWalletAddress;
-
-    // final recipientAddressString = '0x6ed5aD6f949b27EDA88C47d1e3b9Eb3DE9140cfE';
-
-    // <-- ASSUMPTION
-
-    if (recipientAddressString == null || recipientAddressString.isEmpty) {
-      // If no recipient address is available for this video item
+    if (recipientAddressString.isEmpty) {
       walletService.appKitModal.onModalError.broadcast(
         ModalError('Recipient wallet address not available for this video.'),
       );
       return;
     }
 
-    // Basic address format validation
     try {
       if (!recipientAddressString.startsWith('0x') ||
           recipientAddressString.length != 42) {
@@ -79,22 +198,15 @@ class VideoFeedItem extends StatelessWidget {
     // Show the bottom sheet modal
     showModalBottomSheet<int?>(
       context: context,
-      isScrollControlled:
-          true, // Allows the modal to take up more screen space if needed
-      backgroundColor: Colors
-          .transparent, // Makes the background transparent (for rounded corners)
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return StarReactionModal(
-          // You might want to pass the author's username if available in videoItem
-          recipientName:
-              videoItem.username ??
-              "Daniel Tilahun", // <-- ASSUMPTION: username is available
+          recipientName: videoItem.username ?? "Daniel Tilahun",
           recipientAddress: recipientAddressString,
         );
       },
     ).then((amountInStars) {
-      // This block is executed after the modal is closed.
-      // amountInStars will be the value returned from the modal (or null if closed without selecting).
       if (amountInStars != null && amountInStars > 0) {
         print('Modal returned amount: $amountInStars. Initiating gift...');
         walletService.sendGiftStars(recipientAddressString, amountInStars);
@@ -150,10 +262,12 @@ class VideoFeedItem extends StatelessWidget {
                   postReelBloc.add(ShareReel(reelId: videoItem.id));
                 },
                 // Add the new callback for the Gift Stars action
-                onGiftStarsPressed: () =>
-                    _showStarReactionModal(context , videoItem.walletId), // Pass the function
+                onGiftStarsPressed: () => _showStarReactionModal(
+                  context,
+                  videoItem.walletId,
+                ), // Pass the function
                 currentUserId: currentUserId,
-                gift: gift
+                gift: gift,
               );
             },
           ),

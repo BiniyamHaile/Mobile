@@ -13,7 +13,7 @@ class FollowButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       margin: const EdgeInsets.only(left: 12),
       decoration: BoxDecoration(border: Border.all(color: appColors.whiteColor), borderRadius: BorderRadius.circular(8)),
-      child: Text("follow", style: TextStyle(color: appColors.whiteColor, fontSize: 16)),
+      child: Text("Follow", style: TextStyle(color: appColors.whiteColor, fontSize: 16)),
     );
   }
 }

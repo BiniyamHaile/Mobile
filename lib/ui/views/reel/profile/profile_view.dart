@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/video_item.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -40,30 +42,7 @@ final List<VideoItem> _userVideosList = [
     allowSaveToDevice: false,
     saveWithWatermark: true,
     audienceControlUnder18: false,
-    walletId:""
-  ),
-  VideoItem(
-    id: 'user_video_2',
-    videoUrl:
-        'https://res.cloudinary.com/dpmykt0af/video/upload/v1745257849/Download_nkza7a.mp4',
-    username: "Daniel",
-    description: "EAT HEAVY CARRY HEAVY",
-    profileImageUrl: _profileImageUrl,
-    likeCount: 13700000,
-    commentCount: 500,
-    shareCount: 120,
-    isBookmarked: true,
-    isLiked: false,
-    timestamp: DateTime.now().subtract(Duration(hours: 1)),
-    isPremiumContent: false,
-    duration: 25,
-    mentionedUsers: null,
-    privacy: PrivacyOption.followers,
-    allowComments: false,
-    allowSaveToDevice: true,
-    saveWithWatermark: false,
-    audienceControlUnder18: true,
-    walletId:""
+    walletId: "",
   ),
   VideoItem(
     id: 'user_video_3',
@@ -85,7 +64,7 @@ final List<VideoItem> _userVideosList = [
     allowSaveToDevice: true,
     saveWithWatermark: true,
     audienceControlUnder18: false,
-    walletId:""
+    walletId: "",
   ),
 ];
 
@@ -112,32 +91,39 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+        //   onPressed: () {
+        //     Navigator.of(context).pop();
+        //   },
+        // ),
         title: const Text(
-          'Mind Trainer',
+          'Daniel Tilahun',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
+          // IconButton(
+          //   icon: const Icon(Icons.notifications_none, color: Colors.white),
+          //   onPressed: () {
+          //     // TODO: Implement notification action
+          //   },
+          // ),
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () {
-              // TODO: Implement notification action
+              context.go(RouteNames.profileSetting);
             },
           ),
+
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.white),
             onPressed: () {
-              // TODO: Implement share action
+              context.push(RouteNames.notifications);
             },
+            icon: Icon(LucideIcons.bell, color: Colors.white),
           ),
         ],
       ),
@@ -181,7 +167,7 @@ class ProfileView extends StatelessWidget {
                     // TODO: Implement Follow action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent,
+                    backgroundColor: Color.fromRGBO(143, 148, 251, 1),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
@@ -208,35 +194,38 @@ class ProfileView extends StatelessWidget {
                   ),
                   child: const Text(
                     'Message',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: Color.fromRGBO(143, 148, 251, 1),
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.arrow_drop_down, color: Colors.white),
-              ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     border: Border.all(color: Colors.grey),
+              //     borderRadius: BorderRadius.circular(4),
+              //   ),
+              //   padding: const EdgeInsets.all(8),
+              //   child: const Icon(Icons.arrow_drop_down, color: Colors.green),
+              // ),
             ],
           ),
           const SizedBox(height: 20),
           const Text(
             _bioText,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: Colors.black, fontSize: 14),
           ),
           const SizedBox(height: 20),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(Icons.grid_view_rounded, color: Colors.white),
-              Icon(Icons.favorite_border, color: Colors.grey),
-              Icon(Icons.bookmark_border, color: Colors.grey),
-              Icon(Icons.lock_outline, color: Colors.grey),
+              Icon(Icons.grid_view_rounded, color: Colors.black),
+              Icon(Icons.favorite_border, color: Colors.black),
+              Icon(Icons.bookmark_border, color: Colors.black),
+              Icon(Icons.lock_outline, color: Colors.black),
             ],
           ),
           const Divider(color: Colors.grey, height: 20, thickness: 0.5),
@@ -267,7 +256,7 @@ class ProfileView extends StatelessWidget {
         Text(
           count,
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -283,10 +272,7 @@ class ProfileView extends StatelessWidget {
       onTap: () {
         context.push(
           RouterEnum.profileVideoPlayerView.routeName,
-          extra: {
-            'userVideos': _userVideosList,
-            'initialIndex': index,
-          },
+          extra: {'userVideos': _userVideosList, 'initialIndex': index},
         );
       },
       child: AspectRatio(
@@ -306,8 +292,9 @@ class ProfileView extends StatelessWidget {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -320,7 +307,8 @@ class ProfileView extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       debugPrint(
-                          "Error displaying generated thumbnail: $error");
+                        "Error displaying generated thumbnail: $error",
+                      );
                       return Container(color: Colors.red.shade900);
                     },
                   );
@@ -441,12 +429,11 @@ class ProfileView extends StatelessWidget {
                   video.privacy == PrivacyOption.followers
                       ? Icons.group
                       : video.privacy == PrivacyOption.friends
-                          ? Icons.people
-                          : video.privacy == PrivacyOption.onlyYou
-                              ? Icons.lock
-                              : Icons
-                                  .visibility_off, 
-                  color: Colors.grey, 
+                      ? Icons.people
+                      : video.privacy == PrivacyOption.onlyYou
+                      ? Icons.lock
+                      : Icons.visibility_off,
+                  color: Colors.grey,
                   size: 16,
                 ),
               ),

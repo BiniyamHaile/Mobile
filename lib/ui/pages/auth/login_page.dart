@@ -1,10 +1,11 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:mobile/bloc/auth/login/login_bloc.dart';
-import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/core/validators/auth_validator.dart';
+import 'package:mobile/ui/pages/auth/otp-params.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,11 +43,11 @@ class _LoginPageState extends State<LoginPage> {
   void _login() {
     if (_formKey.currentState!.validate()) {
       context.read<LoginBloc>().add(
-            LoginSubmitted(
-              email: _emailController.text.trim(),
-              password: _passwordController.text.trim(),
-            ),
-          );
+        LoginSubmitted(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -56,7 +57,8 @@ class _LoginPageState extends State<LoginPage> {
     final validation = validator.validateNewPassword(password);
     setState(() {
       _errorText = validation.message;
-      _strengthPercentage = (maxStrength - (validation.errorStrength)) * 100 / maxStrength;
+      _strengthPercentage =
+          (maxStrength - (validation.errorStrength)) * 100 / maxStrength;
       _indicatorColor = validation.color;
     });
   }
@@ -68,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state is LoginFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.red,
             ),
@@ -77,12 +79,12 @@ class _LoginPageState extends State<LoginPage> {
           // Navigate to home page after successful login
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Login successful!'),
+              content: Text('Login successful!' , style: TextStyle(color: Colors.white) ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.green,
             ),
           );
-          context.go('/preferences');
+          context.go(RouteNames.feed);
         }
       },
       builder: (context, state) {
@@ -200,12 +202,8 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               Text(
                                 'Welcome back! Please login to continue',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 24),
                               TextFormField(
@@ -213,8 +211,9 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -226,7 +225,9 @@ class _LoginPageState extends State<LoginPage> {
                                   if (val == null || val.isEmpty) {
                                     return 'Email is required';
                                   }
-                                  final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+\u0000?');
+                                  final emailRegex = RegExp(
+                                    r'^[^@\s]+@[^@\s]+\.[^@\s]+\u0000?',
+                                  );
                                   if (!emailRegex.hasMatch(val)) {
                                     return 'Enter a valid email address';
                                   }
@@ -241,8 +242,9 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Password',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
                                     icon: Icon(
@@ -262,7 +264,8 @@ class _LoginPageState extends State<LoginPage> {
                                   filled: true,
                                   fillColor: Colors.grey[50],
                                 ),
-                                onChanged: (value) => _updatePasswordStrength(value),
+                                onChanged: (value) =>
+                                    _updatePasswordStrength(value),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
                                     return 'Password is required';
@@ -311,8 +314,12 @@ class _LoginPageState extends State<LoginPage> {
                                 child: ElevatedButton(
                                   onPressed: isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(143, 148, 251, 1),
+                                    backgroundColor: const Color.fromRGBO(
+                                      143,
+                                      148,
+                                      251,
+                                      1,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),

@@ -1,12 +1,13 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:video_player/video_player.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/repository/social/comment_repository.dart';
 import 'package:mobile/ui/widgets/comment_tile.dart';
+import 'package:video_player/video_player.dart';
 
 class CommentsBottomSheet extends StatefulWidget {
   const CommentsBottomSheet({super.key, required this.post});
@@ -26,9 +27,9 @@ class CommentsBottomSheet extends StatefulWidget {
       builder: (_) => FractionallySizedBox(
         heightFactor: 0.8,
         child: BlocProvider(
-          create: (context) => CommentBloc(
-            commentRepository: CommentRepository(),
-          )..add(LoadComments(post.id)),
+          create: (context) =>
+              CommentBloc(commentRepository: CommentRepository())
+                ..add(LoadComments(post.id)),
           child: CommentsBottomSheet(post: post),
         ),
       ),
@@ -111,7 +112,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             itemCount: _selectedMedia.length,
             itemBuilder: (context, index) {
               final file = _selectedMedia[index];
-              final isVideo = file.path.toLowerCase().endsWith('.mp4') ||
+              final isVideo =
+                  file.path.toLowerCase().endsWith('.mp4') ||
                   file.path.toLowerCase().endsWith('.mov');
 
               Widget mediaWidget;
@@ -124,8 +126,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     child: VideoPlayer(controller),
                   );
                 } else {
-                  mediaWidget =
-                      const Center(child: CircularProgressIndicator());
+                  mediaWidget = const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
               } else {
                 mediaWidget = ClipRRect(
@@ -196,7 +199,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           _editingCommentId = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: TextStyle(color: Colors.white),
+              ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
             ),
@@ -213,7 +219,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 padding: const EdgeInsets.only(top: 64),
                 child: Container(
                   margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
                   padding: const EdgeInsets.only(bottom: 100),
                   child: _buildCommentsList(state),
                 ),
@@ -238,11 +245,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 100),
-          Icon(
-            Icons.mode_comment_outlined,
-            size: 60,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.mode_comment_outlined, size: 60, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No comments yet',
@@ -255,10 +258,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           const SizedBox(height: 8),
           Text(
             'Be the first to comment!',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -270,10 +270,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(
-            color: Colors.blue,
-            strokeWidth: 2,
-          ),
+          child: CircularProgressIndicator(color: Colors.blue, strokeWidth: 2),
         ),
       );
     } else if (state is CommentsLoaded || state is CommentOperationSuccess) {
@@ -284,8 +281,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       final sortedComments = List<Comment>.from(comments)
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      final topLevelComments =
-          sortedComments.where((c) => c.parentId == null).toList();
+      final topLevelComments = sortedComments
+          .where((c) => c.parentId == null)
+          .toList();
       if (topLevelComments.isEmpty) {
         return _buildNoCommentsUI();
       }
@@ -294,16 +292,19 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         itemCount: topLevelComments.length,
         itemBuilder: (_, index) {
           final comment = topLevelComments[index];
-          final replies =
-              comments.where((c) => c.parentId == comment.id).toList();
+          final replies = comments
+              .where((c) => c.parentId == comment.id)
+              .toList();
 
           return Column(
             children: [
               if (index == 0) const SizedBox(height: 16),
               CommentTile(
                 comment: comment,
-                onReply: () => _setReplyingTo(comment.id,
-                    '${comment.owner?.firstName} ${comment.owner?.lastName}'),
+                onReply: () => _setReplyingTo(
+                  comment.id,
+                  '${comment.owner?.firstName} ${comment.owner?.lastName}',
+                ),
                 isReplying: _replyingToCommentId == comment.id,
                 showReplyButton: true,
                 onEdit: (content) {
@@ -324,20 +325,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text(
-            state.message,
-            style: const TextStyle(color: Colors.red),
-          ),
+          child: Text(state.message, style: const TextStyle(color: Colors.red)),
         ),
       );
     }
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(16.0),
-        child: CircularProgressIndicator(
-          color: Colors.blue,
-          strokeWidth: 2,
-        ),
+        child: CircularProgressIndicator(color: Colors.blue, strokeWidth: 2),
       ),
     );
   }
@@ -349,11 +344,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
       if (allComments is CommentsLoaded ||
           allComments is CommentOperationSuccess) {
-        nestedReplies = (allComments is CommentsLoaded
-                ? allComments.comments
-                : (allComments as CommentOperationSuccess).comments)
-            .where((c) => c.parentId == reply.id)
-            .toList();
+        nestedReplies =
+            (allComments is CommentsLoaded
+                    ? allComments.comments
+                    : (allComments as CommentOperationSuccess).comments)
+                .where((c) => c.parentId == reply.id)
+                .toList();
       }
 
       return Column(
@@ -362,8 +358,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             padding: EdgeInsets.only(left: 40.0),
             child: CommentTile(
               comment: reply,
-              onReply: () => _setReplyingTo(reply.id,
-                  '${reply.owner?.firstName} ${reply.owner?.lastName}'),
+              onReply: () => _setReplyingTo(
+                reply.id,
+                '${reply.owner?.firstName} ${reply.owner?.lastName}',
+              ),
               isReplying: _replyingToCommentId == reply.id,
               showReplyButton: true,
               onEdit: (content) {
@@ -471,56 +469,57 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 onPressed: _pickVideo,
               ),
               Expanded(
-                  child: TextField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  hintText: _editingCommentId != null
-                      ? 'Edit your comment...'
-                      : _replyingToCommentId != null
-                          ? 'Write a reply...'
-                          : 'Write a comment...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300, // Subtle border color
-                      width: 1.5,
+                child: TextField(
+                  controller: _commentController,
+                  decoration: InputDecoration(
+                    hintText: _editingCommentId != null
+                        ? 'Edit your comment...'
+                        : _replyingToCommentId != null
+                        ? 'Write a reply...'
+                        : 'Write a comment...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300, // Subtle border color
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                        color: Colors.black, // Accent color when focused
+                        width: 1.5,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 16,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
                     ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1.5,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      color: Colors.black, // Accent color when focused
-                      width: 1.5,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade500,
+                  maxLines: 5,
+                  minLines: 1,
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
                     fontSize: 16,
+                    height: 1.4, // Better line spacing
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
+                  cursorColor: Colors.blue.shade600,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
-                maxLines: 5,
-                minLines: 1,
-                style: TextStyle(
-                  color: Colors.grey.shade800,
-                  fontSize: 16,
-                  height: 1.4, // Better line spacing
-                ),
-                cursorColor: Colors.blue.shade600,
-                textCapitalization: TextCapitalization.sentences,
-              )),
+              ),
               IconButton(
                 icon: const Icon(Icons.send),
                 onPressed: () => _submitComment(context),
@@ -543,27 +542,30 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
     if (_editingCommentId != null) {
       context.read<CommentBloc>().add(
-            UpdateComment(
-              commentId: _editingCommentId!,
-              content: _commentController.text,
-              files: _selectedMedia,
-            ),
-          );
+        UpdateComment(
+          commentId: _editingCommentId!,
+          content: _commentController.text,
+          files: _selectedMedia,
+        ),
+      );
     } else {
       context.read<CommentBloc>().add(
-            CreateComment(
-              postId: widget.post.id,
-              content: _commentController.text,
-              parentId: _replyingToCommentId,
-              files: _selectedMedia,
-            ),
-          );
+        CreateComment(
+          postId: widget.post.id,
+          content: _commentController.text,
+          parentId: _replyingToCommentId,
+          files: _selectedMedia,
+        ),
+      );
     }
   }
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(message, style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 }

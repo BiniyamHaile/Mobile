@@ -5,7 +5,7 @@ class RouteNames {
   static const String profile = '/profile';
   static const String post = '/post';
   static const String chat = '/chat';
-  // static const String walletConnect = '/connect-wallet';
+  static const String wallet = '/wallet';
   static const String reportPost = '/report-post';
   static const String settings = '/settings';
   static const String about = '/about';

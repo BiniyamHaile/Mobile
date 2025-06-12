@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/repository/social/post_repository.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/theme/theme_helper.dart';
 import 'package:mobile/ui/widgets/app_logo.dart';
 import 'package:mobile/ui/widgets/layout/responsive_padding.dart';
@@ -119,46 +121,60 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   AppBar _appBar(ThemeData theme, BuildContext context) {
-  return AppBar(
-    backgroundColor: theme.colorScheme.primary,
-    automaticallyImplyLeading: false,
-    flexibleSpace: ResponsivePadding(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const AppLogo(),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      context.push(RouteNames.post);
-                    },
-                    icon: Icon(
-                      Icons.post_add_outlined,
-                      color: theme.colorScheme.onPrimary,
-                      size: 30,
+     final theme = AppTheme.getTheme(context);
+    final textTheme = theme.textTheme;
+
+    return AppBar(
+
+      
+      backgroundColor: theme.colorScheme.primary, // Add this lin
+      automaticallyImplyLeading: false,
+      
+      flexibleSpace: ResponsivePadding(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const AppLogo(),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        context.push(RouteNames.post);
+                      },
+                      icon: Icon(
+                        Icons.post_add_outlined,
+                        color: theme.colorScheme.onPrimary,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      context.push(RouteNames.chat);
-                    },
-                    icon: Icon(
-                      Icons.send_sharp,
-                      color: theme.colorScheme.onPrimary,
+                    IconButton(
+                      onPressed: () {
+                        context.push(RouteNames.chat);
+                      },
+                      icon: Icon(
+                        Icons.send_sharp,
+                        color: theme.colorScheme.onPrimary,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    IconButton(
+                      onPressed: () {
+                        context.push(RouteNames.notifications);
+                      },
+                      icon: Icon(
+                        LucideIcons.bell,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-
+    );
   }
 }

@@ -16,39 +16,35 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginSubmitted>(_onLoginSubmitted);
   }
 
-  
-Future<void> connectSocket()async {
+  Future<void> connectSocket() async {
     final prefs = await SharedPreferences.getInstance();
-   final token =  prefs.getString('token') ?? "";
-  final parts = token.split('.');
-  if (parts.length != 3) throw Exception('Invalid token');
+    final token = prefs.getString('token') ?? "";
+    final parts = token.split('.');
+    if (parts.length != 3) throw Exception('Invalid token');
 
-  final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
-  final Map<String, dynamic> data = json.decode(payload);
+    final payload = utf8.decode(
+      base64Url.decode(base64Url.normalize(parts[1])),
+    );
+    final Map<String, dynamic> data = json.decode(payload);
 
-  getIt<WebSocketService>().connect(data['userId']);
-
-}
+    getIt<WebSocketService>().connect(data['userId']);
+  }
 
   Future<void> _onLoginSubmitted(
-      LoginSubmitted event, Emitter<LoginState> emit) async {
+    LoginSubmitted event,
+    Emitter<LoginState> emit,
+  ) async {
     emit(LoginLoading());
     try {
       print("Logging in with email: ${event.email} and password: ${event.password}");
       final response = await Dio().post(
         '${ApiEndpoints.baseUrl}/auth/login',
-        data: {
-          'email': event.email,
-          'password': event.password,
-        },
+        data: {'email': event.email, 'password': event.password},
       );
 
       print("Response: ${response.data}");
 
       if (response.statusCode == 201) {
-        // Handle successful login
-        // You might want to save the token and user data here
-
         final token = response.data['accessToken'] as String?;
 
         print("Token:${response}");
@@ -65,12 +61,26 @@ Future<void> connectSocket()async {
         emit(LoginFailure(error: 'Login failed. Please try again.'));
       }
     } on DioException catch (e) {
+      print(e.response?.statusCode);
       if (e.response?.statusCode == 401) {
-        if (e.response?.data?.contains('verify your email') ?? false) {
-          emit(LoginFailure(error: 'Please verify your email first'));
-        } else {
-          emit(LoginFailure(error: 'Invalid email or password'));
+        final dynamic responseData =
+            e.response?.data; 
+
+        String errorMessageForUser = 'Invalid password';
+
+        if (responseData is Map<String, dynamic> &&
+            responseData.containsKey('message') &&
+            responseData['message'] is String) {
+          final String apiMessage =
+              responseData['message'] as String;
+
+          if (apiMessage.contains('verify your email')) {
+            errorMessageForUser = 'Please verify your email first';
+          } else {
+            errorMessageForUser = apiMessage;
+          }
         }
+        emit(LoginFailure(error: errorMessageForUser));
       } else if (e.response?.statusCode == 404) {
         emit(LoginFailure(error: 'User not found'));
       } else {

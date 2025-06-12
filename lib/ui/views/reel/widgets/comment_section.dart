@@ -86,24 +86,22 @@ class _CommentSectionState extends State<CommentSection> {
   Map<String, CommentTreeData> _buildCommentTrees(List<Comment> comments) {
     Map<String, CommentTreeData> commentTrees = {};
 
-    List<Comment> reelComments =
-        comments.where((c) => c.reelId == widget.reelId).toList();
+    List<Comment> reelComments = comments
+        .where((c) => c.reelId == widget.reelId)
+        .toList();
 
-    List<Comment> rootComments =
-        reelComments.where((comment) => comment.parentId == null).toList();
+    List<Comment> rootComments = reelComments
+        .where((comment) => comment.parentId == null)
+        .toList();
 
-    rootComments.sort(
-      (a, b) => b.createdAt.compareTo(a.createdAt),
-    );
+    rootComments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     for (var rootComment in rootComments) {
       List<Comment> replies = reelComments
           .where((comment) => comment.parentId == rootComment.id)
           .toList();
 
-      replies.sort(
-        (a, b) => a.createdAt.compareTo(b.createdAt),
-      );
+      replies.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
       commentTrees[rootComment.id] = CommentTreeData(
         rootComment: rootComment,
@@ -126,8 +124,8 @@ class _CommentSectionState extends State<CommentSection> {
     print("Dispatching PostComment: $newCommentDto");
 
     context.read<CommentBloc>().add(
-          PostComment(commentData: newCommentDto, reelId: widget.reelId),
-        );
+      PostComment(commentData: newCommentDto, reelId: widget.reelId),
+    );
 
     _cancelReply();
     _commentInputController.clear();
@@ -143,12 +141,12 @@ class _CommentSectionState extends State<CommentSection> {
     );
 
     context.read<CommentBloc>().add(
-          UpdateComment(
-            commentId: _editingCommentId!,
-            updateData: updateDto,
-            reelId: widget.reelId,
-          ),
-        );
+      UpdateComment(
+        commentId: _editingCommentId!,
+        updateData: updateDto,
+        reelId: widget.reelId,
+      ),
+    );
 
     _cancelEdit();
     _commentInputController.clear();
@@ -224,9 +222,8 @@ class _CommentSectionState extends State<CommentSection> {
                 Navigator.of(context).pop();
                 print("Dispatching DeleteComment: id=$commentId");
                 context.read<CommentBloc>().add(
-                      DeleteComment(
-                          commentId: commentId, reelId: widget.reelId),
-                    );
+                  DeleteComment(commentId: commentId, reelId: widget.reelId),
+                );
               },
             ),
           ],
@@ -237,6 +234,9 @@ class _CommentSectionState extends State<CommentSection> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the height of the keyboard
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     final isEditing = _editingCommentId != null;
     final isReplying = _replyToCommentId != null;
 
@@ -256,156 +256,173 @@ class _CommentSectionState extends State<CommentSection> {
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.7,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BlocSelector<ReelFeedAndActionBloc, ReelFeedAndActionState,
-                    int>(
-                  selector: (state) {
-                    final videoItem = state.videos.firstWhereOrNull(
-                      (video) => video.id == widget.reelId,
-                    );
-                    return videoItem?.commentCount ?? 0;
-                  },
-                  builder: (context, reelCommentCount) {
-                    return Text(
-                      '$reelCommentCount Comments',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    );
-                  },
-                ),
-                IconButton(
-                    icon: const Icon(Icons.close), onPressed: widget.onClose),
-              ],
+      // Wrap the main Column with Padding that adjusts for the keyboard
+      child: Padding(
+        padding: EdgeInsets.only(bottom: keyboardHeight), // Apply padding here
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  BlocSelector<
+                    ReelFeedAndActionBloc,
+                    ReelFeedAndActionState,
+                    int
+                  >(
+                    selector: (state) {
+                      final videoItem = state.videos.firstWhereOrNull(
+                        (video) => video.id == widget.reelId,
+                      );
+                      return videoItem?.commentCount ?? 0;
+                    },
+                    builder: (context, reelCommentCount) {
+                      return Text(
+                        '$reelCommentCount Comments',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: widget.onClose,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: BlocConsumer<CommentBloc, CommentState>(
-              listener: (context, state) {
-                if (state.errorMessage != null) {
-                  if (state is! CommentInitial && !state.isLoading) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.errorMessage!)),
-                    );
-                  }
-                  print('Comment Bloc Error: ${state.errorMessage}');
-                }
-                if (state is CommentLoaded &&
-                    state.updatedReelId == widget.reelId &&
-                    state.updatedReelCommentCount != null) {
-                  debugPrint(
-                    'CommentSection Listener: Detected comment count update for reel ${state.updatedReelId} to ${state.updatedReelCommentCount!}',
-                  );
-
-                  try {
-                    context.read<ReelFeedAndActionBloc>().add(
-                          UpdateReelCommentCount(
-                            reelId: state.updatedReelId!,
-                            newCount: state.updatedReelCommentCount!,
+            Expanded(
+              child: BlocConsumer<CommentBloc, CommentState>(
+                listener: (context, state) {
+                  if (state.errorMessage != null) {
+                    if (state is! CommentInitial && !state.isLoading) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.red,
+                          content: Text(
+                            state.errorMessage!,
+                            style: TextStyle(color: Colors.white),
                           ),
-                        );
-                    debugPrint(
-                      'Dispatched UpdateReelCommentCount to ReelFeedAndActionBloc',
-                    );
-                  } catch (e) {
-                    print(
-                      'Error dispatching UpdateReelCommentCount: ReelFeedAndActionBloc not found in context: $e',
-                    );
-                  }
-                }
-              },
-              builder: (context, state) {
-                final List<Comment> reelComments = List.of(
-                  state.comments.where((c) => c.reelId == widget.reelId),
-                );
-
-                final Map<String, CommentTreeData> commentTrees =
-                    _buildCommentTrees(reelComments);
-
-                Widget content;
-
-                if (state is CommentInitial ||
-                    (state is CommentLoading && state.isInitialLoad)) {
-                  content = Center(child: CircularProgressIndicator());
-                } else if (state is CommentError && state.isInitialLoad) {
-                  content = Center(
-                    child: Text(
-                      'Error loading comments: ${state.errorMessage ?? "Unknown error"}',
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                } else if (reelComments.isEmpty) {
-                  content = const Center(
-                    child: Text('No comments yet. Be the first to comment!'),
-                  );
-                } else {
-                  content = SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        CommentList(
-                          commentTrees: commentTrees,
-                          onStartReply: _startReply,
-                          onEdit: _startEdit,
-                          onDelete: _handleDelete,
-                          currentUserId: widget.currentUserId,
                         ),
-                        if (state is CommentLoading && !state.isInitialLoad)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: CircularProgressIndicator(),
+                      );
+                    }
+                    print('Comment Bloc Error: ${state.errorMessage}');
+                  }
+                  if (state is CommentLoaded &&
+                      state.updatedReelId == widget.reelId &&
+                      state.updatedReelCommentCount != null) {
+                    debugPrint(
+                      'CommentSection Listener: Detected comment count update for reel ${state.updatedReelId} to ${state.updatedReelCommentCount!}',
+                    );
+
+                    try {
+                      context.read<ReelFeedAndActionBloc>().add(
+                        UpdateReelCommentCount(
+                          reelId: state.updatedReelId!,
+                          newCount: state.updatedReelCommentCount!,
+                        ),
+                      );
+                      debugPrint(
+                        'Dispatched UpdateReelCommentCount to ReelFeedAndActionBloc',
+                      );
+                    } catch (e) {
+                      print(
+                        'Error dispatching UpdateReelCommentCount: ReelFeedAndActionBloc not found in context: $e',
+                      );
+                    }
+                  }
+                },
+                builder: (context, state) {
+                  final List<Comment> reelComments = List.of(
+                    state.comments.where((c) => c.reelId == widget.reelId),
+                  );
+
+                  final Map<String, CommentTreeData> commentTrees =
+                      _buildCommentTrees(reelComments);
+
+                  Widget content;
+
+                  if (state is CommentInitial ||
+                      (state is CommentLoading && state.isInitialLoad)) {
+                    content = const Center(child: CircularProgressIndicator());
+                  } else if (state is CommentError && state.isInitialLoad) {
+                    content = Center(
+                      child: Text(
+                        'Error loading comments: ${state.errorMessage ?? "Unknown error"}',
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  } else if (reelComments.isEmpty) {
+                    content = const Center(
+                      child: Text('No comments yet. Be the first to comment!'),
+                    );
+                  } else {
+                    content = SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          CommentList(
+                            commentTrees: commentTrees,
+                            onStartReply: _startReply,
+                            onEdit: _startEdit,
+                            onDelete: _handleDelete,
+                            currentUserId: widget.currentUserId,
                           ),
-                        if (!state.hasMore &&
-                            reelComments.isNotEmpty &&
-                            state is! CommentLoading)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text(
-                              'End of comments',
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                color: Colors.grey,
+                          if (state is CommentLoading && !state.isInitialLoad)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          if (!state.hasMore &&
+                              reelComments.isNotEmpty &&
+                              state is! CommentLoading)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text(
+                                'End of comments',
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                        if (state is CommentError &&
-                            !state.isInitialLoad &&
-                            reelComments.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8.0,
-                              horizontal: 8.0,
+                          if (state is CommentError &&
+                              !state.isInitialLoad &&
+                              reelComments.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                                horizontal: 8.0,
+                              ),
+                              child: Text(
+                                'Error loading more: ${state.errorMessage ?? "Unknown error"}',
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              'Error loading more: ${state.errorMessage ?? "Unknown error"}',
-                              style: const TextStyle(
-                                  color: Colors.red, fontSize: 12),
-                            ),
-                          ),
-                      ],
-                    ),
-                  );
-                }
+                        ],
+                      ),
+                    );
+                  }
 
-                return content;
-              },
+                  return content;
+                },
+              ),
             ),
-          ),
-          NewMessage(
-            controller: _commentInputController,
-            inputLabel: inputLabel,
-            targetName: targetName,
-            isEditing: isEditing,
-            onSend: (text) => _handleSend(text),
-            onUpdate: (text) => _handleUpdate(text),
-            onCancelAction: onCancelAction,
-          ),
-        ],
+            NewMessage(
+              controller: _commentInputController,
+              inputLabel: inputLabel,
+              targetName: targetName,
+              isEditing: isEditing,
+              onSend: (text) => _handleSend(text),
+              onUpdate: (text) => _handleUpdate(text),
+              onCancelAction: onCancelAction,
+            ),
+          ],
+        ),
       ),
     );
   }

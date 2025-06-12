@@ -37,7 +37,6 @@ void main() async {
     print(".env loaded successfully");
   } catch (e) {
     print("Error loading .env file: $e");
-    // Handle the error - maybe exit or use default values
   }
   injectionSetup();
   setupServiceLocator();
@@ -156,7 +155,6 @@ Future<void> _initNotifications() async {
     },
   );
 
-  // OPTIONAL: Immediately show a test notification when app starts
   await flutterLocalNotificationsPlugin.show(
     0,
     'Test Notification',

@@ -741,7 +741,7 @@ class _PostingScreenState extends State<PostingScreen> {
                           _MediaButton(
                             icon: Icons.photo_library,
                             label: 'Gallery',
-                            color: theme.colorScheme.primary,
+                             color: theme.colorScheme.primary,
                             iconColor: theme.colorScheme.onPrimary,
                             onPressed: _pickImage,
                           ),

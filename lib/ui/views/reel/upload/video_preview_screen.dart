@@ -12,7 +12,7 @@ class VideoPreviewScreen extends StatefulWidget {
   final String videoPath;
 
   const VideoPreviewScreen({Key? key, required this.videoPath})
-      : super(key: key);
+    : super(key: key);
 
   @override
   _VideoPreviewScreenState createState() => _VideoPreviewScreenState();
@@ -35,30 +35,36 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
   Future<void> _initializeVideoPlayer() async {
     _controller = VideoPlayerController.file(File(widget.videoPath))
       ..addListener(_videoPlayerListener)
-      ..initialize().then((_) {
-        if (!mounted) return;
-        setState(() {
-          _isInitialized = _controller?.value.isInitialized ?? false;
-          if (_isInitialized) {
-            _controller!.play();
-            _startHideTimer();
-          }
-        });
-      }).catchError((e) {
-        print("Error initializing video player: $e");
-        if (!mounted) return;
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error playing video: ${e.toString()}'),
-            ),
-          );
-        });
-        setState(() {
-          _isInitialized = false;
-          _controller = null;
-        });
-      });
+      ..initialize()
+          .then((_) {
+            if (!mounted) return;
+            setState(() {
+              _isInitialized = _controller?.value.isInitialized ?? false;
+              if (_isInitialized) {
+                _controller!.play();
+                _startHideTimer();
+              }
+            });
+          })
+          .catchError((e) {
+            print("Error initializing video player: $e");
+            if (!mounted) return;
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    'Error playing video: ${e.toString()}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            });
+            setState(() {
+              _isInitialized = false;
+              _controller = null;
+            });
+          });
   }
 
   void _videoPlayerListener() {
@@ -195,7 +201,7 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
               child: IgnorePointer(
                 ignoring: !_showControls,
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Color.fromRGBO(143, 148, 251, 1),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12.0,
                     vertical: 16.0,
@@ -214,11 +220,17 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     Navigator.pop(context);
                                   }
                                 : null,
-                            icon: const Icon(Icons.videocam),
+                            icon: const Icon(
+                              Icons.videocam,
+                              color: Colors.white,
+                            ),
                             label: const Text(
                               'Record Again',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             style: ElevatedButton.styleFrom(),
                           ),
@@ -235,19 +247,22 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     GoRouter.of(context).push(
                                       RouterEnum.postScreen.routeName
                                           .replaceAll(
-                                        ':videoPath',
-                                        Uri.encodeComponent(
-                                          widget.videoPath!,
-                                        ),
-                                      ),
+                                            ':videoPath',
+                                            Uri.encodeComponent(
+                                              widget.videoPath!,
+                                            ),
+                                          ),
                                     );
                                   }
                                 : null,
-                            icon: const Icon(Icons.send),
+                            icon: const Icon(Icons.send, color: Colors.white),
                             label: const Text(
                               'Next',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 10),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),

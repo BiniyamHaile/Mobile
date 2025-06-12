@@ -1,7 +1,7 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:mobile/bloc/auth/reset_password/reset_password_bloc.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 
@@ -40,7 +40,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       if (_newPasswordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Passwords do not match'),
+            content: Text(
+              'Passwords do not match',
+              style: TextStyle(color: Colors.white),
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red,
           ),
@@ -49,12 +52,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       }
 
       context.read<ResetPasswordBloc>().add(
-            ResetPasswordSubmitted(
-              email: _emailController.text.trim(),
-              resetCode: _resetCodeController.text.trim(),
-              newPassword: _newPasswordController.text.trim(),
-            ),
-          );
+        ResetPasswordSubmitted(
+          email: _emailController.text.trim(),
+          resetCode: _resetCodeController.text.trim(),
+          newPassword: _newPasswordController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -65,7 +68,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         if (state is ResetPasswordFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.red,
             ),
@@ -73,7 +76,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         } else if (state is ResetPasswordSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: TextStyle(color: Colors.white),
+              ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.green,
             ),
@@ -197,12 +203,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             children: [
                               Text(
                                 'Enter your new password and reset code',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 24),
                               TextFormField(
@@ -210,8 +212,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -230,8 +233,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Reset Code',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -251,8 +255,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'New Password',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
                                     icon: Icon(
@@ -290,8 +295,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Confirm Password',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   suffixIcon: IconButton(
                                     icon: Icon(
@@ -323,8 +329,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 child: ElevatedButton(
                                   onPressed: isLoading ? null : _resetPassword,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(143, 148, 251, 1),
+                                    backgroundColor: const Color.fromRGBO(
+                                      143,
+                                      148,
+                                      251,
+                                      1,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),

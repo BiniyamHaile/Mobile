@@ -64,7 +64,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
-  
+
   // Password validation state
   double _strengthPercentage = 0.0;
   String? _errorText;
@@ -77,15 +77,16 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
-  
+
   void _updatePasswordStrength(String password) {
     final validator = Validator(context);
     final maxStrength = validator.maxErrorStrength;
     final validation = validator.validateNewPassword(password);
-    
+
     setState(() {
       _errorText = validation.message;
-      _strengthPercentage = (maxStrength - (validation.errorStrength)) * 100 / maxStrength;
+      _strengthPercentage =
+          (maxStrength - (validation.errorStrength)) * 100 / maxStrength;
       _indicatorColor = validation.color;
     });
   }
@@ -97,7 +98,10 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
         if (state is PasswordUpdateSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Password updated successfully'),
+              content: Text(
+                'Password updated successfully',
+                style: TextStyle(color: Colors.white),
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -106,7 +110,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
         if (state is PasswordUpdateFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -149,7 +153,9 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
@@ -186,7 +192,9 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
@@ -199,15 +207,15 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                 if (value == null || value.isEmpty) {
                   return 'New password is required';
                 }
-                
+
                 final validator = Validator(context);
                 final validation = validator.validateNewPassword(value);
-                
+
                 // Only return error if the password is not valid (error strength > 0)
                 if (validation.errorStrength > 0) {
                   return validation.message;
                 }
-                
+
                 return null;
               },
             ),
@@ -240,7 +248,9 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
@@ -276,17 +286,16 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                         : () {
                             if (_formKey.currentState!.validate()) {
                               context.read<PasswordsettingsBloc>().add(
-                                    PasswordChanged(
-                                      currentPassword: _currentPasswordController.text,
-                                      newPassword: _newPasswordController.text,
-                                    ),
-                                  );
+                                PasswordChanged(
+                                  currentPassword:
+                                      _currentPasswordController.text,
+                                  newPassword: _newPasswordController.text,
+                                ),
+                              );
                             }
                           },
                     child: isLoading
-                        ? CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                        ? CircularProgressIndicator(color: Colors.white)
                         : Text(
                             'UPDATE PASSWORD',
                             style: TextStyle(

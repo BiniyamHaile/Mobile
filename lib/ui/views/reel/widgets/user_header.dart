@@ -38,7 +38,7 @@ class UserHeader extends StatelessWidget {
           Text(
             username,
             style: TextStyle(
-              color: appColors.blackColor,
+              color: appColors.whiteColor,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
