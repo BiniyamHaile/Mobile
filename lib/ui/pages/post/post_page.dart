@@ -1,11 +1,15 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
+import 'package:mobile/models/post.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';

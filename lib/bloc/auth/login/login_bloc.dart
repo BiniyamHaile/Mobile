@@ -35,8 +35,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     emit(LoginLoading());
-    try {
-      print("Logging in with email: ${event.email} and password: ${event.password}");
+    try {  
       final response = await Dio().post(
         '${ApiEndpoints.baseUrl}/auth/login',
         data: {'email': event.email, 'password': event.password},
@@ -63,8 +62,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } on DioException catch (e) {
       print(e.response?.statusCode);
       if (e.response?.statusCode == 401) {
-        final dynamic responseData =
-            e.response?.data; 
+        final dynamic responseData = 
+        e.response?.data;
 
         String errorMessageForUser = 'Invalid password';
 
@@ -72,7 +71,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             responseData.containsKey('message') &&
             responseData['message'] is String) {
           final String apiMessage =
-              responseData['message'] as String;
+           responseData['message'] as String;
 
           if (apiMessage.contains('verify your email')) {
             errorMessageForUser = 'Please verify your email first';
