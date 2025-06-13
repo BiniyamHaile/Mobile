@@ -1,7 +1,7 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:mobile/bloc/auth/otp/otp_bloc.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/routes/route_names.dart';
@@ -31,14 +31,15 @@ class _OtpPageState extends State<OtpPage> {
       _initialized = true;
     }
   }
+
   void _verifyOtp() {
     if (_formKey.currentState!.validate()) {
       context.read<OtpBloc>().add(
-            OtpSubmitted(
-              email: _emailController.text.trim(),
-              code: _otpController.text.trim(),
-            ),
-          );
+        OtpSubmitted(
+          email: _emailController.text.trim(),
+          code: _otpController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -49,7 +50,7 @@ class _OtpPageState extends State<OtpPage> {
         if (state is OtpFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.error),
+              content: Text(state.error, style: TextStyle(color: Colors.white)),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.red,
             ),
@@ -57,7 +58,10 @@ class _OtpPageState extends State<OtpPage> {
         } else if (state is OtpSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: TextStyle(color: Colors.white),
+              ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.green,
             ),
@@ -183,12 +187,8 @@ class _OtpPageState extends State<OtpPage> {
                             children: [
                               Text(
                                 'Enter the OTP sent to your email',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 24),
                               TextFormField(
@@ -196,8 +196,9 @@ class _OtpPageState extends State<OtpPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'Email',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -216,8 +217,9 @@ class _OtpPageState extends State<OtpPage> {
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
                                   labelText: 'OTP Code',
-                                  labelStyle:
-                                      TextStyle(color: Colors.grey[600]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -237,8 +239,12 @@ class _OtpPageState extends State<OtpPage> {
                                 child: ElevatedButton(
                                   onPressed: isLoading ? null : _verifyOtp,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(143, 148, 251, 1),
+                                    backgroundColor: const Color.fromRGBO(
+                                      143,
+                                      148,
+                                      251,
+                                      1,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -270,11 +276,11 @@ class _OtpPageState extends State<OtpPage> {
                                         ? null
                                         : () {
                                             context.read<OtpBloc>().add(
-                                                  OtpResendRequested(
-                                                    email: _emailController.text
-                                                        .trim(),
-                                                  ),
-                                                );
+                                              OtpResendRequested(
+                                                email: _emailController.text
+                                                    .trim(),
+                                              ),
+                                            );
                                           },
                                     child: const Text(
                                       'Resend',

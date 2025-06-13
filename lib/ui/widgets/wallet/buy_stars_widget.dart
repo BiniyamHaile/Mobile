@@ -6,9 +6,7 @@ import 'package:provider/provider.dart'; // Import Provider
 import 'package:reown_appkit/reown_appkit.dart';
 
 class BuyStarsModal extends StatefulWidget {
-  const BuyStarsModal({
-    super.key,
-  });
+  const BuyStarsModal({super.key});
 
   @override
   State<BuyStarsModal> createState() => _BuyStarsModalState();
@@ -237,7 +235,8 @@ class _BuyStarsModalState extends State<BuyStarsModal> {
     final walletService = context.watch<WalletService>();
 
     // Determine if interactions are generally enabled (connected to Sepolia, contracts loaded)
-    final isSepoliaConnected = walletService.isConnected &&
+    final isSepoliaConnected =
+        walletService.isConnected &&
         walletService.connectedNetwork?.chainId == walletService.sepoliaChainId;
     final enableInteractions =
         isSepoliaConnected && walletService.areContractsLoaded;
@@ -284,171 +283,192 @@ class _BuyStarsModalState extends State<BuyStarsModal> {
     // Determine if the main Buy button should be enabled
     final bool enableConfirmButton =
         enableInteractions && // Must be connected & contracts loaded
-            _purchaseAmountNative !=
-                null && // Must have a calculated purchase amount
-            _purchaseAmountNative! > 0 && // Amount must be positive
-            walletService.currentNativeBalanceWei >= // Use service state
-                walletService.nativeDoubleToWei(
-                  _purchaseAmountNative!,
-                ); // Use service helper
+        _purchaseAmountNative !=
+            null && // Must have a calculated purchase amount
+        _purchaseAmountNative! > 0 && // Amount must be positive
+        walletService.currentNativeBalanceWei >= // Use service state
+            walletService.nativeDoubleToWei(
+              _purchaseAmountNative!,
+            ); // Use service helper
 
     return Container(
-      // Padding to adjust for keyboard when it's up
-      padding: EdgeInsets.all(16.0) +
+      padding:
+          EdgeInsets.all(16.0) +
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      // Styling for the modal container
       decoration: BoxDecoration(
-        color: Theme.of(context).canvasColor, // Use theme's background color
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(143, 148, 251, 0.1),
+            blurRadius: 20,
+            offset: Offset(0, -5),
+          ),
+        ],
       ),
       child: SingleChildScrollView(
-        // Allows scrolling if content overflows (e.g., keyboard pushes up)
         child: Column(
-          mainAxisSize:
-              MainAxisSize.min, // Column should take minimum space vertically
-          crossAxisAlignment:
-              CrossAxisAlignment.stretch, // Stretch children horizontally
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Row (Title and Close button)
+            SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Buy Stars',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                  ),
                 ),
-                // Close Button - pops the modal with null result
                 IconButton(
-                  icon: Icon(Icons.close),
+                  icon: Icon(Icons.close, color: Colors.grey[600]),
                   onPressed: () => Navigator.pop(context, null),
                 ),
               ],
             ),
-            SizedBox(height: 16),
-
-            // Display Current Balances (using service state)
-            Card(
-              elevation: 1.0,
-              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Your Balances',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.amber[700], size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          '$formattedStarsBalance ${walletService.starsTokenSymbol}', // Use service symbol
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet_outlined,
-                          color: Colors.blueGrey,
-                          size: 20,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '${formattedNativeBalance} ${walletService.connectedNetwork?.currency ?? "Native"}', // Use service state for currency symbol
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Info Text
-            Text(
-              '1 Star Needed',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: Text(
-                'Buy Stars to send paid reactions to channels.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              ),
-            ),
             SizedBox(height: 20),
 
-            // Package Selection Section
+            // Balance Card
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color.fromRGBO(143, 148, 251, 0.1), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Color.fromRGBO(143, 148, 251, 0.2)),
+              ),
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Your Balances',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(143, 148, 251, 1),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  _buildBalanceRow(
+                    icon: Icons.star,
+                    iconColor: Colors.amber[700]!,
+                    amount:
+                        '$formattedStarsBalance ${walletService.starsTokenSymbol}',
+                  ),
+                  SizedBox(height: 8),
+                  _buildBalanceRow(
+                    icon: Icons.account_balance_wallet_outlined,
+                    iconColor: Color.fromRGBO(143, 148, 251, 1),
+                    amount:
+                        '${formattedNativeBalance} ${walletService.connectedNetwork?.currency ?? "Native"}',
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // Info Section
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(143, 148, 251, 0.05),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  // Text(
+                  //   '1 Star Needed',
+                  //   style: TextStyle(
+                  //     fontSize: 20,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Color.fromRGBO(143, 148, 251, 1),
+                  //   ),
+                  // ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Buy Stars to send paid reactions to channels.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // Package Selection
             Text(
               'Choose package',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(143, 148, 251, 1),
+              ),
             ),
-            SizedBox(height: 8),
-            // List of Fixed Packages
+            SizedBox(height: 12),
             ListView.separated(
-              shrinkWrap: true, // Take minimum space
-              physics:
-                  NeverScrollableScrollPhysics(), // Disable internal scrolling
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: _starPackages.length,
               separatorBuilder: (context, index) => SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final starsAmount = _starPackages[index];
-                // Calculate required native amount using service helper
-                final requiredNativeAmount =
-                    walletService.getNativeAmountForStars(starsAmount);
+                final requiredNativeAmount = walletService
+                    .getNativeAmountForStars(starsAmount);
                 final isSelected = _selectedStarsAmount == starsAmount;
-
-                // Check if user can afford this specific package for visual feedback
-                // Use service helper to convert double to Wei
                 final requiredNativeAmountWei = walletService.nativeDoubleToWei(
                   requiredNativeAmount,
                 );
-                // Compare with service's current native balance
                 final bool canAffordThisPackage =
                     walletService.currentNativeBalanceWei >=
-                        requiredNativeAmountWei;
+                    requiredNativeAmountWei;
 
-                return Card(
-                  elevation: isSelected ? 4.0 : 1.0, // Highlight selected card
-                  color: isSelected ? Colors.blue.shade50 : Colors.white,
-                  surfaceTintColor: isSelected ? Colors.blue.shade50 : null,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Color.fromRGBO(143, 148, 251, 0.1)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? Color.fromRGBO(143, 148, 251, 1)
+                          : Color.fromRGBO(143, 148, 251, 0.2),
+                    ),
+                  ),
                   child: ListTile(
                     contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    leading: Icon(Icons.star, color: Colors.amber[700]),
+                    leading: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(143, 148, 251, 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.star, color: Colors.amber[700]),
+                    ),
                     title: Text(
-                      '${_formatNumber(starsAmount)} ${walletService.starsTokenSymbol}', // Use service symbol
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      '${_formatNumber(starsAmount)} ${walletService.starsTokenSymbol}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(143, 148, 251, 1),
+                      ),
                     ),
                     trailing: Text(
-                      // Display required native amount using service state for currency
                       '${requiredNativeAmount.toStringAsFixed(4).replaceAll(RegExp(r'0*$'), '').replaceAll(RegExp(r'\.$'), '')} ${walletService.connectedNetwork?.currency ?? "Native"}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: enableInteractions // Dim text if not connected
-                            ? (canAffordThisPackage
-                                ? Colors.black87 // Green if affordable
-                                : Colors.red) // Red if not affordable
-                            : Colors.grey, // Gray if not connected/loaded
+                        color: enableInteractions
+                            ? (canAffordThisPackage ? Colors.green : Colors.red)
+                            : Colors.grey,
                       ),
                     ),
-                    // Disable tap if interactions are not enabled
                     onTap: enableInteractions
                         ? () => _handlePackageSelected(starsAmount)
                         : null,
@@ -458,27 +478,48 @@ class _BuyStarsModalState extends State<BuyStarsModal> {
             ),
             SizedBox(height: 24),
 
-            // Custom Amount Input Section
+            // Custom Amount Section
             Text(
               'Or buy with native currency',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(143, 148, 251, 1),
+              ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 12),
             TextField(
               controller: _customAmountController,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
-              enabled:
-                  enableInteractions, // Disable input if not connected/loaded
+              enabled: enableInteractions,
               decoration: InputDecoration(
                 labelText:
-                    'Amount (${walletService.connectedNetwork?.currency ?? "Native"})', // Use service state for currency
+                    'Amount (${walletService.connectedNetwork?.currency ?? "Native"})',
                 hintText: 'e.g., 0.05',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                  vertical: 15.0,
+                filled: true,
+                fillColor: Colors.grey[50],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 0.2),
+                  ),
                 ),
-                // Show calculated stars as suffix using service symbol
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 0.2),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                  ),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 suffixText: _calculatedStarsDisplay,
                 suffixStyle: TextStyle(
                   color: Colors.green,
@@ -486,29 +527,33 @@ class _BuyStarsModalState extends State<BuyStarsModal> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 24),
 
-            // Buy Button (Single button for both modes)
+            // Buy Button
             ElevatedButton(
-              // Button is enabled based on _updateBuyStatus checks and general interaction state
               onPressed: enableConfirmButton ? _confirmPurchase : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 12.0),
+                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 2,
               ),
               child: Text(
-                // Button text indicates action or state
                 _purchaseAmountNative == null || _purchaseAmountNative! <= 0
                     ? 'Select / Enter Amount'
                     : 'Confirm Purchase',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
-            SizedBox(height: 8),
-            // Display buy status (updated by _updateBuyStatus)
+            SizedBox(height: 12),
+
+            // Status Text
             Center(
               child: Text(
                 _buyStatus,
@@ -517,32 +562,69 @@ class _BuyStarsModalState extends State<BuyStarsModal> {
                   fontSize: 14,
                   color: _buyStatus.contains('Insufficient')
                       ? Colors.red
-                      : Colors.black87,
+                      : Colors.grey[700],
                 ),
               ),
             ),
             SizedBox(height: 16),
-            // Conversion Rate Info (using service rate and symbol)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+
+            // Conversion Rate
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Text(
                 'Conversion Rate: 1 ${walletService.connectedNetwork?.currency ?? "Native"} = ${walletService.starsPerNativeToken.toStringAsFixed(0)} ${walletService.starsTokenSymbol}',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[700],
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
-            // Terms and Conditions Text
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'By proceeding and purchasing Stars, you agree with the Terms and Conditions.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: Colors.grey[600]),
-              ),
-            ),
+            SizedBox(height: 12),
+
+            // // Terms
+            // Text(
+            //   'By proceeding and purchasing Stars, you agree with the Terms and Conditions.',
+            //   textAlign: TextAlign.center,
+            //   style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            // ),
+            // SizedBox(height: 16),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBalanceRow({
+    required IconData icon,
+    required Color iconColor,
+    required String amount,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(143, 148, 251, 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
+        SizedBox(width: 12),
+        Text(
+          amount,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[800],
+          ),
+        ),
+      ],
     );
   }
 }

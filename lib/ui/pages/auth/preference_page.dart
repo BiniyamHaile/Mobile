@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/preference/preference_bloc.dart';
-
+import 'package:mobile/ui/routes/route_names.dart';
 
 class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});
@@ -13,11 +14,17 @@ class PreferencesPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
           title: const Text('Select Your Preferences'),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.white,
           foregroundColor: Colors.black,
+           leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            context.go(RouteNames.profileSetting);
+          },
+        ),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -27,19 +34,24 @@ class PreferencesPage extends StatelessWidget {
                 if (state is PreferencesError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.error),
+                      content: Text(state.error ,  style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 } else if (state is PreferencesSubmitted) {
-                  // Navigate to home page after successful submission
-                  // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
+                  // Show success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Preferences saved successfully!'),
+                      content: Text(
+                        'Profile updated successfully!',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
+
+                  // Navigate to home page after successful submission
+                  context.go(RouteNames.feed);
                 }
               },
               builder: (context, state) {
@@ -54,9 +66,9 @@ class PreferencesPage extends StatelessWidget {
                         const Text('Failed to load preferences'),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () => context
-                              .read<PreferenceBloc>()
-                              .add(LoadPreferences()),
+                          onPressed: () => context.read<PreferenceBloc>().add(
+                            LoadPreferences(),
+                          ),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -68,8 +80,8 @@ class PreferencesPage extends StatelessWidget {
                   final categories = (state is PreferencesLoaded)
                       ? state.categories
                       : (state is PreferencesSubmitting)
-                          ? state.categories
-                          : (state as PreferencesError).categories!;
+                      ? state.categories
+                      : (state as PreferencesError).categories!;
 
                   final isSubmitting = state is PreferencesSubmitting;
 
@@ -86,15 +98,14 @@ class PreferencesPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       const Text(
                         'This will help us personalize your experience',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                       const SizedBox(height: 24),
                       ...categories
-                          .map((category) =>
-                              _buildCategorySection(context, category))
+                          .map(
+                            (category) =>
+                                _buildCategorySection(context, category),
+                          )
                           .toList(),
                       const SizedBox(height: 32),
                       SizedBox(
@@ -103,9 +114,9 @@ class PreferencesPage extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: isSubmitting
                               ? null
-                              : () => context
-                                  .read<PreferenceBloc>()
-                                  .add(SubmitPreferences()),
+                              : () => context.read<PreferenceBloc>().add(
+                                  SubmitPreferences(),
+                                ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple,
                             shape: RoundedRectangleBorder(
@@ -114,7 +125,8 @@ class PreferencesPage extends StatelessWidget {
                           ),
                           child: isSubmitting
                               ? const CircularProgressIndicator(
-                                  color: Colors.white)
+                                  color: Colors.white,
+                                )
                               : const Text(
                                   'Continue',
                                   style: TextStyle(
@@ -138,16 +150,15 @@ class PreferencesPage extends StatelessWidget {
   }
 
   Widget _buildCategorySection(
-      BuildContext context, PreferenceCategory category) {
+    BuildContext context,
+    PreferenceCategory category,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           category.name,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -158,11 +169,11 @@ class PreferencesPage extends StatelessWidget {
               selected: option.selected,
               onSelected: (selected) {
                 context.read<PreferenceBloc>().add(
-                      TogglePreference(
-                        categoryId: category.id,
-                        optionId: option.id,
-                      ),
-                    );
+                  TogglePreference(
+                    categoryId: category.id,
+                    optionId: option.id,
+                  ),
+                );
               },
               label: Text(option.name),
               selectedColor: Colors.deepPurple.withOpacity(0.2),

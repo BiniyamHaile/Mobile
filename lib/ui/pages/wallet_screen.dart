@@ -2,13 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/models/token.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
-import 'package:mobile/ui/styles/app_colors.dart';
 import 'package:mobile/ui/widgets/wallet/buy_stars_widget.dart';
 import 'package:mobile/ui/widgets/wallet/star_reaction_modal.dart';
 import 'package:provider/provider.dart';
 import 'package:reown_appkit/modal/i_appkit_modal_impl.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+// Define the custom clipper for the concave bottom shape
+class ConcaveBottomClipper extends CustomClipper<Path> {
+  final double curveHeight; // How deep the concave curve is
+
+  ConcaveBottomClipper({this.curveHeight = 30.0}); // Default curve height
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // Start from the top-left corner (0,0)
+    path.lineTo(0, size.height); // Go down to the bottom-left
+    // Add a quadratic bezier curve from bottom-left to bottom-right
+    // The control point is in the middle horizontally, and moves *up* to create the concave shape
+    path.quadraticBezierTo(
+      size.width / 2, // Control point x (middle horizontal)
+      size.height - curveHeight, // Control point y (above the bottom)
+      size.width, // End point x (bottom-right)
+      size.height, // End point y (bottom)
+    );
+    // Go up to the top-right corner
+    path.lineTo(size.width, 0);
+    // Close the path (draws a line from top-right back to top-left)
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(ConcaveBottomClipper oldClipper) {
+    // Only reclip if the curveHeight changes
+    return oldClipper.curveHeight != curveHeight;
+  }
+}
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -155,49 +188,37 @@ class _WalletScreenState extends State<WalletScreen> {
   ) {
     final bool isOutgoing =
         tx.from.toLowerCase() == currentAddress.toLowerCase();
-
     final double amount = walletService.weiToStarsDouble(
       tx.value,
       tx.tokenDecimal,
     );
-
-    print('--- Debug Transaction Item ---');
-    print('Tx Hash: ${tx.hash}');
-    print('Tx Value (BigInt): ${tx.value}');
-    print('Tx Decimal (int): ${tx.tokenDecimal}');
-    print('Calculated Amount (double): $amount');
-    print('Amount Runtime Type: ${amount.runtimeType}');
-
-    String formattedAmount;
-    if (amount is num) {
-      formattedAmount = NumberFormat('#,##0.####').format(amount);
-    } else {
-      print(
-        "!!! ALERT: amount is NOT a number. It is ${amount.runtimeType} !!!",
-      );
-      formattedAmount = 'Invalid Amount';
-    }
-    print('Formatted Amount: $formattedAmount');
-    print('--- End Debug Transaction Item ---');
-
+    String formattedAmount = NumberFormat('#,##0.####').format(amount);
     final bool isExpanded = _expandedTxHash == tx.hash;
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0),
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+        side: BorderSide(color: Color.fromRGBO(143, 148, 251, 0.2), width: 1),
+      ),
       child: InkWell(
         onTap: () {
           setState(() {
-            if (isExpanded) {
-              _expandedTxHash = null;
-            } else {
-              _expandedTxHash = tx.hash;
-            }
+            _expandedTxHash = isExpanded ? null : tx.hash;
           });
         },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
+        borderRadius: BorderRadius.circular(16.0),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Color.fromRGBO(143, 148, 251, 0.05)],
+            ),
+            borderRadius: BorderRadius.circular(16.0),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -206,84 +227,149 @@ class _WalletScreenState extends State<WalletScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        isOutgoing ? Icons.north_east : Icons.south_west,
-                        color: isOutgoing ? Colors.red[700] : Colors.green[700],
-                        size: 18,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        '${isOutgoing ? '-' : '+'}${formattedAmount} ${tx.tokenSymbol}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isOutgoing
+                              ? Colors.red.withOpacity(0.1)
+                              : Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          isOutgoing
+                              ? Icons.arrow_upward_rounded
+                              : Icons.arrow_downward_rounded,
                           color: isOutgoing
                               ? Colors.red[700]
                               : Colors.green[700],
-                          fontSize: 16,
+                          size: 20,
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${isOutgoing ? '-' : '+'}${formattedAmount} ${tx.tokenSymbol}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isOutgoing
+                                  ? Colors.red[700]
+                                  : Colors.green[700],
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            _formatTimestamp(tx.timeStamp),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
+                  ),
+                  Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: Color.fromRGBO(143, 148, 251, 1),
                   ),
                 ],
               ),
-              Visibility(
-                visible: isExpanded,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 4),
-                      Text(
-                        'Token ID: ${tx.tokenSymbol}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        isOutgoing ? 'To: ${tx.to}' : 'From: ${tx.from}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'When: ${_formatTimestamp(tx.timeStamp)}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      ),
-                      SizedBox(height: 4),
-                      if (tx.hash.isNotEmpty)
-                        GestureDetector(
-                          onTap: () async {
-                            final url = Uri.parse(
-                              'https://sepolia.etherscan.io/tx/${tx.hash}',
-                            );
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(
-                                url,
-                                mode: LaunchMode.externalApplication,
-                              );
-                            } else {
-                              print('Could not launch $url');
-                              walletService.appKitModal.onModalError.broadcast(
-                                ModalError('Could not open transaction link.'),
-                              );
-                            }
-                          },
-                          child: Text(
-                            'Tx Hash: ${tx.hash}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+              if (isExpanded) ...[
+                const Divider(height: 24),
+                _buildDetailRow(
+                  icon: Icons.token,
+                  label: 'Token',
+                  value: tx.tokenSymbol,
                 ),
-              ),
+                const SizedBox(height: 12),
+                _buildDetailRow(
+                  icon: isOutgoing ? Icons.send : Icons.call_received,
+                  label: isOutgoing ? 'To' : 'From',
+                  value: isOutgoing ? tx.to : tx.from,
+                ),
+                // const SizedBox(height: 12),
+                // if (tx.hash.isNotEmpty)
+                //   GestureDetector(
+                //     onTap: () async {
+                //       final url = Uri.parse(
+                //         'https://sepolia.etherscan.io/tx/${tx.hash}',
+                //       );
+                //       if (await canLaunchUrl(url)) {
+                //         await launchUrl(
+                //           url,
+                //           mode: LaunchMode.externalApplication,
+                //         );
+                //       } else {
+                //         walletService.appKitModal.onModalError.broadcast(
+                //           ModalError('Could not open transaction link.'),
+                //         );
+                //       }
+                //     },
+                //     child: Container(
+                //       padding: const EdgeInsets.symmetric(
+                //         vertical: 8,
+                //         horizontal: 12,
+                //       ),
+                //       decoration: BoxDecoration(
+                //         color: Color.fromRGBO(143, 148, 251, 0.1),
+                //         borderRadius: BorderRadius.circular(8),
+                //       ),
+                //       child: Row(
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           Icon(
+                //             Icons.link,
+                //             size: 16,
+                //             color: Color.fromRGBO(143, 148, 251, 1),
+                //           ),
+                //           const SizedBox(width: 8),
+                //           Text(
+                //             'View on Etherscan',
+                //             style: TextStyle(
+                //               fontSize: 12,
+                //               color: Color.fromRGBO(143, 148, 251, 1),
+                //               fontWeight: FontWeight.w500,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                  // ),
+              ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Color.fromRGBO(143, 148, 251, 1)),
+        const SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 12, color: Colors.grey[900]),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 
@@ -387,7 +473,7 @@ class _WalletScreenState extends State<WalletScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.indigoAccent,
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
         elevation: 0,
         leading: isConnected
             ? Builder(
@@ -400,19 +486,67 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
       drawer: isConnected
           ? Drawer(
-              backgroundColor: AppColors().purpleEventColor,
+              backgroundColor: Colors.white,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 30),
                 children: [
-                  // ListTile(
-                  //   leading: Icon(Icons.refresh),
-                  //   title: Text('Refresh STARS Balance'),
-                  //   onTap: enableTxActions
-                  //       ? walletService.getStarsBalance
-                  //       : null,
-                  //   enabled:
-                  //       enableTxActions,
-                  // ),
+                  ClipPath(
+                    // <-- Wrap with ClipPath
+                    clipper: ConcaveBottomClipper(
+                      curveHeight: 20.0,
+                    ), // <-- Use your custom clipper here, adjust curveHeight
+                    child: SizedBox(
+                      // Use SizedBox to give the header a defined height
+                      height: 80, // Adjust height as needed
+                      child: Container(
+                        // NO borderRadius needed here, the shape is defined by the clipper
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(
+                            143,
+                            148,
+                            251,
+                            1,
+                          ), // Set the background color to green
+                          // Remove the borderRadius property
+                        ),
+                        // Center the content within the container
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                          ), // Add some horizontal padding for the text
+                          child: Text(
+                            'Wallet Settings',
+                            style: TextStyle(
+                              color: Colors
+                                  .white, // Make text white for visibility on green
+                              fontSize: 20, // Adjust font size
+                              fontWeight: FontWeight.bold, // Make text bold
+                            ),
+                            textAlign:
+                                TextAlign.center, // Center the text itself
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Add some vertical spacing after the header before the list items start
+                  SizedBox(height: 16.0), // Adjust spacing as needed
+
+                  ListTile(
+                    leading: Icon(Icons.shopping_cart),
+                    title: Text('Buy Stars'),
+                    onTap: enableBuyButton
+                        ? () {
+                            Navigator.pop(
+                              context,
+                            ); // Close drawer before showing modal
+                            _showBuyStarsModal();
+                          }
+                        : null,
+                    enabled: enableBuyButton,
+                  ),
                   ListTile(
                     leading: Icon(Icons.token),
                     title: Text('Add STARS Token to Wallet'),
@@ -433,7 +567,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
 
-                      color: Theme.of(context).canvasColor,
+                      color: Color.fromRGBO(143, 148, 251, 1),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -441,15 +575,13 @@ class _WalletScreenState extends State<WalletScreen> {
                         leading: Icon(
                           Icons.logout,
 
-                          color: isConnected
-                              ? Colors.red[700]
-                              : Colors.grey[500],
+                          color: isConnected ? Colors.white : Colors.grey[500],
                         ),
                         title: Text(
                           'Disconnect',
                           style: TextStyle(
                             color: isConnected
-                                ? Colors.red[700]
+                                ? Colors.white
                                 : Colors.grey[500],
                             fontWeight: FontWeight.bold,
                           ),
@@ -493,15 +625,37 @@ class _WalletScreenState extends State<WalletScreen> {
                   // ),
                   ElevatedButton(
                     onPressed: () => _connectWallet(context),
-                    child: Padding(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      shadowColor: Color.fromRGBO(143, 148, 251, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12.0,
+                        horizontal: 24.0,
+                        vertical: 16.0,
                       ),
-                      child: Text(
-                        'Connect Wallet',
-                        style: TextStyle(fontSize: 18),
-                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet_rounded,
+                          size: 24,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Connect Wallet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: 20),
@@ -545,6 +699,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   Card(
                     margin: EdgeInsets.zero,
                     elevation: 1.0,
+                    color: Color.fromRGBO(143, 148, 251, 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -556,13 +711,13 @@ class _WalletScreenState extends State<WalletScreen> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: Colors.deepPurple.shade100,
+                                backgroundColor: Colors.white,
                                 radius: 18,
                                 child: Text(
                                   walletService.starsTokenSymbol[0],
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.deepPurple,
+                                    color: Color.fromRGBO(143, 148, 251, 1),
                                   ),
                                 ),
                               ),
@@ -581,7 +736,10 @@ class _WalletScreenState extends State<WalletScreen> {
                                         SizedBox(width: 8),
                                         Text(
                                           '$formattedStarsBalance ${walletService.starsTokenSymbol}', // Use service symbol
-                                          style: TextStyle(fontSize: 16),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -590,13 +748,16 @@ class _WalletScreenState extends State<WalletScreen> {
                                       children: [
                                         Icon(
                                           Icons.account_balance_wallet_outlined,
-                                          color: Colors.blueGrey,
+                                          color: Colors.green,
                                           size: 20,
                                         ),
                                         SizedBox(width: 8),
                                         Text(
                                           '${formattedNativeBalance} ${walletService.connectedNetwork?.currency ?? "Native"}', // Use service state for currency symbol
-                                          style: TextStyle(fontSize: 16),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -609,53 +770,53 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30), 
+                  SizedBox(height: 30),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //   children: [
+                  //     _buildActionButton(
+                  //       icon: Icons.shopping_cart,
+                  //       label: 'Buy',
+                  //       onPressed: enableBuyButton ? _showBuyStarsModal : null,
+                  //     ),
+                  //     SizedBox(width: 8),
+                  //     // _buildActionButton(
+                  //     //   icon: Icons.card_giftcard,
+                  //     //   label: 'Gift',
+                  //     //   onPressed: enableGiftButton
+                  //     //       ? _showStarReactionModal
+                  //     //       : null,
+                  //     // ),
+                  //     SizedBox(width: 8),
+                  //   ],
+                  // ),
+                  // SizedBox(height: 30),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildActionButton(
-                        icon: Icons.shopping_cart,
-                        label: 'Buy',
-                        onPressed: enableBuyButton ? _showBuyStarsModal : null,
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: Text(
+                          'Recent STARS Transactions:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
-                      SizedBox(width: 8),
-                      _buildActionButton(
-                        icon: Icons.card_giftcard,
-                        label: 'Gift',
-                        onPressed: enableGiftButton
-                            ? _showStarReactionModal
+                      IconButton(
+                        icon: Icon(
+                          Icons.refresh,
+                          color: enableRefreshTransactionsButton
+                              ? Colors.blue
+                              : Colors.grey,
+                        ),
+                        tooltip: 'Refresh Transactions',
+                        onPressed: enableRefreshTransactionsButton
+                            ? walletService.fetchTokenTransactions
                             : null,
                       ),
-                      SizedBox(width: 8), 
                     ],
-                  ),
-                  SizedBox(height: 30), 
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      'Recent STARS Transactions (Sepolia):',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center, 
-                    ),
-                  ),
-
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.refresh,
-                        color: enableRefreshTransactionsButton
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                      tooltip: 'Refresh Transactions',
-                      onPressed: enableRefreshTransactionsButton
-                          ? walletService.fetchTokenTransactions
-                          : null,
-                    ),
                   ),
                   SizedBox(height: 8),
 
@@ -695,8 +856,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: walletService.transactions.map((tx) {
                         final currentAddress = walletService.connectedAddress;
-                        if (currentAddress == null)
-                          return SizedBox.shrink(); 
+                        if (currentAddress == null) return SizedBox.shrink();
                         return _buildTransactionItem(
                           tx,
                           currentAddress,

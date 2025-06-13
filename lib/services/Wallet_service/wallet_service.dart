@@ -731,7 +731,11 @@ class WalletService extends ChangeNotifier {
         Future.delayed(Duration(milliseconds: 100), () {
           if (_context!.mounted) {
             ScaffoldMessenger.of(_context!).showSnackBar(
-              SnackBar(content: Text('Wallet Error: ${event.message}')),
+              SnackBar(
+                backgroundColor: Colors.red,
+                content: Text('Wallet Error: ${event.message}' , style: TextStyle(
+                  color: Colors.white
+                ),)),
             );
           }
         });

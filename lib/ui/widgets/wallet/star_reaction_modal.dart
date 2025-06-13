@@ -145,7 +145,8 @@ class _StarReactionModalState extends State<StarReactionModal> {
     final walletService = Provider.of<WalletService>(context, listen: false);
 
     // Only allow editing if interactions are enabled and maxStarsAmount is at least 1
-    final bool enableInteractions = walletService.isConnected &&
+    final bool enableInteractions =
+        walletService.isConnected &&
         walletService.connectedNetwork?.chainId ==
             walletService.sepoliaChainId &&
         walletService.areContractsLoaded;
@@ -279,7 +280,8 @@ class _StarReactionModalState extends State<StarReactionModal> {
     );
 
     // Determine if interactions are generally enabled (connected to Sepolia, contracts loaded)
-    final bool enableInteractions = walletService.isConnected &&
+    final bool enableInteractions =
+        walletService.isConnected &&
         walletService.connectedNetwork?.chainId ==
             walletService.sepoliaChainId &&
         walletService.areContractsLoaded;
@@ -288,8 +290,9 @@ class _StarReactionModalState extends State<StarReactionModal> {
     final int sliderMin = (_maxStarsAmount >= 1) ? 1 : 0;
     final int sliderMax = _maxStarsAmount;
     // Divisions = number of steps. If max=5, min=1, divisions=4. If max=0, min=0, divisions=1 (0 to 0)
-    final int sliderDivisions =
-        sliderMax > sliderMin ? sliderMax - sliderMin : 1;
+    final int sliderDivisions = sliderMax > sliderMin
+        ? sliderMax - sliderMin
+        : 1;
 
     // Ensure selected amount is within the valid range for the slider value
     double sliderValue = _selectedStarsAmount.toDouble();
@@ -305,10 +308,10 @@ class _StarReactionModalState extends State<StarReactionModal> {
     // Enabled if interactions are enabled, selected amount is >= 1 and <= max available, AND not currently editing
     final bool isSendButtonEnabled =
         enableInteractions && // Must be connected & contracts loaded
-            _selectedStarsAmount >= 1 && // Amount must be at least 1
-            _selectedStarsAmount <=
-                _maxStarsAmount && // Amount must be <= max available
-            !_isEditingAmount; // Disable button while actively editing
+        _selectedStarsAmount >= 1 && // Amount must be at least 1
+        _selectedStarsAmount <=
+            _maxStarsAmount && // Amount must be <= max available
+        !_isEditingAmount; // Disable button while actively editing
 
     // Get current view padding (especially bottom for keyboard)
     final mediaQuery = MediaQuery.of(context);
@@ -333,13 +336,14 @@ class _StarReactionModalState extends State<StarReactionModal> {
           // Use padding for overall layout
           padding: const EdgeInsets.all(24.0),
           decoration: const BoxDecoration(
-            color: Color(0xFF1E293B), // Dark background color
+            color: Colors.white, // Dark background color
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
           ),
           child: SingleChildScrollView(
             // Wrap content in SingleChildScrollView
             // Use NeverScrollableScrollPhysics unless keyboard is up or content overflows
-            physics: (_maxStarsAmount > 0 ||
+            physics:
+                (_maxStarsAmount > 0 ||
                     keyboardPadding > 0 ||
                     _isEditingAmount) // Allow scroll if balance > 0, keyboard is up, or editing
                 ? AlwaysScrollableScrollPhysics()
@@ -360,7 +364,12 @@ class _StarReactionModalState extends State<StarReactionModal> {
                         // Placeholder for the Eagle Icon (replace with actual asset if needed)
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: Colors.white, // Example background
+                          backgroundColor: Color.fromRGBO(
+                            143,
+                            148,
+                            251,
+                            1,
+                          ), // Example background
                           child: Icon(
                             Icons.star,
                             color: Colors.amber,
@@ -372,14 +381,14 @@ class _StarReactionModalState extends State<StarReactionModal> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                       ],
                     ),
                     // Close Button
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(Icons.close, color: Colors.black),
                       onPressed: () => Navigator.pop(
                         context,
                         null,
@@ -416,7 +425,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                                 // Style to match the Text widget
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: Colors.black,
                                 decoration: TextDecoration
                                     .none, // Remove default underline
                               ),
@@ -451,7 +460,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                               children: [
                                 Icon(
                                   Icons.star,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   size: 18,
                                 ), // Star icon
                                 SizedBox(width: 6),
@@ -462,7 +471,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ],
@@ -479,10 +488,10 @@ class _StarReactionModalState extends State<StarReactionModal> {
                       data: SliderTheme.of(context).copyWith(
                         activeTrackColor:
                             Colors.amber[600], // Active track color
-                        inactiveTrackColor: Colors.white.withOpacity(
+                        inactiveTrackColor: Colors.black.withOpacity(
                           0.3,
                         ), // Inactive track color
-                        thumbColor: Colors.white, // Thumb color
+                        thumbColor: Colors.black, // Thumb color
                         overlayColor: Colors.amber[600]?.withOpacity(
                           0.2,
                         ), // Overlay color on hover/press
@@ -506,9 +515,9 @@ class _StarReactionModalState extends State<StarReactionModal> {
                                   // Update selected amount based on slider, clamping to valid range [1, maxStars]
                                   // Note: sliderMin is 1 if maxStars >= 1, so clamp(sliderMin, ...) ensures min of 1
                                   _selectedStarsAmount = newValue.round().clamp(
-                                        sliderMin,
-                                        _maxStarsAmount,
-                                      );
+                                    sliderMin,
+                                    _maxStarsAmount,
+                                  );
                                   // Also update the text controller when slider changes
                                   _amountTextController.text =
                                       _selectedStarsAmount.toString();
@@ -530,7 +539,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                         child: Text(
                           'Available: ${_formatNumber(_maxStarsAmount)} ${walletService.starsTokenSymbol}', // Use service symbol
                           textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                          style: TextStyle(color: Colors.black, fontSize: 12),
                         ),
                       ),
                     if (_maxStarsAmount == 0)
@@ -557,40 +566,40 @@ class _StarReactionModalState extends State<StarReactionModal> {
                 Text(
                   'Choose how many ${walletService.starsTokenSymbol} you want to send\nto ${widget.recipientName} to support this post.', // Use service symbol
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
                 SizedBox(height: 20),
                 // Checkbox
-                CheckboxListTile(
-                  title: Text(
-                    'Show me in Top Senders',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  value: _showInTopSenders,
-                  // Disable checkbox if interactions are not enabled
-                  onChanged: enableInteractions
-                      ? (bool? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _showInTopSenders = newValue;
-                            });
-                          }
-                        }
-                      : null, // Disable checkbox
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  checkColor: Colors.amber,
-                  activeColor: Colors.white,
-                ),
+                // CheckboxListTile(
+                //   title: Text(
+                //     'Show me in Top Senders',
+                //     style: TextStyle(color: Colors.black),
+                //   ),
+                //   value: _showInTopSenders,
+                //   // Disable checkbox if interactions are not enabled
+                //   onChanged: enableInteractions
+                //       ? (bool? newValue) {
+                //           if (newValue != null) {
+                //             setState(() {
+                //               _showInTopSenders = newValue;
+                //             });
+                //           }
+                //         }
+                //       : null, // Disable checkbox
+                //   dense: true,
+                //   contentPadding: EdgeInsets.zero,
+                //   controlAffinity: ListTileControlAffinity.leading,
+                //   checkColor: Colors.amber,
+                //   activeColor: Colors.black,
+                // ),
                 SizedBox(height: 30),
                 // Send Button
                 ElevatedButton(
                   // Button enabled if interactions are enabled AND amount is valid AND not editing
                   onPressed: isSendButtonEnabled ? _handleSendStars : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF61A4F1),
-                    foregroundColor: Colors.white,
+                    backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                    // foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -598,58 +607,58 @@ class _StarReactionModalState extends State<StarReactionModal> {
                     disabledBackgroundColor: const Color(
                       0xFF61A4F1,
                     ).withOpacity(0.5),
-                    disabledForegroundColor: Colors.white.withOpacity(0.5),
+                    disabledForegroundColor: Colors.black.withOpacity(0.5),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.star, color: Colors.white),
+                      Icon(Icons.star, color: Colors.amber, size: 30,),
                       SizedBox(width: 8),
                       Text(
                         // Button text changes based on enabled state
                         isSendButtonEnabled
                             ? 'Send ${_formatNumber(_selectedStarsAmount)} ${walletService.starsTokenSymbol}' // Use service symbol
                             : (!enableInteractions
-                                ? 'Connect to Send' // Show if not connected/loaded
-                                : (_maxStarsAmount == 0
-                                    ? 'Insufficient Balance'
-                                    : 'Enter Amount') // Show if connected but invalid state
-                            ),
-                        style: TextStyle(fontSize: 18),
+                                  ? 'Connect to Send' // Show if not connected/loaded
+                                  : (_maxStarsAmount == 0
+                                        ? 'Insufficient Balance'
+                                        : 'Enter Amount') // Show if connected but invalid state
+                                    ),
+                        style: TextStyle(fontSize: 18 , color: Colors.white),
                       ),
                     ],
                   ),
                 ),
                 SizedBox(height: 20),
                 // Terms of Service Link
-                Center(
-                  child: GestureDetector(
-                    onTap: () async {
-                      final url = Uri.parse('https://reown.com/terms');
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(
-                          url,
-                          mode: LaunchMode.externalApplication,
-                        );
-                      } else {
-                        print('Could not launch $url');
-                        // Use service's AppKitModal to broadcast error
-                        walletService.appKitModal.onModalError.broadcast(
-                          ModalError('Could not open Terms link.'),
-                        );
-                      }
-                    },
-                    child: Text(
-                      'By sending ${walletService.starsTokenSymbol} you agree to the Terms of Service.', // Use service symbol
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: const Color(0xFF61A4F1),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ),
+                // Center(
+                //   child: GestureDetector(
+                //     onTap: () async {
+                //       final url = Uri.parse('https://reown.com/terms');
+                //       if (await canLaunchUrl(url)) {
+                //         await launchUrl(
+                //           url,
+                //           mode: LaunchMode.externalApplication,
+                //         );
+                //       } else {
+                //         print('Could not launch $url');
+                //         // Use service's AppKitModal to broadcast error
+                //         walletService.appKitModal.onModalError.broadcast(
+                //           ModalError('Could not open Terms link.'),
+                //         );
+                //       }
+                //     },
+                //     child: Text(
+                //       'By sending ${walletService.starsTokenSymbol} you agree to the Terms of Service.', // Use service symbol
+                //       textAlign: TextAlign.center,
+                //       style: TextStyle(
+                //         fontSize: 12,
+                //         color: const Color(0xFF61A4F1),
+                //         decoration: TextDecoration.underline,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

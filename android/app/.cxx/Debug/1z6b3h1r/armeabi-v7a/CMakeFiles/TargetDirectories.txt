@@ -1,0 +1,2 @@
+C:/Users/bilen/OneDrive/Desktop/MobileApp/Mobile/android/app/.cxx/Debug/1z6b3h1r/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/bilen/OneDrive/Desktop/MobileApp/Mobile/android/app/.cxx/Debug/1z6b3h1r/armeabi-v7a/CMakeFiles/rebuild_cache.dir

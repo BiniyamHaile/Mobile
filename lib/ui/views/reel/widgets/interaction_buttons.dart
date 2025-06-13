@@ -68,6 +68,7 @@ class InteractionButtons extends StatelessWidget {
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                backgroundColor: Colors.white,
                 isScrollControlled: true,
                 builder: (BuildContext context) {
                   return CommentSection(
@@ -83,14 +84,6 @@ class InteractionButtons extends StatelessWidget {
             },
           ),
           // Share Button
-          InteractionButton(
-            id: reelid,
-            icon: LucideIcons.send,
-            count: shareCount,
-            color: appColors.whiteColor,
-            onTap: onShareTap,
-            shareLink: shareLink,
-          ),
           InteractionButton(
             id: reelid,
             icon: LucideIcons.send,

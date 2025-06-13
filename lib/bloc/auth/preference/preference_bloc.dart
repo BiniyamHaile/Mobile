@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
+import 'package:mobile/data/preference.dart';
 
 part 'preference_event.dart';
 part 'preference_state.dart';
@@ -20,29 +21,7 @@ class PreferenceBloc extends Bloc<PreferenceEvent, PreferenceState> {
   ) async {
     emit(PreferencesLoading());
     try {
-      // Mock data - replace with actual API call
-      final categories = [
-        PreferenceCategory(
-          id: 'entertainment',
-          name: 'Entertainment',
-          options: [
-            PreferenceOption(id: 'movies', name: 'Movies'),
-            PreferenceOption(id: 'tv_shows', name: 'TV Shows'),
-            PreferenceOption(id: 'celebrity', name: 'Celebrity News'),
-          ],
-        ),
-        PreferenceCategory(
-          id: 'music',
-          name: 'Music',
-          options: [
-            PreferenceOption(id: 'pop', name: 'Pop'),
-            PreferenceOption(id: 'rock', name: 'Rock'),
-            PreferenceOption(id: 'hiphop', name: 'Hip Hop'),
-          ],
-        ),
-      ];
-
-      emit(PreferencesLoaded(categories: categories));
+      emit(PreferencesLoaded(categories: mockPreferenceCategories));
     } catch (e) {
       emit(PreferencesError(error: 'Failed to load preferences'));
     }
