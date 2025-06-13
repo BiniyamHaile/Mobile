@@ -10,6 +10,8 @@ import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
 import 'package:mobile/models/post.dart';
+import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
@@ -346,7 +348,7 @@ class _PostingScreenState extends State<PostingScreen> {
       children: [
         const SizedBox(height: 16),
         Text(
-          'Media Preview',
+          AppStrings.mediaPreview.tr(context),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -484,7 +486,7 @@ class _PostingScreenState extends State<PostingScreen> {
       children: [
         const SizedBox(height: 16),
         Text(
-          'Mentioned Users',
+          AppStrings.mentionedUsers.tr(context),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -573,9 +575,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
             if (state is PostCreationSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
-                    'Post created successfully',
+                    AppStrings.postCreatedSuccess.tr(context),
                     style: TextStyle(color: Colors.white),
                   ),
                   backgroundColor: Colors.green,
@@ -588,8 +590,8 @@ class _PostingScreenState extends State<PostingScreen> {
               );
             } else if (state is PostUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Post updated successfully' ,  style: TextStyle(color: Colors.white)),
+                 SnackBar(
+                  content: Text(AppStrings.postUpdatedSuccess.tr(context) ,  style: TextStyle(color: Colors.white)),
                   backgroundColor: Colors.green,
                   duration: Duration(seconds: 2),
                 ),
@@ -633,7 +635,7 @@ class _PostingScreenState extends State<PostingScreen> {
             },
           ),
           title: Text(
-            _editingPost != null ? 'Edit Post' : 'Create Post',
+            _editingPost != null ? AppStrings.editPost.tr(context) : AppStrings.createPost.tr(context),
             style: const TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -683,8 +685,8 @@ class _PostingScreenState extends State<PostingScreen> {
                         child: TextField(
                           controller: _textController,
                           focusNode: _textFocusNode,
-                          decoration: const InputDecoration(
-                            hintText: "What's on your mind?",
+                          decoration: InputDecoration(
+                            hintText: AppStrings.whatsOnYourMind.tr(context),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.all(16),
                             fillColor: Colors.white,
@@ -705,19 +707,19 @@ class _PostingScreenState extends State<PostingScreen> {
                       children: [
                         _MediaButton(
                           icon: Icons.photo_library,
-                          label: 'Gallery',
+                          label: AppStrings.gallery.tr(context),
                           color: Colors.blue,
                           onPressed: _pickImage,
                         ),
                         _MediaButton(
                           icon: Icons.video_library,
-                          label: 'Video',
+                          label: AppStrings.video.tr(context),
                           color: Colors.purple,
                           onPressed: _pickVideos,
                         ),
                         _MediaButton(
                           icon: Icons.camera_alt,
-                          label: 'Camera',
+                          label: AppStrings.camera.tr(context),
                           color: Colors.green,
                           onPressed: _takePhoto,
                         ),
@@ -742,7 +744,7 @@ class _PostingScreenState extends State<PostingScreen> {
                   child: _isSubmitting
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                          _editingPost != null ? 'Update Post' : 'Create Post',
+                          _editingPost != null ? AppStrings.updatePost.tr(context) : AppStrings.createPost.tr(context),
                         ),
                 ),
               ),

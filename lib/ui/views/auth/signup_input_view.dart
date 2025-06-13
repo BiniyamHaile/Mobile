@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
+import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/utils/screen_size_utils.dart';
 import 'package:mobile/ui/views/auth/form_wrapper.dart';
 import 'package:mobile/ui/views/auth/password_input.dart';
@@ -96,7 +98,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 margin: EdgeInsets.symmetric(
                     vertical: screen.scaledScreenHeight(0.015)),
                 controller: widget.nameController,
-                hintText: "first name",
+                hintText: AppStrings.firstName.tr(context),
                 keyboardType: TextInputType.name,
                 prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
                 validator: (value) => _validate(widget.nameController),
@@ -111,7 +113,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 margin: EdgeInsets.symmetric(
                     vertical: screen.scaledScreenHeight(0.015)),
                 controller: widget.surnameController,
-                hintText: "last name",
+                hintText: AppStrings.lastName.tr(context),
                 keyboardType: TextInputType.name,
                 prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
                 validator: (value) => _validate(widget.surnameController),
@@ -137,7 +139,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                   bottom: screen.scaledScreenHeight(0.03),
                   top: screen.scaledScreenHeight(0.015),
                 ),
-                hintText: "email",
+                hintText: AppStrings.email.tr(context),
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: Icon(Icons.email, color: appTheme.iconTheme.color),
               ),
@@ -151,7 +153,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                   }),
               PasswordInput(
                 controller: widget.confirmPasswordController,
-                hintText: "Confirm password",
+                hintText: AppStrings.confirmPassword.tr(context),
                 validator: (value) =>
                     _validate(widget.confirmPasswordController),
                 onChanged: (value) {
@@ -170,9 +172,9 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
               ),
               DropdownButtonFormField<String>(
                 value: selectedGender,
-                items: const [
-                  DropdownMenuItem(value: 'male', child: Text('Male')),
-                  DropdownMenuItem(value: 'female', child: Text('Female')),
+                items:  [
+                  DropdownMenuItem(value: 'male', child: Text(AppStrings.male.tr(context))),
+                  DropdownMenuItem(value: 'female', child: Text(AppStrings.female.tr(context))),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -183,7 +185,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                   }
                 },
                 decoration: const InputDecoration(
-                  hintText: 'Select Gender',
+                  hintText: AppStrings.selectGender,
                   prefixIcon: Icon(Icons.people),
                 ),
               ),
@@ -191,7 +193,7 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
             bottomGap: screen.scaledScreenHeight(0.025),
             onSubmit: widget.onSubmit,
             onPrevalidation: _onPrevalidation,
-            submitTitle: "Enter",
+            submitTitle: AppStrings.register.tr(context),
           );
         },
       ),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
+import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/pages/auth/otp_page.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
@@ -56,16 +58,14 @@ class _SignupFormViewState extends State<SignupFormView> {
 
   void _handleSubmit() {
      if (_selectedGender == null || _selectedGender!.isEmpty) {
-      UiHelpers.showErrorSnackBar(context, 'Please select a gender.');
+      UiHelpers.showErrorSnackBar(context, AppStrings.selectGender.tr(context));
       return;
     }
     if (!checkboxValueNotifier.value) {
       _handleCheckbox(false, Colors.red);
 
-      print("Still not checked");
       return;
     }
-    print("Checked");
     context.read<SignupBloc>().add(
           SignupEvent( 
             email: _emailController.text,
@@ -106,7 +106,7 @@ class _SignupFormViewState extends State<SignupFormView> {
         child: Column(
           children: [
             Text(
-              "Complete your details",
+              AppStrings.completeDetails.tr(context),
               style: appTheme.textTheme.labelSmall,
             ),
             SignupInputFields(
@@ -140,13 +140,13 @@ class _SignupFormViewState extends State<SignupFormView> {
             RichText(
               textAlign: TextAlign.center, 
               text: TextSpan(
-                text: 'Already have an account? ',
+                text: AppStrings.dontHaveAccount.tr(context),
                 style: appTheme.textTheme.bodyMedium?.copyWith(
                   color: appTheme.colorScheme.onSurface.withOpacity(0.7), // Match nearby text color
                 ),
                 children: [
                   TextSpan(
-                    text: 'Log In',
+                    text: AppStrings.login.tr(context),
                     style: appTheme.textTheme.bodyMedium?.copyWith( 
                       color: Color.fromRGBO(143, 148, 251, 1),
                       fontWeight: FontWeight.bold, 

@@ -23,6 +23,7 @@ import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/repository/social/post_repository.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
 import 'package:mobile/services/api/wallet/wallet_repository_impl.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
@@ -50,75 +51,78 @@ void main() async {
   );
 
   runApp(
-    MultiProvider(
-      providers: [
-        MultiBlocProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (context) =>
-                  WalletService(walletRepository: walletRepository),
-            ),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider(
-              create: (context) => PostBloc(postRepository: PostRepository()),
-              child: const PostingScreen(),
-            ),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-            BlocProvider(create: (_) => AuthFormBloc()),
-            BlocProvider(create: (_) => SignupBloc()),
-            BlocProvider(create: (_) => RetrieveNotificationsBloc()),
-            BlocProvider(
-              create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
-            ),
-            BlocProvider(create: (_) => RetrieveMessagesBloc()),
-            BlocProvider(create: (_) => SendMessageBloc()),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-            BlocProvider<ReelFeedAndActionBloc>(
-              create: (context) => getIt<ReelFeedAndActionBloc>(),
-            ),
-            BlocProvider<PostDetailsBloc>(
-              create: (context) => getIt<PostDetailsBloc>(),
-            ),
-            BlocProvider<CommentBloc>(
-              create: (context) => getIt<CommentBloc>(),
-            ),
-            BlocProvider(create: (_) => RetrieveNotificationsBloc()),
-            BlocProvider(
-              create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
-            ),
-            BlocProvider(create: (_) => RetrieveMessagesBloc()),
-            BlocProvider(create: (_) => SendMessageBloc()),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-          ],
-          child: App(),
-        ),
-      ],
+    ChangeNotifierProvider(
+      create: (context) => LanguageService(),
+      child: MultiProvider(
+        providers: [
+          MultiBlocProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (context) =>
+                    WalletService(walletRepository: walletRepository),
+              ),
+              BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
+              BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+              BlocProvider(
+                create: (context) => PostBloc(postRepository: PostRepository()),
+                child: const PostingScreen(),
+              ),
+              BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+              BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+              BlocProvider<ResetPasswordBloc>(
+                create: (context) => ResetPasswordBloc(),
+              ),
+              BlocProvider<ForgotPasswordBloc>(
+                create: (context) => ForgotPasswordBloc(),
+              ),
+              BlocProvider(create: (_) => AuthFormBloc()),
+              BlocProvider(create: (_) => SignupBloc()),
+              BlocProvider(create: (_) => RetrieveNotificationsBloc()),
+              BlocProvider(
+                create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
+              ),
+              BlocProvider(create: (_) => RetrieveMessagesBloc()),
+              BlocProvider(create: (_) => SendMessageBloc()),
+              BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
+              BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+              BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+              BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+              BlocProvider<ResetPasswordBloc>(
+                create: (context) => ResetPasswordBloc(),
+              ),
+              BlocProvider<ForgotPasswordBloc>(
+                create: (context) => ForgotPasswordBloc(),
+              ),
+              BlocProvider<ReelFeedAndActionBloc>(
+                create: (context) => getIt<ReelFeedAndActionBloc>(),
+              ),
+              BlocProvider<PostDetailsBloc>(
+                create: (context) => getIt<PostDetailsBloc>(),
+              ),
+              BlocProvider<CommentBloc>(
+                create: (context) => getIt<CommentBloc>(),
+              ),
+              BlocProvider(create: (_) => RetrieveNotificationsBloc()),
+              BlocProvider(
+                create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
+              ),
+              BlocProvider(create: (_) => RetrieveMessagesBloc()),
+              BlocProvider(create: (_) => SendMessageBloc()),
+              BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
+              BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+              BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+              BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+              BlocProvider<ResetPasswordBloc>(
+                create: (context) => ResetPasswordBloc(),
+              ),
+              BlocProvider<ForgotPasswordBloc>(
+                create: (context) => ForgotPasswordBloc(),
+              ),
+            ],
+            child: App(),
+          ),
+        ],
+      ),
     ),
   );
 }
