@@ -13,6 +13,10 @@ import 'package:mobile/models/post.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import 'package:mobile/bloc/social/post/post_bloc.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:mobile/models/post.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 class PostingScreen extends StatefulWidget {
   final dynamic post;
@@ -153,6 +157,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
     if (filteredUsers.isEmpty) return;
 
+    final theme = AppTheme.getTheme(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     _mentionOverlay = OverlayEntry(
       builder: (context) => Positioned(
         width: 200,
@@ -165,7 +172,7 @@ class _PostingScreenState extends State<PostingScreen> {
             child: Container(
               constraints: const BoxConstraints(maxHeight: 200),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListView.builder(
@@ -176,15 +183,22 @@ class _PostingScreenState extends State<PostingScreen> {
                   final user = filteredUsers[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: user.profilePic != null
-                          ? CachedNetworkImageProvider(user.profilePic!)
-                          : null,
-                      child: user.profilePic == null
-                          ? const Icon(Icons.person)
-                          : null,
+                      backgroundColor: isDark
+                          ? AppTheme.appColors.darkGreyColor5
+                          : AppTheme.appColors.accent2,
+                      child: Icon(
+                        Icons.person,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
-                    title: Text('${user.firstName} ${user.lastName}'),
-                    subtitle: Text('@${user.username}'),
+                    title: Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: TextStyle(color: theme.colorScheme.onSurface),
+                    ),
+                    subtitle: Text(
+                      '@${user.username}',
+                      style: TextStyle(color: theme.hintColor),
+                    ),
                     onTap: () => _insertMention(user),
                   );
                 },
@@ -305,8 +319,6 @@ class _PostingScreenState extends State<PostingScreen> {
       return;
     }
 
-    print("mentions here>>> ${_mentions}");
-
     if (_editingPost != null) {
       postBloc.add(
         UpdatePost(
@@ -329,30 +341,29 @@ class _PostingScreenState extends State<PostingScreen> {
 
   void _showError(String message) {
     if (!mounted) return;
+    final theme = AppTheme.getTheme(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(
+          message,
+          style: TextStyle(color: theme.colorScheme.onError),
+        ),
+        backgroundColor: theme.colorScheme.error,
       ),
     );
   }
 
-  Widget _buildMediaPreview() {
+  Widget _buildMediaPreview(bool isDark) {
     final totalItems = _existingMediaUrls.length + _selectedMedia.length;
     if (totalItems == 0) return const SizedBox();
+
+    final theme = AppTheme.getTheme(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text(
-          'Media Preview',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Media Preview', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -374,12 +385,14 @@ class _PostingScreenState extends State<PostingScreen> {
                           Container(
                             width: 120,
                             height: 120,
-                            color: Colors.black12,
+                            color: isDark
+                                ? AppTheme.appColors.darkGreyColor5
+                                : AppTheme.appColors.accent2,
                           ),
-                          const Center(
+                          Center(
                             child: Icon(
                               Icons.play_circle_fill,
-                              color: Colors.white,
+                              color: theme.colorScheme.onSurface,
                               size: 40,
                             ),
                           ),
@@ -393,16 +406,25 @@ class _PostingScreenState extends State<PostingScreen> {
                         placeholder: (context, url) => Container(
                           width: 120,
                           height: 120,
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                          color: isDark
+                              ? AppTheme.appColors.darkGreyColor5
+                              : AppTheme.appColors.accent2,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: theme.colorScheme.onSurface,
+                            ),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
                           width: 120,
                           height: 120,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.broken_image),
+                          color: isDark
+                              ? AppTheme.appColors.darkGreyColor5
+                              : AppTheme.appColors.accent2,
+                          child: Icon(
+                            Icons.broken_image,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                       );
               } else {
@@ -416,17 +438,22 @@ class _PostingScreenState extends State<PostingScreen> {
                                 children: [
                                   VideoPlayer(_videoControllers[path]!),
                                   Container(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: theme.colorScheme.surface
+                                        .withOpacity(0.4),
                                   ),
-                                  const Icon(
+                                  Icon(
                                     Icons.play_circle_fill,
                                     size: 40,
-                                    color: Colors.white,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ],
                               ),
                             )
-                          : const Center(child: CircularProgressIndicator()))
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ))
                     : Image.file(
                         File(path),
                         width: 120,
@@ -458,10 +485,10 @@ class _PostingScreenState extends State<PostingScreen> {
                             color: Colors.black.withOpacity(0.6),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.close,
                             size: 16,
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -476,21 +503,16 @@ class _PostingScreenState extends State<PostingScreen> {
     );
   }
 
-  Widget _buildMentionsPreview() {
+  Widget _buildMentionsPreview(bool isDark) {
     if (_mentions.isEmpty) return const SizedBox();
+
+    final theme = AppTheme.getTheme(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text(
-          'Mentioned Users',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text('Mentioned Users', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -499,43 +521,68 @@ class _PostingScreenState extends State<PostingScreen> {
               (u) => u.id == userId,
             );
 
-            // User not found case
             if (userIndex == -1) {
               return Chip(
-                avatar: const CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person_off, size: 16, color: Colors.white),
+                avatar: CircleAvatar(
+                  backgroundColor: theme.hintColor,
+                  child: Icon(
+                    Icons.person_off,
+                    size: 16,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 label: Text(
                   'User not found',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: theme.colorScheme.onSurface),
                 ),
-                deleteIcon: const Icon(Icons.close, size: 16),
+                deleteIcon: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: theme.colorScheme.onSurface,
+                ),
                 onDeleted: () {
                   setState(() => _mentions.remove(userId));
                   _removeMentionFromText(userId);
                 },
-                backgroundColor: Colors.grey[200],
+                backgroundColor: isDark
+                    ? AppTheme.appColors.darkGreyColor5
+                    : AppTheme.appColors.accent2,
               );
             }
 
-            // User found case
             final user = _mentionableUsers[userIndex];
             return Chip(
               avatar: CircleAvatar(
                 backgroundImage: user.profilePic != null
                     ? CachedNetworkImageProvider(user.profilePic!)
                     : null,
+                backgroundColor: isDark
+                    ? AppTheme.appColors.darkGreyColor5
+                    : AppTheme.appColors.accent2,
                 child: user.profilePic == null
-                    ? const Icon(Icons.person, size: 16)
+                    ? Icon(
+                        Icons.person,
+                        size: 16,
+                        color: theme.colorScheme.onSurface,
+                      )
                     : null,
               ),
-              label: Text('@${user.username}'),
-              deleteIcon: const Icon(Icons.close, size: 16),
+              label: Text(
+                '@${user.username}',
+                style: TextStyle(color: theme.colorScheme.onSurface),
+              ),
+              deleteIcon: Icon(
+                Icons.close,
+                size: 16,
+                color: theme.colorScheme.onSurface,
+              ),
               onDeleted: () {
                 setState(() => _mentions.remove(userId));
                 _removeMentionFromText(user.username!);
               },
+              backgroundColor: isDark
+                  ? AppTheme.appColors.darkGreyColor5
+                  : AppTheme.appColors.accent2,
             );
           }).toList(),
         ),
@@ -563,6 +610,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.getTheme(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
         if (state is PostCreationSuccess || state is PostUpdateSuccess) {
@@ -571,30 +621,20 @@ class _PostingScreenState extends State<PostingScreen> {
 
             ScaffoldMessenger.of(context).clearSnackBars();
 
-            if (state is PostCreationSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Post created successfully',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
+            final message = state is PostCreationSuccess
+                ? 'Post created successfully'
+                : 'Post updated successfully';
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  message,
+                  style: TextStyle(color: theme.colorScheme.onPrimary),
                 ),
-              );
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            } else if (state is PostUpdateSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Post updated successfully' ,  style: TextStyle(color: Colors.white)),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
+                backgroundColor: theme.colorScheme.primary,
+                duration: const Duration(seconds: 2),
+              ),
+            );
 
             if (_editingPost != null) {
               _editingPost = null;
@@ -612,21 +652,20 @@ class _PostingScreenState extends State<PostingScreen> {
         } else if (state is PostCreationFailure || state is PostUpdateFailure) {
           if (mounted) {
             setState(() => _isSubmitting = false);
-            _showError("Post creation failed: ${state}");
+            _showError(
+              state is PostCreationFailure
+                  ? 'Post creation failed'
+                  : 'Post update failed',
+            );
           }
         }
       },
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromRGBO(
-            143,
-            148,
-            251,
-            1,
-          ), // Add this lin
+          backgroundColor: theme.colorScheme.primary,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
             onPressed: () {
               if (_isSubmitting) return;
               Navigator.pop(context);
@@ -634,120 +673,138 @@ class _PostingScreenState extends State<PostingScreen> {
           ),
           title: Text(
             _editingPost != null ? 'Edit Post' : 'Create Post',
-            style: const TextStyle(
-              fontSize: 30,
+            style: TextStyle(
+              color: theme.colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
-              backgroundColor: Color.fromRGBO(143, 148, 251, 1),
             ),
           ),
+         
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: (currentProfilePic.isNotEmpty)
-                              ? CachedNetworkImageProvider(currentProfilePic)
-                              : null,
-                          child: (currentProfilePic.isNotEmpty)
-                              ? null
-                              : Icon(Icons.person, color: Colors.grey.shade800),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          currentUserFullname,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+        body: Container(
+          color: theme.colorScheme.surface,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: isDark
+                                ? AppTheme.appColors.darkGreyColor5
+                                : AppTheme.appColors.accent2,
+                            backgroundImage: currentProfilePic.isNotEmpty
+                                ? CachedNetworkImageProvider(currentProfilePic)
+                                : null,
+                            child: currentProfilePic.isEmpty
+                                ? Icon(
+                                    Icons.person,
+                                    color: theme.colorScheme.onSurface,
+                                  )
+                                : null,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    CompositedTransformTarget(
-                      link: _mentionLayerLink,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                          const SizedBox(width: 10),
+                          Text(
+                            currentUserFullname,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      CompositedTransformTarget(
+                        link: _mentionLayerLink,
                         child: TextField(
                           controller: _textController,
                           focusNode: _textFocusNode,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "What's on your mind?",
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16),
-                            fillColor: Colors.white,
-                            filled: true,
+                            hintStyle: TextStyle(
+                              color: theme.colorScheme.primary,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.all(16),
                           ),
                           maxLines: 8,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
                           minLines: 4,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _MediaButton(
-                          icon: Icons.photo_library,
-                          label: 'Gallery',
-                          color: Colors.blue,
-                          onPressed: _pickImage,
-                        ),
-                        _MediaButton(
-                          icon: Icons.video_library,
-                          label: 'Video',
-                          color: Colors.purple,
-                          onPressed: _pickVideos,
-                        ),
-                        _MediaButton(
-                          icon: Icons.camera_alt,
-                          label: 'Camera',
-                          color: Colors.green,
-                          onPressed: _takePhoto,
-                        ),
-                      ],
-                    ),
-                    _buildMediaPreview(),
-                    _buildMentionsPreview(),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitPost,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _MediaButton(
+                            icon: Icons.photo_library,
+                            label: 'Gallery',
+                             color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _pickImage,
+                          ),
+                          _MediaButton(
+                            icon: Icons.video_library,
+                            label: 'Video',
+                            color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _pickVideos,
+                          ),
+                          _MediaButton(
+                            icon: Icons.camera_alt,
+                            label: 'Camera',
+                            color: theme.colorScheme.primary,
+                            iconColor: theme.colorScheme.onPrimary,
+                            onPressed: _takePhoto,
+                          ),
+                        ],
+                      ),
+                      _buildMediaPreview(isDark),
+                      _buildMentionsPreview(isDark),
+                    ],
                   ),
-                  child: _isSubmitting
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          _editingPost != null ? 'Update Post' : 'Create Post',
-                        ),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isSubmitting ? null : _submitPost,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                          width: 1.5,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: _isSubmitting
+                        ? CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          )
+                        : Text(
+                            _editingPost != null
+                                ? 'Update Post'
+                                : 'Create Post',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -758,12 +815,14 @@ class _MediaButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final Color iconColor;
   final VoidCallback onPressed;
 
   const _MediaButton({
     required this.icon,
     required this.label,
     required this.color,
+    required this.iconColor,
     required this.onPressed,
   });
 
@@ -772,11 +831,11 @@ class _MediaButton extends StatelessWidget {
     return Column(
       children: [
         IconButton(
-          icon: Icon(icon, size: 40),
+          icon: Icon(icon, size: 30),
           color: color,
           onPressed: onPressed,
         ),
-        Text(label, style: TextStyle(color: Colors.grey[700])),
+        Text(label, style: TextStyle(color: iconColor)),
       ],
     );
   }

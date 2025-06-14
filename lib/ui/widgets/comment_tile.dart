@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/bloc/social/comment/comment_bloc.dart';
 import 'package:mobile/models/models.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
@@ -96,6 +97,7 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   void _showFullScreenMedia(BuildContext context, String url, bool isVideo) {
+     final theme = AppTheme.getTheme(context);
     if (isVideo) {
       final controller = _videoControllers[url];
       if (controller != null) {
@@ -103,15 +105,10 @@ class _CommentTileState extends State<CommentTile> {
           context,
           MaterialPageRoute(
             builder: (context) => Scaffold(
-              backgroundColor: Colors.black,
+              backgroundColor: theme.colorScheme.primary,
               appBar: AppBar(
-                backgroundColor: const Color.fromRGBO(
-                  143,
-                  148,
-                  251,
-                  1,
-                ), // Add this lin
-                iconTheme: const IconThemeData(color: Colors.white),
+                backgroundColor:theme.colorScheme.primary, // Add this lin
+                iconTheme:  IconThemeData(color: theme.colorScheme.primary),
               ),
               body: Center(
                 child: Chewie(
@@ -131,10 +128,10 @@ class _CommentTileState extends State<CommentTile> {
         context,
         MaterialPageRoute(
           builder: (context) => Scaffold(
-            backgroundColor: Colors.black,
+            backgroundColor: theme.colorScheme.primary,
             appBar: AppBar(
-              backgroundColor: Colors.black,
-              iconTheme: const IconThemeData(color: Colors.white),
+              backgroundColor: theme.colorScheme.primary,
+              iconTheme:  IconThemeData(color: theme.colorScheme.primary),
             ),
             body: Center(
               child: InteractiveViewer(
@@ -152,7 +149,7 @@ class _CommentTileState extends State<CommentTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+     final theme = AppTheme.getTheme(context);
 
     return BlocListener<CommentBloc, CommentState>(
       listener: (context, state) {
@@ -174,7 +171,7 @@ class _CommentTileState extends State<CommentTile> {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: theme.colorScheme.primary,
               backgroundImage:
                   (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
                   ? CachedNetworkImageProvider(
@@ -183,7 +180,7 @@ class _CommentTileState extends State<CommentTile> {
                   : null,
               child: (_currentComment.owner?.profilePic?.isNotEmpty ?? false)
                   ? null
-                  : Icon(Icons.person, color: Colors.grey.shade800),
+                  : Icon(Icons.person, color: theme.colorScheme.onPrimary, size: 24),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -206,7 +203,7 @@ class _CommentTileState extends State<CommentTile> {
                           Text(
                             _formatDate(_currentComment.createdAt),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                         ],
@@ -265,6 +262,8 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   Widget _buildMediaAttachments() {
+         final theme = AppTheme.getTheme(context);
+
     return Column(
       children: _currentComment.files.map((file) {
         final isVideo = _isVideo(file);
@@ -297,14 +296,14 @@ class _CommentTileState extends State<CommentTile> {
                             height: 300,
                             placeholder: (context, url) => Container(
                               height: 300,
-                              color: Colors.grey[200],
+                              color: theme.colorScheme.primary,
                               child: const Center(
                                 child: CircularProgressIndicator(),
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
                               height: 300,
-                              color: Colors.grey[200],
+                              color: theme.colorScheme.primary,
                               child: const Icon(
                                 Icons.error,
                                 size: 50,
@@ -323,10 +322,12 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   Widget _buildVideoThumbnail(String url) {
+         final theme = AppTheme.getTheme(context);
+
     if (!_chewieControllers.containsKey(url)) {
       return Container(
         height: 300,
-        color: Colors.grey[200],
+        color: theme.colorScheme.primary,
         child: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -347,7 +348,7 @@ class _CommentTileState extends State<CommentTile> {
           Container(
             height: 300,
             color: Colors.black.withOpacity(0.3),
-            child: const Icon(Icons.play_arrow, size: 50, color: Colors.white),
+            child:  Icon(Icons.play_arrow, size: 50, color: theme.colorScheme.primary),
           ),
       ],
     );
@@ -359,6 +360,8 @@ class _CommentTileState extends State<CommentTile> {
 
   void _showCommentOptions(BuildContext context, Comment comment) async {
     final commentBloc = BlocProvider.of<CommentBloc>(context);
+         final theme = AppTheme.getTheme(context);
+
 
     showModalBottomSheet(
       context: context,
@@ -381,12 +384,12 @@ class _CommentTileState extends State<CommentTile> {
                 Navigator.pop(context);
                 commentBloc.add(DeleteComment(_currentComment.id));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                   SnackBar(
                     content: Text(
                       'Comment deleted successfully',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: theme.colorScheme.primary),
                     ),
-                    backgroundColor: Colors.green,
+                    backgroundColor: theme.colorScheme.primary,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );

@@ -5,6 +5,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/repository/social/post_repository.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
+import 'package:mobile/ui/theme/theme_helper.dart';
 import 'package:mobile/ui/widgets/app_logo.dart';
 import 'package:mobile/ui/widgets/layout/responsive_padding.dart';
 import 'package:mobile/ui/widgets/post_card.dart';
@@ -119,8 +121,13 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   AppBar _appBar(ThemeData theme, BuildContext context) {
+     final theme = AppTheme.getTheme(context);
+    final textTheme = theme.textTheme;
+
     return AppBar(
-      backgroundColor: const Color.fromRGBO(143, 148, 251, 1), // Add this lin
+
+      
+      backgroundColor: theme.colorScheme.primary, // Add this lin
       automaticallyImplyLeading: false,
       
       flexibleSpace: ResponsivePadding(
@@ -139,7 +146,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         Icons.post_add_outlined,
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                         size: 30,
                       ),
                     ),
@@ -149,7 +156,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         Icons.send_sharp,
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                       ),
                     ),
                     IconButton(
@@ -158,7 +165,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         LucideIcons.bell,
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                       ),
                     ),
                   ],

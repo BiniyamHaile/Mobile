@@ -4,7 +4,7 @@ class ApiEndpoints {
   static const String _notificationUrl = '$baseUrl/notifications';
   static const String _reelUrl = '$baseUrl/reel';
   static const String _reelCommentUrl = '$baseUrl/reel-comment';
-  static const String ip = "http://10.5.240.34";
+  static const String ip = "http://192.168.43.4";
   static const String _chatUrl = '$baseUrl/chat';
 
   String get socketServerUrl => "$ip:4000";
@@ -31,7 +31,6 @@ class ApiEndpoints {
   String get reelComment => _reelCommentUrl;
   String get recentChats => "$_chatUrl/recent-chats";
 
-  String retrieveMessages(String roomId) =>
-      "$_chatUrl/messages/$roomId";
+  String retrieveMessages(String roomId) => "$_chatUrl/messages/$roomId";
   String get sendMessage => "$_chatUrl/send";
 }

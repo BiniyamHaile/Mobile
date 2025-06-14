@@ -15,8 +15,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final CommentRepository _commentRepository;
 
   CommentBloc({required CommentRepository commentRepository})
-      : _commentRepository = commentRepository,
-        super(CommentInitial()) {
+    : _commentRepository = commentRepository,
+      super(CommentInitial()) {
     on<LoadComments>(_onLoadComments);
     on<CreateComment>(_onCreateComment);
     on<UpdateComment>(_onUpdateComment);
@@ -30,8 +30,9 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   ) async {
     emit(CommentLoading());
     try {
-      final comments =
-          await _commentRepository.getCommentsForPost(event.postId);
+      final comments = await _commentRepository.getCommentsForPost(
+        event.postId,
+      );
       print('Loaded comments: $comments');
       emit(CommentsLoaded(comments));
     } catch (e) {
@@ -74,10 +75,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
 
       final updatedComments = [...currentComments, newComment];
       emit(CommentsLoaded(updatedComments));
-      emit(CommentOperationSuccess(
-        comments: updatedComments,
-        message: 'Comment created successfully',
-      ));
+      emit(
+        CommentOperationSuccess(
+          comments: updatedComments,
+          message: 'Comment created successfully',
+        ),
+      );
     } catch (e) {
       emit(CommentError('Failed to create comment: $e', state.comments));
       if (state is CommentOperationSuccess || state is CommentsLoaded) {
@@ -118,15 +121,19 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       );
 
       final updatedComments = currentComments
-          .map((comment) =>
-              comment.id == event.commentId ? updatedComment : comment)
+          .map(
+            (comment) =>
+                comment.id == event.commentId ? updatedComment : comment,
+          )
           .toList();
 
       emit(CommentsLoaded(updatedComments));
-      emit(CommentOperationSuccess(
-        comments: updatedComments,
-        message: 'Comment updated successfully',
-      ));
+      emit(
+        CommentOperationSuccess(
+          comments: updatedComments,
+          message: 'Comment updated successfully',
+        ),
+      );
     } catch (e) {
       emit(CommentError('Failed to update comment: $e', state.comments));
       if (state is CommentOperationSuccess || state is CommentsLoaded) {
@@ -162,10 +169,12 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           .toList();
 
       emit(CommentsLoaded(updatedComments));
-      emit(CommentOperationSuccess(
-        comments: updatedComments,
-        message: 'Comment deleted successfully',
-      ));
+      emit(
+        CommentOperationSuccess(
+          comments: updatedComments,
+          message: 'Comment deleted successfully',
+        ),
+      );
     } catch (e) {
       emit(CommentError('Failed to delete comment: $e', state.comments));
       if (state is CommentOperationSuccess || state is CommentsLoaded) {
@@ -176,58 +185,62 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     }
   }
 
-Future<void> _onToggleReaction(
-  ToggleReaction event,
-  Emitter<CommentState> emit,
-) async {
-  // Get current state and user ID
-  final prefs = await SharedPreferences.getInstance();
-  final currentUserId = prefs.getString('userId');
-  
-  if (state is! CommentsLoaded) return;
-  final currentState = state as CommentsLoaded;
+  Future<void> _onToggleReaction(
+    ToggleReaction event,
+    Emitter<CommentState> emit,
+  ) async {
+    // Get current state and user ID
+    final prefs = await SharedPreferences.getInstance();
+    final currentUserId = prefs.getString('userId');
 
-  // Find the comment being liked/unliked
-  final commentIndex = currentState.comments.indexWhere((c) => c.id == event.commentId);
-  if (commentIndex == -1) return;
+    if (state is! CommentsLoaded) return;
+    final currentState = state as CommentsLoaded;
 
-  // Create temporary updated comment with optimistic UI update
-  final originalComment = currentState.comments[commentIndex];
-  final tempComment = originalComment.copyWith(
-    likedBy: List.from(originalComment.likedBy),
-  );
+    // Find the comment being liked/unliked
+    final commentIndex = currentState.comments.indexWhere(
+      (c) => c.id == event.commentId,
+    );
+    if (commentIndex == -1) return;
 
-  // Optimistically update UI
-  final isLiked = currentUserId != null && tempComment.likedBy.contains(currentUserId);
-  if (isLiked) {
-    tempComment.likedBy.remove(currentUserId);
-  } else if (currentUserId != null) {
-    tempComment.likedBy.add(currentUserId);
-  }
+    // Create temporary updated comment with optimistic UI update
+    final originalComment = currentState.comments[commentIndex];
+    final tempComment = originalComment.copyWith(
+      likedBy: List.from(originalComment.likedBy),
+    );
 
-  // Create updated comments list
-  final updatedComments = List<Comment>.from(currentState.comments);
-  updatedComments[commentIndex] = tempComment;
+    // Optimistically update UI
+    final isLiked =
+        currentUserId != null && tempComment.likedBy.contains(currentUserId);
+    if (isLiked) {
+      tempComment.likedBy.remove(currentUserId);
+    } else if (currentUserId != null) {
+      tempComment.likedBy.add(currentUserId);
+    }
 
-  // Emit optimistic update
-  emit(CommentsLoaded(updatedComments));
+    // Create updated comments list
+    final updatedComments = List<Comment>.from(currentState.comments);
+    updatedComments[commentIndex] = tempComment;
 
-  try {
-    // Make actual API call
-    final updatedComment = await _commentRepository.toggleReaction(event.commentId);
-
-    // Update with real server response
-    updatedComments[commentIndex] = updatedComment;
+    // Emit optimistic update
     emit(CommentsLoaded(updatedComments));
-    emit(CommentOperationSuccess(
-      comments: updatedComments,
-      message: 'Reaction toggled successfully',
-    ));
-  } catch (e) {
-    // Revert if error occurs
-    updatedComments[commentIndex] = originalComment;
-    emit(CommentsLoaded(updatedComments));
-    emit(CommentError('Failed to toggle reaction', updatedComments));
+
+    try {
+      // Make actual API call
+      final updatedComment = await _commentRepository.toggleReaction(event.commentId,
+);
+
+      // Update with real server response
+      updatedComments[commentIndex] = updatedComment;
+      emit(CommentsLoaded(updatedComments));
+      emit(CommentOperationSuccess(
+          comments: updatedComments,
+          message: 'Reaction toggled successfully',
+        ));
+    } catch (e) {
+      // Revert if error occurs
+      updatedComments[commentIndex] = originalComment;
+      emit(CommentsLoaded(updatedComments));
+      emit(CommentError('Failed to toggle reaction', updatedComments));
+    }
   }
-}
 }
