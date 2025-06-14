@@ -13,6 +13,7 @@ class AppLogo extends StatelessWidget {
     return Text(
       'EthioMedia',
       style: textTheme.headlineMedium?.copyWith(
+        fontFamily: 'EduNSWACTCursive',
         fontWeight: FontWeight.bold,
         color: theme.colorScheme.onPrimary,
         fontSize: 24

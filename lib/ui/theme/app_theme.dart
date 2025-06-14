@@ -129,6 +129,7 @@ class AppTheme {
   }) {
     return TextTheme(
       bodyMedium: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
           context,
           StyleConstants.bodyMediumFontSize,
@@ -136,6 +137,7 @@ class AppTheme {
         color: isDark ? appColors.whiteColor : appColors.blackColor,
       ),
       bodySmall: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
           context,
           StyleConstants.bodySmallFontSize,
@@ -148,6 +150,7 @@ class AppTheme {
             : appColors.greyColor,
       ),
       labelSmall: TextStyle(
+        fontFamily: 'Poppins',
         color: isDark ? appColors.whiteColor : appColors.blackColor,
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
           context,
@@ -156,6 +159,7 @@ class AppTheme {
         fontWeight: FontWeight.normal,
       ),
       labelMedium: TextStyle(
+        fontFamily: 'Poppins',
         color: isDark ? appColors.whiteColor : appColors.blackColor,
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
           context,
@@ -164,6 +168,7 @@ class AppTheme {
         fontWeight: FontWeight.w500,
       ),
       labelLarge: TextStyle(
+        fontFamily: 'Poppins',
         color: isDark ? appColors.whiteColor : appColors.blackColor,
         letterSpacing: 0.5,
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
@@ -173,6 +178,7 @@ class AppTheme {
         fontWeight: FontWeight.w400,
       ),
       headlineSmall: TextStyle(
+        fontFamily: 'Poppins',
         color: isDark ? appColors.whiteColor : appColors.blackColor,
         letterSpacing: 0.5,
         fontSize: ResponsiveTextUtil.adaptiveFontScaler(
