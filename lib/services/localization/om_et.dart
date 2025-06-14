@@ -1,7 +1,9 @@
+// lib/lang/om_et.dart
 
-import 'package:mobile/services/localization/app_text.dart' show AppStrings, appTitle;
+import 'package:mobile/services/localization/app_text.dart';
 
 const Map<String, String> omET = {
+  // ... (previous keys)
   AppStrings.appTitle: 'Agarsiisa Afaanii',
   AppStrings.greeting: 'Gara Moosaajii keenyaatti Baga Nagaan Dhuftan!',
   AppStrings.languageSelect: 'Maaloo afaan keessan filadhaa:',
@@ -15,7 +17,6 @@ const Map<String, String> omET = {
   AppStrings.confirmPassword: 'Jecha darbi mirkaneessi',
   AppStrings.dontHaveAccount: 'Galmee hin qabduu?',
   AppStrings.register: 'Galmaa\'i',
-
   AppStrings.emailRequired: 'Imeelii barbaachisaa dha',
   AppStrings.passwordRequired: 'Jecha darbi barbaachisaa dha',
   AppStrings.passwordMinLength: 'Jecha darbi dheerina 8 ol qabaachuu qaba',
@@ -24,15 +25,12 @@ const Map<String, String> omET = {
   AppStrings.passwordSpecialChar: 'Jecha darbi keessatti mallattoo addaa qabaachuu qaba',
   AppStrings.passwordMatch: 'Jecha darbi fi Jecha darbi mirkaneessi wal simachuu qabu',
   AppStrings.loginSuccess: 'Seensa milkaa\'aa',
-
   AppStrings.completeDetails: 'Maaloo odeeffannoo keessan guutuu gochuu',
   AppStrings.selectGender: 'Maaloo saala keessan filadhaa.',
-
   AppStrings.firstName: 'Maqaa Duraa',
   AppStrings.lastName: 'Maqaa Dhumaa',
   AppStrings.male: 'Dhiirota',
   AppStrings.female: 'Dubartoota',
-
   AppStrings.enterEmailForReset: 'Jecha darbi haaromsuu ergaa argachuuf imeelii keessan galchaa',
   AppStrings.sendResetCode: 'Koodii haaromsuu ergaa',
   AppStrings.backToLogin: 'Deebi\'i gara seensaatti',
@@ -43,7 +41,6 @@ const Map<String, String> omET = {
   AppStrings.postUpdatedSuccess: 'Postii milkaa\'aa fooyya\'e',
   AppStrings.postDeletedSuccess: 'Postii milkaa\'aa haqame',
   AppStrings.postNotFound: 'Postii hin argamne',
-
   AppStrings.editPost: 'Postii Fooyyessi',
   AppStrings.createPost: 'Postii Uumi',
   AppStrings.whatsOnYourMind: "Maaltu yaada keessan keessa jiru?",
@@ -51,6 +48,51 @@ const Map<String, String> omET = {
   AppStrings.video: 'Viidiyoo',
   AppStrings.camera: 'Kaamera',
   AppStrings.updatePost: 'Postii Fooyyessi',
+  
+  // Report Page
+  AppStrings.reportPostTitle: 'Ibsa Gabaasaa',
+  AppStrings.reportReasonQuestion: 'Maaliif barreeffama kana gabaasta?',
+  AppStrings.reportSubmittedSuccess: 'Gabaasni milkaa\'inaan galmaa\'eera',
+  AppStrings.submitReport: 'Gabaasa Galchi',
+  AppStrings.customReason: 'Sababa Dhuunfaa',
+  AppStrings.specifyReason: 'Maaloo ibsi',
+  AppStrings.changePassword: 'Jecha Darbi Jijjiiri',
 
+  // Report Categories
+  AppStrings.reportCatViolence: 'Jeequmsa ykn Miidhaa Qaamaa',
+  AppStrings.reportCatHateSpeech: 'Haasaa Jibbiinsaa ykn Mallattoolee',
+  AppStrings.reportCatHarassment: 'Cinqursuu ykn Doorsisuu',
+  AppStrings.reportCatNudity: 'Qaama Saalaa Mul\'isuu ykn Qabiyyee Saalaa',
+  AppStrings.reportCatFalseInfo: 'Odeeffannoo Soba',
+  AppStrings.reportCatSpam: 'Imeelii Faayidaa hin Qabne ykn Qabiyyee Dogongorsaa',
+  AppStrings.reportCatOther: 'Kan Biraa',
+
+  // Report Sub-reasons
+  AppStrings.subAssault: 'Haleellaa',
+  AppStrings.subThreats: 'Sodachisa',
+  AppStrings.subAnimalCruelty: 'Gara-jabina Bineensotaa',
+  AppStrings.subRacist: 'Sanyummaa',
+  AppStrings.subSexist: 'Saalummaa',
+  AppStrings.subReligious: 'Amantaa',
+  AppStrings.subLgbtqTargeted: 'LGBTQ+ irratti kan xiyyeeffate',
+  AppStrings.subRepeatedInsults: 'Arrabsoo irra deddeebiin',
+  AppStrings.subNameCalling: 'Maqaa balleessuu',
+  AppStrings.subStalking: 'Hordofuu',
+  AppStrings.subExplicitPhotos: 'Suuraa ifatti mul\'atu',
+  AppStrings.subSexualLanguage: 'Afaan saalqunnamtii',
+  AppStrings.subMedical: 'Yaala fayyaa',
+  AppStrings.subPolitical: 'Siyaasaa',
+  AppStrings.subOtherInfo: 'Kan biraa',
+  AppStrings.subClickbait: 'Kiliikbeetii',
+  AppStrings.subScamLinks: 'Liinkiiwwan gowwomsaa',
+
+
+  AppStrings.currentPassword: 'Jecha Darbi Aanaa',
+  AppStrings.passwordUpdatedSuccess: 'Jecha Darbi Milkaa\'inaan Fooyya\'eera',
+  AppStrings.currentPasswordRequired: 'Jecha Darbi Aanaa barbaachisaa dha',
+  AppStrings.newPassword: 'Jecha Darbi Haaraa',
+  AppStrings.newPasswordRequired: 'Jecha Darbi Haaraa barbaachisaa dha',
+  AppStrings.pleaseConfirmPassword: 'Maaloo jecha darbi haaraa mirkaneessi',
+  AppStrings.passwordsDoNotMatch: 'Jecha darbi fi jecha darbi mirkaneessi wal simachuu qabu',
 
 };

@@ -1,6 +1,9 @@
+// lib/lang/en_us.dart
+
 import 'package:mobile/services/localization/app_text.dart';
 
 const Map<String, String> enUS = {
+  // ... (previous keys)
   AppStrings.appTitle: 'Localization Demo',
   AppStrings.greeting: 'Welcome to our App!',
   AppStrings.languageSelect: 'Please select your language:',
@@ -14,7 +17,6 @@ const Map<String, String> enUS = {
   AppStrings.confirmPassword: 'Confirm Password',
   AppStrings.dontHaveAccount: 'Don\'t have an account?',
   AppStrings.register: 'Register',
-
   AppStrings.emailRequired: 'Email is required',
   AppStrings.passwordRequired: 'Password is required',
   AppStrings.passwordMinLength: 'Password must be at least 8 characters',
@@ -25,15 +27,11 @@ const Map<String, String> enUS = {
   AppStrings.loginSuccess: 'Login successful',
   AppStrings.completeDetails: 'Please complete your details',
   AppStrings.selectGender: 'Please select',
-
   AppStrings.firstName: 'First Name',
   AppStrings.lastName: 'Last Name',
-
-  AppStrings.male : "Male",
+  AppStrings.male: "Male",
   AppStrings.female: "Female",
-
   AppStrings.enterEmailForReset: 'Enter your email to receive a password reset code',
-
   AppStrings.sendResetCode: 'Send Reset Code',
   AppStrings.backToLogin: 'Back to Login',
   AppStrings.mediaPreview: 'Media Preview',
@@ -50,7 +48,49 @@ const Map<String, String> enUS = {
   AppStrings.video: 'Video',
   AppStrings.camera: 'Camera',
   AppStrings.updatePost: 'Update Post',
+  AppStrings.changePassword: 'Change Password',
+
+  // Report Page
+  AppStrings.reportPostTitle: 'Report Post',
+  AppStrings.reportReasonQuestion: 'Why are you reporting this post?',
+  AppStrings.reportSubmittedSuccess: 'Report submitted successfully',
+  AppStrings.submitReport: 'Submit Report',
+  AppStrings.customReason: 'Custom Reason',
+  AppStrings.specifyReason: 'Please specify',
   
+  // Report Categories
+  AppStrings.reportCatViolence: 'Violence or Physical Harm',
+  AppStrings.reportCatHateSpeech: 'Hate Speech or Symbols',
+  AppStrings.reportCatHarassment: 'Harassment or Bullying',
+  AppStrings.reportCatNudity: 'Nudity or Sexual Content',
+  AppStrings.reportCatFalseInfo: 'False Information',
+  AppStrings.reportCatSpam: 'Spam or Misleading Content',
+  AppStrings.reportCatOther: 'Other',
 
+  // Report Sub-reasons
+  AppStrings.subAssault: 'Assault',
+  AppStrings.subThreats: 'Threats',
+  AppStrings.subAnimalCruelty: 'Animal cruelty',
+  AppStrings.subRacist: 'Racist',
+  AppStrings.subSexist: 'Sexist',
+  AppStrings.subReligious: 'Religious',
+  AppStrings.subLgbtqTargeted: 'LGBTQ+ targeted',
+  AppStrings.subRepeatedInsults: 'Repeated insults',
+  AppStrings.subNameCalling: 'Name calling',
+  AppStrings.subStalking: 'Stalking',
+  AppStrings.subExplicitPhotos: 'Explicit photos',
+  AppStrings.subSexualLanguage: 'Sexual language',
+  AppStrings.subMedical: 'Medical',
+  AppStrings.subPolitical: 'Political',
+  AppStrings.subOtherInfo: 'Other',
+  AppStrings.subClickbait: 'Clickbait',
+  AppStrings.subScamLinks: 'Scam links',
 
+  AppStrings.currentPassword: 'Current Password',
+  AppStrings.passwordUpdatedSuccess: 'Password updated successfully',
+  AppStrings.currentPasswordRequired: 'Current password is required',
+  AppStrings.newPassword: 'New Password',
+  AppStrings.newPasswordRequired: 'New password is required',
+  AppStrings.pleaseConfirmPassword: 'Please confirm your new password',
+  AppStrings.passwordsDoNotMatch: 'Passwords do not match',
 };

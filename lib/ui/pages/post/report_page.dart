@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/social/postReport/post_report_bloc.dart';
 import 'package:mobile/bloc/social/postReport/post_report_event.dart';
 import 'package:mobile/bloc/social/postReport/post_report_state.dart';
+import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/models/report_post.dart';
 import 'package:mobile/repository/social/post_report_repository.dart';
 import 'package:mobile/ui/routes/route_names.dart';
@@ -19,31 +22,53 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   late final PostReportBloc _postReportBloc;
-  String? selectedCategory;
-  String? selectedSubReason;
+  String? selectedCategoryKey;
+  String? selectedSubReasonKey;
   final TextEditingController _customReasonController = TextEditingController();
 
-  final Map<String, List<String>> reportReasons = {
-    'Violence or Physical Harm': ['Assault', 'Threats', 'Animal cruelty'],
-    'Hate Speech or Symbols': [
-      'Racist',
-      'Sexist',
-      'Religious',
-      'LGBTQ+ targeted',
-    ],
-    'Harassment or Bullying': ['Repeated insults', 'Name calling', 'Stalking'],
-    'Nudity or Sexual Content': ['Explicit photos', 'Sexual language'],
-    'False Information': ['Medical', 'Political', 'Other'],
-    'Spam or Misleading Content': ['Clickbait', 'Scam links'],
-    'Other': ['Please specify'],
-  };
+  Map<String, List<String>> _getTranslatedReasons(BuildContext context) {
+    return {
+      AppStrings.reportCatViolence.tr(context): [
+        AppStrings.subAssault.tr(context),
+        AppStrings.subThreats.tr(context),
+        AppStrings.subAnimalCruelty.tr(context),
+      ],
+      AppStrings.reportCatHateSpeech.tr(context): [
+        AppStrings.subRacist.tr(context),
+        AppStrings.subSexist.tr(context),
+        AppStrings.subReligious.tr(context),
+        AppStrings.subLgbtqTargeted.tr(context),
+      ],
+      AppStrings.reportCatHarassment.tr(context): [
+        AppStrings.subRepeatedInsults.tr(context),
+        AppStrings.subNameCalling.tr(context),
+        AppStrings.subStalking.tr(context),
+      ],
+      AppStrings.reportCatNudity.tr(context): [
+        AppStrings.subExplicitPhotos.tr(context),
+        AppStrings.subSexualLanguage.tr(context),
+      ],
+      AppStrings.reportCatFalseInfo.tr(context): [
+        AppStrings.subMedical.tr(context),
+        AppStrings.subPolitical.tr(context),
+        AppStrings.subOtherInfo.tr(context),
+      ],
+      AppStrings.reportCatSpam.tr(context): [
+        AppStrings.subClickbait.tr(context),
+        AppStrings.subScamLinks.tr(context),
+      ],
+      AppStrings.reportCatOther.tr(context): [
+        AppStrings.specifyReason.tr(context),
+      ],
+    };
+  }
 
   bool get _isFormValid {
-    if (selectedCategory == null) return false;
-    if (selectedSubReason == 'Please specify') {
+    if (selectedCategoryKey == null) return false;
+    if (selectedSubReasonKey == AppStrings.specifyReason.tr(context)) {
       return _customReasonController.text.trim().isNotEmpty;
     }
-    return selectedSubReason != null;
+    return selectedSubReasonKey != null;
   }
 
   @override
@@ -61,8 +86,10 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageService>();
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final reportReasons = _getTranslatedReasons(context);
 
     return BlocProvider.value(
       value: _postReportBloc,
@@ -70,21 +97,21 @@ class _ReportPageState extends State<ReportPage> {
         listener: (context, state) {
           if (state is PostReportSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  'Report submitted successfully',
-                  style: TextStyle(color: Colors.white),
+                  AppStrings.reportSubmittedSuccess.tr(context),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 backgroundColor: Colors.green,
               ),
             );
-            context.push(RouteNames.feed);
+            context.go(RouteNames.feed);
           } else if (state is PostReportFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  state.message,
-                  style: TextStyle(color: Colors.white),
+                  state.message, // Assuming state.message is already localized or an error code
+                  style: const TextStyle(color: Colors.white),
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -94,18 +121,13 @@ class _ReportPageState extends State<ReportPage> {
         child: Scaffold(
           backgroundColor: isDark ? Colors.black : Colors.grey[100],
           appBar: AppBar(
-            title: const Text(
-              'Report Post',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              AppStrings.reportPostTitle.tr(context),
+              style: const TextStyle(color: Colors.white),
             ),
             centerTitle: true,
-            backgroundColor: const Color.fromRGBO(
-              143,
-              148,
-              251,
-              1,
-            ), // Add this lin
-            foregroundColor: isDark ? Colors.white : Colors.black,
+            backgroundColor: const Color.fromRGBO(143, 148, 251, 1),
+            iconTheme: const IconThemeData(color: Colors.white),
             elevation: 1,
           ),
           body: SingleChildScrollView(
@@ -114,7 +136,7 @@ class _ReportPageState extends State<ReportPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Why are you reporting this post?',
+                  AppStrings.reportReasonQuestion.tr(context),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -123,7 +145,7 @@ class _ReportPageState extends State<ReportPage> {
                 ),
                 const SizedBox(height: 24),
                 ...reportReasons.entries.map((entry) {
-                  final isExpanded = selectedCategory == entry.key;
+                  final isExpanded = selectedCategoryKey == entry.key;
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     elevation: 3,
@@ -132,6 +154,7 @@ class _ReportPageState extends State<ReportPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ExpansionTile(
+                      key: ValueKey(entry.key), // Important for state management
                       tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                       title: Text(
                         entry.key,
@@ -146,13 +169,13 @@ class _ReportPageState extends State<ReportPage> {
                       initiallyExpanded: isExpanded,
                       onExpansionChanged: (expanded) {
                         setState(() {
-                          selectedCategory = expanded ? entry.key : null;
-                          selectedSubReason = null;
+                          selectedCategoryKey = expanded ? entry.key : null;
+                          selectedSubReasonKey = null;
                           _customReasonController.clear();
                         });
                       },
                       children: entry.value.map((sub) {
-                        final isSelected = selectedSubReason == sub;
+                        final isSelected = selectedSubReasonKey == sub;
                         return ListTile(
                           title: Text(
                             sub,
@@ -165,13 +188,11 @@ class _ReportPageState extends State<ReportPage> {
                           selected: isSelected,
                           onTap: () {
                             setState(() {
-                              selectedSubReason = sub;
+                              selectedSubReasonKey = sub;
                             });
                           },
                           trailing: Icon(
-                            isSelected
-                                ? Icons.check_circle
-                                : Icons.radio_button_unchecked,
+                            isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
                             color: isSelected ? Colors.green : Colors.grey,
                           ),
                         );
@@ -179,13 +200,13 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                   );
                 }).toList(),
-                if (selectedSubReason == 'Please specify')
+                if (selectedSubReasonKey == AppStrings.specifyReason.tr(context))
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: TextField(
                       controller: _customReasonController,
                       decoration: InputDecoration(
-                        labelText: 'Custom Reason',
+                        labelText: AppStrings.customReason.tr(context),
                         labelStyle: TextStyle(
                           color: isDark ? Colors.white70 : Colors.black87,
                         ),
@@ -199,6 +220,7 @@ class _ReportPageState extends State<ReportPage> {
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                       maxLines: 3,
+                      onChanged: (text) => setState(() {}),
                     ),
                   ),
                 const SizedBox(height: 32),
@@ -207,15 +229,15 @@ class _ReportPageState extends State<ReportPage> {
                   child: ElevatedButton(
                     onPressed: _isFormValid
                         ? () {
-                            final main = selectedCategory!;
-                            final sub = selectedSubReason == 'Please specify'
+                            final main = selectedCategoryKey!;
+                            final sub = selectedSubReasonKey == AppStrings.specifyReason.tr(context)
                                 ? _customReasonController.text.trim()
-                                : selectedSubReason;
+                                : selectedSubReasonKey;
 
                             final report = PostReport(
                               id: '',
                               content_id: widget.postId,
-                              reporterId: null,
+                              reporterId: null, // Should be populated from auth state
                               mainReason: main,
                               subreason: sub,
                               status: 'pending',
@@ -225,22 +247,18 @@ class _ReportPageState extends State<ReportPage> {
                               createdAt: DateTime.now(),
                               updatedAt: DateTime.now(),
                             );
-
-                            print("report: $report.toJson()");
                             _postReportBloc.add(CreatePostReport(report));
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: _isFormValid
-                          ? theme.primaryColor
-                          : Colors.grey[400],
+                      backgroundColor: _isFormValid ? theme.primaryColor : Colors.grey[400],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: Text(
-                      'Submit Report',
+                      AppStrings.submitReport.tr(context),
                       style: TextStyle(
                         fontSize: 16,
                         color: _isFormValid ? Colors.white : Colors.grey[700],

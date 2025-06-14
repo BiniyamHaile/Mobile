@@ -1,6 +1,9 @@
+// lib/lang/am_et.dart
+
 import 'package:mobile/services/localization/app_text.dart';
 
 const Map<String, String> amET = {
+  // ... (previous keys)
   AppStrings.appTitle: 'የአካባቢ ማሳያ',
   AppStrings.greeting: 'ወደ መተግበሪያችን እንኳን ደህና መጡ!',
   AppStrings.languageSelect: 'እባክዎ ቋንቋዎን ይምረጡ:',
@@ -14,7 +17,6 @@ const Map<String, String> amET = {
   AppStrings.confirmPassword: 'የይለፍ ቃል አረጋግጥ',
   AppStrings.dontHaveAccount: 'መለያ የለዎትም?',
   AppStrings.register: 'መመዝገብ',
-
   AppStrings.emailRequired: 'ኢሜይል ያስፈልጋል',
   AppStrings.passwordRequired: 'የይለፍ ቃል ያስፈልጋል',
   AppStrings.passwordMinLength: 'የይለፍ ቃል ቢያንስ 8 ቁምፊዎች መኖር አለበት',
@@ -25,24 +27,20 @@ const Map<String, String> amET = {
   AppStrings.loginSuccess: 'የመግቢያ ሂደት ተሳክቷል',
   AppStrings.completeDetails: 'እባክዎ ዝርዝር መረጃዎን ሙሉ ያድርጉ',
   AppStrings.selectGender: 'እባክዎ ጾታዎን ይምረጡ።',
-
   AppStrings.firstName: 'የመጀመሪያ ስም',
   AppStrings.lastName: 'የአባት ስም',
   AppStrings.male: 'ወንድ',
   AppStrings.female: 'ሴት',
-  
   AppStrings.enterEmailForReset: 'የይለፍ ቃል ለመሻሻል ኢሜይልዎን ያስገቡ',
   AppStrings.sendResetCode: 'የይለፍ ቃል ማስጀመሪያ ኮድ ላክ',
   AppStrings.backToLogin: 'ወደ መግቢያ ተመለስ',
-
-  AppStrings.mediaPreview :'ሚዲያ እንቅስቃሴ',
-  AppStrings.mentionedUsers : 'የተጠቀሱ ተጠቃሚዎች',
-  AppStrings.userNotFound : 'ተጠቃሚው አልተገኘም',
-  AppStrings.postCreatedSuccess : 'ልጥፍ በተሳካ ሁኔታ ተፈጥሯል',
-  AppStrings.postUpdatedSuccess : 'ልጥፍ በተሳካ ሁኔታ ተሻሽሏል',
-  AppStrings.postDeletedSuccess : 'ልጥፍ በተሳካ ሁኔታ ተሰርዟል',
-  AppStrings.postNotFound : 'ልጥፍ አልተገኘም',
-
+  AppStrings.mediaPreview: 'ሚዲያ እንቅስቃሴ',
+  AppStrings.mentionedUsers: 'የተጠቀሱ ተጠቃሚዎች',
+  AppStrings.userNotFound: 'ተጠቃሚው አልተገኘም',
+  AppStrings.postCreatedSuccess: 'ልጥፍ በተሳካ ሁኔታ ተፈጥሯል',
+  AppStrings.postUpdatedSuccess: 'ልጥፍ በተሳካ ሁኔታ ተሻሽሏል',
+  AppStrings.postDeletedSuccess: 'ልጥፍ በተሳካ ሁኔታ ተሰርዟል',
+  AppStrings.postNotFound: 'ልጥፍ አልተገኘም',
   AppStrings.editPost: 'ልጥፍ አሻሽል',
   AppStrings.createPost: 'ልጥፍ ፈጥር',
   AppStrings.whatsOnYourMind: "ምን እያሰቡ ነው?",
@@ -50,6 +48,50 @@ const Map<String, String> amET = {
   AppStrings.video: 'ቪዲዮ',
   AppStrings.camera: 'ካሜራ',
   AppStrings.updatePost: 'ልጥፍ አሻሽል',
+  AppStrings.changePassword: 'የይለፍ ቃል ያሻሽሉ',
 
+  // Report Page
+  AppStrings.reportPostTitle: 'ልጥፍ ሪፖርት አድርግ',
+  AppStrings.reportReasonQuestion: 'ይህን ልጥፍ ለምን ሪፖርት ያደርጋሉ?',
+  AppStrings.reportSubmittedSuccess: 'ሪፖርት በተሳካ ሁኔታ ቀርቧል',
+  AppStrings.submitReport: 'ሪፖርት አስገባ',
+  AppStrings.customReason: 'ብጁ ምክንያት',
+  AppStrings.specifyReason: 'እባክዎ ይግለጹ',
   
+  // Report Categories
+  AppStrings.reportCatViolence: 'ዓመፅ ወይም አካላዊ ጉዳት',
+  AppStrings.reportCatHateSpeech: 'የጥላቻ ንግግር ወይም ምልክቶች',
+  AppStrings.reportCatHarassment: 'ትንኮሳ ወይም ጉልበተኝነት',
+  AppStrings.reportCatNudity: 'እርቃንነት ወይም ወሲባዊ ይዘት',
+  AppStrings.reportCatFalseInfo: 'የሐሰት መረጃ',
+  AppStrings.reportCatSpam: 'አይፈለጌ መልእክት ወይም አሳሳች ይዘት',
+  AppStrings.reportCatOther: 'ሌላ',
+
+  // Report Sub-reasons
+  AppStrings.subAssault: 'ጥቃት',
+  AppStrings.subThreats: 'ዛቻ',
+  AppStrings.subAnimalCruelty: 'የእንስሳት ጭካኔ',
+  AppStrings.subRacist: 'ዘረኛ',
+  AppStrings.subSexist: 'ወሲባዊ',
+  AppStrings.subReligious: 'ሃይማኖታዊ',
+  AppStrings.subLgbtqTargeted: 'ኤልጂቢቲኪው+ ላይ ያነጣጠረ',
+  AppStrings.subRepeatedInsults: 'ተደጋጋሚ ስድብ',
+  AppStrings.subNameCalling: 'ስም መጥራት',
+  AppStrings.subStalking: 'ማሳደድ',
+  AppStrings.subExplicitPhotos: 'ግልጽ ፎቶዎች',
+  AppStrings.subSexualLanguage: 'ወሲባዊ ቋንቋ',
+  AppStrings.subMedical: 'ሕክምና',
+  AppStrings.subPolitical: 'ፖለቲካዊ',
+  AppStrings.subOtherInfo: 'ሌላ',
+  AppStrings.subClickbait: 'ክሊክባይት',
+  AppStrings.subScamLinks: 'የማጭበርበሪያ አገናኞች',
+
+  AppStrings.currentPassword: 'የአሁኑ የይለፍ ቃል',
+  AppStrings.passwordUpdatedSuccess: 'የይለፍ ቃል በተሳካ ሁኔታ ተሻሽሏል',
+  AppStrings.currentPasswordRequired: 'የአሁኑ የይለፍ ቃል ያስፈልጋል',
+  AppStrings.newPassword: 'አዲስ የይለፍ ቃል',
+  AppStrings.newPasswordRequired: 'አዲስ የይለፍ ቃል ያስፈልጋል',
+  AppStrings.pleaseConfirmPassword: 'እባክዎ አዲስ የይለፍ ቃል ያረጋግጡ',
+  AppStrings.passwordsDoNotMatch: 'የይለፍ ቃል እና የይለፍ ቃል አረጋግጥ መስማማት አለበት',
+
 };

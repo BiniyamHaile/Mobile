@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
 import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 
@@ -28,6 +29,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+        context.watch<LanguageService>();
     return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
       listener: (context, state) {
         if (state is ForgotPasswordFailure) {

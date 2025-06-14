@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
 import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/pages/auth/otp_page.dart';
@@ -81,6 +82,7 @@ class _SignupFormViewState extends State<SignupFormView> {
   Widget build(BuildContext context) {
     final screen = ScreenSizeUtils(context);
     final appTheme = Theme.of(context);
+        context.watch<LanguageService>();
 
     return BlocListener<SignupBloc, SignupState>(
       listener: (context, state) {

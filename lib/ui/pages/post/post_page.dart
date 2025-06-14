@@ -11,6 +11,7 @@ import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
 import 'package:mobile/models/post.dart';
 import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -565,6 +566,7 @@ class _PostingScreenState extends State<PostingScreen> {
 
   @override
   Widget build(BuildContext context) {
+        context.watch<LanguageService>();
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
         if (state is PostCreationSuccess || state is PostUpdateSuccess) {
