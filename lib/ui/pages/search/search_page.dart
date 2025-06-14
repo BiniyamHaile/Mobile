@@ -13,37 +13,48 @@ class SearchPage extends StatelessWidget {
       create: (_) => SearchBloc(),
       child: DefaultTabController(
         length: 4,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-            elevation: 0,
-            centerTitle: true,
-            title: SizedBox(
-              width: 320,
-              child: _SearchBar(),
-            ),
-            bottom: TabBar(
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
-              indicatorWeight: 3,
-              tabs: [
-                Tab(text: 'All'),
-                Tab(text: 'People'),
-                Tab(text: 'Posts'),
-                Tab(text: 'Videos'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              AllSearchPage(),
-              PeopleSearchPage(),
-              PostsSearchPage(),
-              VideosSearchPage(),
-            ],
-          ),
+        child: Builder(
+          builder: (context) {
+            final TabController tabController = DefaultTabController.of(context);
+            tabController.addListener(() {
+              if (!tabController.indexIsChanging) {
+                context.read<SearchBloc>().add(SearchTabChanged(tabController.index));
+              }
+            });
+            
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                elevation: 0,
+                centerTitle: true,
+                title: SizedBox(
+                  width: 320,
+                  child: _SearchBar(),
+                ),
+                bottom: TabBar(
+                  indicatorColor: Colors.white,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  indicatorWeight: 3,
+                  tabs: [
+                    Tab(text: 'All'),
+                    Tab(text: 'People'),
+                    Tab(text: 'Posts'),
+                    Tab(text: 'Videos'),
+                  ],
+                ),
+              ),
+              body: TabBarView(
+                children: [
+                  AllSearchPage(),
+                  PeopleSearchPage(),
+                  PostsSearchPage(),
+                  VideosSearchPage(),
+                ],
+              ),
+            );
+          }
         ),
       ),
     );
