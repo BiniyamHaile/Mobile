@@ -1,10 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
-import 'package:mobile/bloc/auth/login/login_bloc.dart';
-import 'package:mobile/bloc/auth/search/search_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
-import 'package:mobile/services/utls/get-userId.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'search_event.dart';
@@ -62,30 +59,62 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   // }
 
   Future<void> _onQueryChanged(
-      SearchQueryChanged event, Emitter<SearchState> emit) async {
+    SearchQueryChanged event,
+    Emitter<SearchState> emit,
+  ) async {
     emit(SearchLoading());
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final currentUserId =
-          await getCurrentUserId(); 
-      print('Current User ID: $currentUserId');
+      final currentTab = prefs.getInt('currentSearchTab') ?? 0;
+
+      String endpoint;
+      Map<String, dynamic> queryParams = {};
+
+      switch (currentTab) {
+        case 0: // All
+          // Handle all search
+          return;
+        case 1: // People
+          endpoint = '${ApiEndpoints.baseUrl}/auth/search-users';
+          queryParams = {'q': event.query};
+          break;
+        case 2: // Posts
+          endpoint = '${ApiEndpoints.baseUrl}/social/posts/search';
+          queryParams = {'search': event.query};
+          break;
+        case 3: // Videos
+          // Handle videos search
+          return;
+        default:
+          endpoint = '${ApiEndpoints.baseUrl}/auth/search-users';
+          queryParams = {'q': event.query};
+      }
+
       final response = await Dio().get(
-        '${ApiEndpoints.baseUrl}/auth/search-users',
-        queryParameters: {'q': event.query},
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
+        endpoint,
+        queryParameters: queryParams,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
-      final people = response.data as List;
-      emit(SearchLoaded(people));
+
+      List results;
+      if (currentTab == 2) { // Posts search returns FindResult
+        results = response.data['data'] as List;
+      } else { // Users search returns array directly
+        results = response.data as List;
+      }
+      
+      emit(SearchLoaded(results));
     } catch (e) {
-      emit(SearchError('Failed to search users'));
+      emit(SearchError('Failed to search: ${e.toString()}'));
     }
   }
 
   Future<void> _onTabChanged(
-      SearchTabChanged event, Emitter<SearchState> emit) async {
-    // Optionally handle tab-specific logic
+    SearchTabChanged event,
+    Emitter<SearchState> emit,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('currentSearchTab', event.tabIndex);
   }
 }
