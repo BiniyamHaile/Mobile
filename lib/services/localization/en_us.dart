@@ -260,4 +260,7 @@ const Map<String, String> enUS = {
   AppStrings.afaanOromo: 'Afaan Oromo',
   AppStrings.english: 'English',
   AppStrings.selectLanguage: 'Select Language',
+
+  AppStrings.waitingForVideoDuration: 'Waiting for video duration...',
+  AppStrings.postUpdateFailed: 'Post update failed: ',
 };

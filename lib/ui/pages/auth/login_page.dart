@@ -9,6 +9,7 @@ import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';
 
 
@@ -69,7 +70,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
     final lang = context.watch<LanguageService>();
+
+    final theme = AppTheme.getTheme(context);
+
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state is LoginFailure) {
@@ -84,7 +89,10 @@ class _LoginPageState extends State<LoginPage> {
           // Navigate to home page after successful login
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Login successful!' , style: TextStyle(color: Colors.white) ),
+              content: Text(
+                'Login successful!',
+                style: TextStyle(color: Colors.white),
+              ),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.green,
             ),
@@ -94,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       builder: (context, state) {
         final isLoading = state is LoginLoading;
+        final theme = AppTheme.getTheme(context);
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -214,24 +223,26 @@ class _LoginPageState extends State<LoginPage> {
                               TextFormField(
                                 controller: _emailController,
                                 cursorColor: Colors.deepPurple,
+                                style:  TextStyle(color: theme.colorScheme.primary),
                                 decoration: InputDecoration(
                                   labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: theme.colorScheme.primary,
                                   ),
                                   prefixIcon: const Icon(Icons.email_outlined),
+                                  prefixIconColor: theme.colorScheme.primary,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor: theme.colorScheme.onPrimary,
                                 ),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
                                     return 'Email is required';
                                   }
                                   final emailRegex = RegExp(
-                                    r'^[^@\s]+@[^@\s]+\.[^@\s]+\u0000?',
+                                    r'^[^@\s]+@[^@\s]+\.[^@\s]+?',
                                   );
                                   if (!emailRegex.hasMatch(val)) {
                                     return 'Enter a valid email address';
@@ -245,12 +256,17 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
                                 cursorColor: Colors.deepPurple,
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                ),
+
                                 decoration: InputDecoration(
                                   labelText: AppStrings.password.tr(context),
                                   labelStyle: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: theme.colorScheme.primary,
                                   ),
                                   prefixIcon: const Icon(Icons.lock_outline),
+                                  prefixIconColor: theme.colorScheme.primary,
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
@@ -267,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor: theme.colorScheme.onPrimary,
                                 ),
                                 onChanged: (value) =>
                                     _updatePasswordStrength(value),

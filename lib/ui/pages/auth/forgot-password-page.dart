@@ -7,6 +7,7 @@ import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -60,6 +61,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       },
       builder: (context, state) {
         final isLoading = state is ForgotPasswordLoading;
+            final theme = AppTheme.getTheme(context);
+
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -180,6 +183,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               TextFormField(
                                 controller: _emailController,
                                 cursorColor: Colors.deepPurple,
+                                style: TextStyle(color: theme.colorScheme.primary),
                                 decoration: InputDecoration(
                                   labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
@@ -190,7 +194,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor:theme.colorScheme.onPrimary ,
                                 ),
                                 validator: (val) => val == null || val.isEmpty
                                     ? AppStrings.emailRequired.tr(context)

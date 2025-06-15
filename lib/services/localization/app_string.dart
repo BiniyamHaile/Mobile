@@ -274,4 +274,8 @@ class AppStrings {
   static const String afaanOromo = 'afaan_oromo';
   static const String english = 'english';
   static const String selectLanguage = 'select_language';
+
+  static const String waitingForVideoDuration = 'waiting_for_video_duration';
+  static const String postUpdateFailed = 'post_update_failed';
+
 }

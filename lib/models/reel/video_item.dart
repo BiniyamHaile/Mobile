@@ -6,6 +6,7 @@ import 'package:mobile/models/reel/privacy_option.dart';
 class VideoItem extends Equatable {
   final String id;
   final String username;
+  final String ownerId;
   final String description;
   final String walletId;
   final String videoUrl;
@@ -34,6 +35,7 @@ class VideoItem extends Equatable {
   VideoItem({
     required this.id,
     required this.username,
+    this.ownerId = '',
     required this.description,
     required this.walletId,
     required this.videoUrl,
@@ -58,6 +60,7 @@ class VideoItem extends Equatable {
   List<Object?> get props => [
     id,
     username,
+    ownerId,
     description,
     walletId,
     videoUrl,
@@ -107,6 +110,12 @@ class VideoItem extends Equatable {
           : "",
     );
 
+    final String ownerId = safeString(
+      profileJson != null && profileJson is Map<String, dynamic>
+          ? profileJson['id']
+          : "",
+    );
+
     final String profileImageUrl = safeString(
       profileJson != null && profileJson is Map<String, dynamic>
           ? profileJson['picture']
@@ -116,6 +125,7 @@ class VideoItem extends Equatable {
     return VideoItem(
       id: safeString(json['id']),
       username: username,
+      ownerId: ownerId,
       description: safeString(json['description']),
       videoUrl: safeString(json['videoURL']),
       walletId: walletId,

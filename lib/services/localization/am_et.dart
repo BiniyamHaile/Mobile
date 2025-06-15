@@ -258,4 +258,7 @@ const Map<String, String> amET = {
   AppStrings.afaanOromo: 'አፋን ኦሮሞ',
   AppStrings.english: 'እንግሊዝኛ',
   AppStrings.selectLanguage: 'ቋንቋ ይምረጡ',
+
+  AppStrings.waitingForVideoDuration: 'ቪዲዮ ጊዜ ለመጠበቅ እየቆየ ነው...',
+  AppStrings.postUpdateFailed: 'የልጥፍ አዘምን አልተሳካም: ',
 };

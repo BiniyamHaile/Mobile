@@ -25,7 +25,7 @@ class CommentsBottomSheet extends StatefulWidget {
       enableDrag: true,
       isScrollControlled: true,
       builder: (_) => FractionallySizedBox(
-        heightFactor: 0.8,
+        heightFactor: 0.6,
         child: BlocProvider(
           create: (context) =>
               CommentBloc(commentRepository: CommentRepository())

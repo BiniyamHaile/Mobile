@@ -6,8 +6,17 @@ import 'package:mobile/services/localization/om_et.dart';
 class LanguageService extends ChangeNotifier {
   // Default language is English
   String _currentLanguage = 'am';
+  Locale _currentLocale = const Locale('am');
 
   String get currentLanguage => _currentLanguage;
+  Locale get currentLocale => _currentLocale;
+
+  // Supported locales
+  final List<Locale> supportedLocales = const [
+    Locale('am'), // Amharic
+    Locale('om'), // Afaan Oromo
+    Locale('en'), // English
+  ];
 
   // Your translation strings
   final Map<String, Map<String, String>> _localizedStrings = {
@@ -18,6 +27,13 @@ class LanguageService extends ChangeNotifier {
 
   void changeLanguage(String languageCode) {
     _currentLanguage = languageCode;
+    _currentLocale = Locale(languageCode);
+    notifyListeners();
+  }
+
+  void changeLocale(Locale locale) {
+    _currentLocale = locale;
+    _currentLanguage = locale.languageCode;
     notifyListeners();
   }
 

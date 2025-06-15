@@ -9,12 +9,18 @@ import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_bloc.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_event.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_state.dart';
+import 'package:mobile/models/reel/mentioned_user.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+
 import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:provider/provider.dart';
+
+import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 import 'widgets/more_options_sheet_content.dart';
 import 'widgets/post_options_section.dart';
@@ -210,11 +216,14 @@ class _PostScreenState extends State<PostScreen> {
     bool showSuggestions = postDetailsState.activeSuggestionType != '';
     bool showDefaultOptions = !showSuggestions;
 
+        final theme = AppTheme.getTheme(context);
+
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: theme.colorScheme.onPrimary,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon:  Icon(Icons.arrow_back,color: theme.colorScheme.primary,),
           onPressed: () {
             if (isLoading) {
               return;
@@ -222,7 +231,9 @@ class _PostScreenState extends State<PostScreen> {
             Navigator.pop(context);
           },
         ),
-        title: Text(languageService.translate(AppStrings.createPost)),
+
+        title:  Text(AppStrings.createPost.tr(context),style: TextStyle(color: theme.colorScheme.primary),),
+
       ),
       body: BlocListener<ReelFeedAndActionBloc, ReelFeedAndActionState>(
         listenWhen: (previousState, currentState) {
@@ -235,7 +246,7 @@ class _PostScreenState extends State<PostScreen> {
                 backgroundColor: Colors.green,
                 content: Text(
                   languageService.translate(AppStrings.reelPostedSuccess),
-                  style: TextStyle(color: Colors.white),
+                style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -244,14 +255,14 @@ class _PostScreenState extends State<PostScreen> {
               const MarkMoreVideosAvailable(),
             );
 
-            context.go(RouteNames.home);
+            context.go(RouterEnum.videoFeedView.routeName);
           } else if (state.actionStatus == ReelActionStatus.postFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.red,
                 content: Text(
-                  languageService.translate(AppStrings.failedToPostReel) + state.lastActionError,
-                  style: TextStyle(color: Colors.white),
+       AppStrings.failedToPostReel.tr(context) + state.lastActionError,
+           style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -281,10 +292,13 @@ class _PostScreenState extends State<PostScreen> {
                           expands: true,
                           maxLines: null,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: InputDecoration(
+                          decoration:  InputDecoration(
                             filled: true,
-                            fillColor: Colors.white,
-                            hintText: languageService.translate(AppStrings.addDescription),
+                            fillColor: theme.colorScheme.onPrimary,
+                             hintText: languageService.translate(AppStrings.addDescription),
+                            hintStyle: TextStyle(
+                              color: theme.colorScheme.primary.withOpacity(0.6),
+                            ),
                             border: OutlineInputBorder(),
                             isDense: true,
                             contentPadding: EdgeInsets.all(8.0),
@@ -300,7 +314,7 @@ class _PostScreenState extends State<PostScreen> {
                         height: 150,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: theme.colorScheme.onPrimary,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(color: Colors.grey),
                           ),
@@ -392,9 +406,24 @@ class _PostScreenState extends State<PostScreen> {
                       onPressed: buttonIsLoading
                           ? null
                           : () {
-                              final currentDetailsState =
-                                  context.read<PostDetailsBloc>().state;
-                              final mentionedUsersToPost =
+                              final currentDetailsState = context
+                                  .read<PostDetailsBloc>()
+                                  .state;
+
+                              if (currentDetailsState.durationInSeconds == 0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                   SnackBar(
+                                    backgroundColor: Colors.red,
+                                    content: Text(
+                                      'Please wait, video duration is loading...',
+                                      style: TextStyle(color: theme.colorScheme.primary),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final List<MentionedUser> mentionedUsersToPost =
                                   currentDetailsState.mentionedUsers;
 
                               context.read<ReelFeedAndActionBloc>().add(
@@ -419,21 +448,21 @@ class _PostScreenState extends State<PostScreen> {
                               );
                             },
                       icon: buttonIsLoading
-                          ? const SizedBox(
+                          ?  SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: theme.colorScheme.primary,
                                 strokeWidth: 3,
                               ),
                             )
-                          : const Icon(Icons.send),
+                          :  Icon(Icons.send, color: theme.colorScheme.primary,),
                       label: buttonIsLoading
-                          ? Text(languageService.translate(AppStrings.posting))
-                          : Text(languageService.translate(AppStrings.post)),
+                          ?  Text(AppStrings.posting.tr(context), style: TextStyle(color: theme.colorScheme.primary),)
+                          :  Text(AppStrings.post.tr(context),style: TextStyle(color: theme.colorScheme.primary)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                        foregroundColor: Colors.white,
+                        backgroundColor: theme.colorScheme.onPrimary,
+                        foregroundColor: theme.colorScheme.primary,
                       ),
                     );
                   },

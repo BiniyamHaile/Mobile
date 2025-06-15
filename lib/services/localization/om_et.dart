@@ -258,4 +258,7 @@ const Map<String, String> omET = {
   AppStrings.afaanOromo: 'Afaan Oromoo',
   AppStrings.english: 'Ingiliiffaa',
   AppStrings.selectLanguage: 'Afaan Filadhu',
+
+  AppStrings.waitingForVideoDuration: 'viidiyoo eeggachaa jira...',
+  AppStrings.postUpdateFailed: 'postii fooyyessu hin dandeenye',
 };

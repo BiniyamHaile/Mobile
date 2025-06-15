@@ -43,9 +43,14 @@ final List<ShareProfileItem> _shareProfileItems = [
 ];
 
 class ShareBottomSheet extends StatelessWidget {
-  const ShareBottomSheet({Key? key, required this.reelid}) : super(key: key);
+  const ShareBottomSheet({
+    Key? key,
+    required this.reelid,
+    required this.isOwner,
+  }) : super(key: key);
 
   final String reelid;
+  final bool isOwner;
 
   @override
   Widget build(BuildContext context) {
@@ -75,85 +80,87 @@ class ShareBottomSheet extends StatelessWidget {
       //     Navigator.pop(context);
       //   },
       // ),
-      ShareGridActionItem(
-        icon: Icons.edit,
-        label: 'Edit',
-        bgColor: Color.fromRGBO(143, 148, 251, 1),
-        iconColor: Colors.white,
-        onTap: () {
-          print('Tapped action: Edit (reelid: $reelid)');
+      if (isOwner)
+        ShareGridActionItem(
+          icon: Icons.edit,
+          label: 'Edit',
+          bgColor: Color.fromRGBO(143, 148, 251, 1),
+          iconColor: Colors.white,
+          onTap: () {
+            print('Tapped action: Edit (reelid: $reelid)');
 
-          final videoFeedState = context.read<ReelFeedAndActionBloc>().state;
+            final videoFeedState = context.read<ReelFeedAndActionBloc>().state;
 
-          final Iterable<VideoItem> matchingVideos = videoFeedState.videos
-              .where((video) => video.id == reelid);
+            final Iterable<VideoItem> matchingVideos = videoFeedState.videos
+                .where((video) => video.id == reelid);
 
-          final VideoItem? videoToEdit = matchingVideos.isNotEmpty
-              ? matchingVideos.first
-              : null;
+            final VideoItem? videoToEdit = matchingVideos.isNotEmpty
+                ? matchingVideos.first
+                : null;
 
-          if (videoToEdit != null) {
-            print('Found video to edit: ${videoToEdit.id}');
+            if (videoToEdit != null) {
+              print('Found video to edit: ${videoToEdit.id}');
 
-            final initialEditData = {
-              'reelId': videoToEdit.id,
-              'videoUrl': videoToEdit.videoUrl,
-              'initialDescription': videoToEdit.description,
-              'initialPrivacy': videoToEdit.privacy,
-              'initialAllowComments': videoToEdit.allowComments,
-              'initialSaveToDevice': videoToEdit.allowSaveToDevice,
-              'initialSaveWithWatermark': videoToEdit.saveWithWatermark,
-              'initialAudienceControls': videoToEdit.audienceControlUnder18,
-            };
+              final initialEditData = {
+                'reelId': videoToEdit.id,
+                'videoUrl': videoToEdit.videoUrl,
+                'initialDescription': videoToEdit.description,
+                'initialPrivacy': videoToEdit.privacy,
+                'initialAllowComments': videoToEdit.allowComments,
+                'initialSaveToDevice': videoToEdit.allowSaveToDevice,
+                'initialSaveWithWatermark': videoToEdit.saveWithWatermark,
+                'initialAudienceControls': videoToEdit.audienceControlUnder18,
+              };
 
-            print(videoToEdit);
-            print(initialEditData);
+              print(videoToEdit);
+              print(initialEditData);
 
-            Navigator.pop(context);
+              Navigator.pop(context);
 
-            context
-                .push(
-                  RouterEnum.editPostScreen.routeName,
-                  extra: initialEditData,
-                )
-                .then((editedData) {
-                  if (editedData != null &&
-                      editedData is Map<String, dynamic>) {
-                    print('Received edited data after editing: $editedData');
-                    // TODO: Here you would typically dispatch an event/call a method
-                  } else {
-                    print(
-                      'Edit screen was closed without saving or returned null.',
-                    );
-                  }
-                });
-          } else {
-            print('Video with id $reelid not found in state. Cannot edit.');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                backgroundColor: Colors.red,
-                content: Text(
-                  'Could not find video details to edit.',
-                  style: TextStyle(color: Colors.white),
+              context
+                  .push(
+                    RouterEnum.editPostScreen.routeName,
+                    extra: initialEditData,
+                  )
+                  .then((editedData) {
+                    if (editedData != null &&
+                        editedData is Map<String, dynamic>) {
+                      print('Received edited data after editing: $editedData');
+                      // TODO: Here you would typically dispatch an event/call a method
+                    } else {
+                      print(
+                        'Edit screen was closed without saving or returned null.',
+                      );
+                    }
+                  });
+            } else {
+              print('Video with id $reelid not found in state. Cannot edit.');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    'Could not find video details to edit.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  duration: Duration(seconds: 2),
                 ),
-                duration: Duration(seconds: 2),
-              ),
-            );
+              );
+              Navigator.pop(context);
+            }
+          },
+        ),
+      if (isOwner)
+        ShareGridActionItem(
+          icon: Icons.delete_outline,
+          label: 'Delete',
+          bgColor: Color.fromRGBO(143, 148, 251, 1),
+          iconColor: Colors.white,
+          onTap: () {
+            final deleteEvent = DeleteReel(reelId: reelid);
+            context.read<ReelFeedAndActionBloc>().add(deleteEvent);
             Navigator.pop(context);
-          }
-        },
-      ),
-      ShareGridActionItem(
-        icon: Icons.delete_outline,
-        label: 'Delete',
-        bgColor: Color.fromRGBO(143, 148, 251, 1),
-        iconColor: Colors.white,
-        onTap: () {
-          final deleteEvent = DeleteReel(reelId: reelid);
-          context.read<ReelFeedAndActionBloc>().add(deleteEvent);
-          Navigator.pop(context);
-        },
-      ),
+          },
+        ),
       ShareGridActionItem(
         icon: Icons.copy,
         label: 'Copy\nLink',
