@@ -2,71 +2,16 @@ import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:mobile/bloc/profile/profile_bloc.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/video_item.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-
-const String _profileImageUrl =
-    'https://res.cloudinary.com/dpmykt0af/image/upload/v1744224571/ImageMagic/jwvonkoaqb7f1yjdbl0k.jpg';
-const String _username = '@that_mind_trainer';
-const int _followingCount = 3;
-const String _followersCount = '197.0K';
-const String _likesCount = '8.1M';
-const String _bioText = '🚀 Road to 200k ';
-
-const String _s3VideoUrl =
-    'https://blockchainsocialmedia-reelandprofile.s3.amazonaws.com/POC/Download%20%281%29.mp4';
-
-final List<VideoItem> _userVideosList = [
-  VideoItem(
-    id: 'user_video_1',
-    videoUrl: _s3VideoUrl,
-    username: "Daniel",
-    description: "EVERY GYM RAT ON PUMP",
-    profileImageUrl: _profileImageUrl,
-    likeCount: 19300000,
-    commentCount: 400,
-    shareCount: 100,
-    isBookmarked: true,
-    isLiked: true,
-    timestamp: DateTime.now(),
-    isPremiumContent: true,
-    duration: 18,
-    mentionedUsers: null,
-    privacy: PrivacyOption.public,
-    allowComments: true,
-    allowSaveToDevice: false,
-    saveWithWatermark: true,
-    audienceControlUnder18: false,
-    walletId: "",
-  ),
-  VideoItem(
-    id: 'user_video_3',
-    videoUrl:
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
-    username: "Alice",
-    description: "Beautiful butterfly",
-    profileImageUrl: 'https://example.com/alice_profile.jpg',
-    likeCount: 1500,
-    commentCount: 50,
-    shareCount: 10,
-    isBookmarked: false,
-    isLiked: true,
-    timestamp: DateTime.now().subtract(Duration(days: 2)),
-    isPremiumContent: false,
-    duration: 35,
-    privacy: PrivacyOption.onlyYou,
-    allowComments: true,
-    allowSaveToDevice: true,
-    saveWithWatermark: true,
-    audienceControlUnder18: false,
-    walletId: "",
-  ),
-];
 
 Future<Uint8List?> createThumbnail(String videoPath) async {
   Uint8List? bytes;
@@ -90,189 +35,217 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back, color: Colors.white),
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //   },
-        // ),
-        title: const Text(
-          'Daniel Tilahun',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.notifications_none, color: Colors.white),
-          //   onPressed: () {
-          //     // TODO: Implement notification action
-          //   },
-          // ),
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              context.go(RouteNames.profileSetting);
-            },
-          ),
+    final theme = AppTheme.getTheme(context);
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileInitial) {
+          context.read<ProfileBloc>().add(LoadProfile());
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          IconButton(
-            onPressed: () {
-              context.push(RouteNames.notifications);
-            },
-            icon: Icon(LucideIcons.bell, color: Colors.white),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        children: [
-          const SizedBox(height: 20),
-          const Center(
-            child: CircleAvatar(
-              radius: 40,
-              backgroundImage: CachedNetworkImageProvider(_profileImageUrl),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Center(
-            child: Text(
-              _username,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatColumn('Following', _followingCount.toString()),
-              _buildStatColumn('Followers', _followersCount),
-              _buildStatColumn('Likes', _likesCount),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement Follow action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  child: const Text(
-                    'Follow',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+        if (state is ProfileLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is ProfileError) {
+          return Center(child: Text('Error: ${state.message}'));
+        }
+
+        if (state is ProfileLoaded) {
+          final user = state.user;
+          final videos = state.videos ?? [];
+          final isFollowing = state.isFollowing ?? false;
+
+          return Scaffold(
+            backgroundColor: theme.colorScheme.onPrimary,
+            appBar: AppBar(
+              backgroundColor: theme.colorScheme.onPrimary,
+              title: Text(
+                user.name,
+                style: TextStyle(
+                  color: theme.colorScheme.onBackground,
+                  fontWeight: FontWeight.bold
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.settings, color: theme.colorScheme.onBackground),
                   onPressed: () {
-                    // TODO: Implement Message action
+                    context.go(RouteNames.profileSetting);
                   },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                ),
+                IconButton(
+                  onPressed: () {
+                    context.push(RouteNames.notifications);
+                  },
+                  icon: Icon(LucideIcons.bell, color: theme.colorScheme.onBackground),
+                ),
+              ],
+            ),
+            body: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: CachedNetworkImageProvider(
+                      user.profilePic ?? 'https://via.placeholder.com/150',
                     ),
-                    side: const BorderSide(color: Colors.grey),
                   ),
-                  child: const Text(
-                    'Message',
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    '@${user.username}',
                     style: TextStyle(
-                      color: Color.fromRGBO(143, 148, 251, 1),
-                      fontSize: 16,
+                      color: theme.colorScheme.onBackground,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     border: Border.all(color: Colors.grey),
-              //     borderRadius: BorderRadius.circular(4),
-              //   ),
-              //   padding: const EdgeInsets.all(8),
-              //   child: const Icon(Icons.arrow_drop_down, color: Colors.green),
-              // ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            _bioText,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontSize: 14),
-          ),
-          const SizedBox(height: 20),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(Icons.grid_view_rounded, color: Colors.black),
-              Icon(Icons.favorite_border, color: Colors.black),
-              Icon(Icons.bookmark_border, color: Colors.black),
-              Icon(Icons.lock_outline, color: Colors.black),
-            ],
-          ),
-          const Divider(color: Colors.grey, height: 20, thickness: 0.5),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 1.5,
-              mainAxisSpacing: 1.5,
-              childAspectRatio: 9 / 16,
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildStatColumn(context, 'Posts', videos.length.toString()),
+                    _buildStatColumn(context, 'Followers', state.followers.length.toString()),
+                    _buildStatColumn(context, 'Following', state.following.length.toString()),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (isFollowing) {
+                            context.read<ProfileBloc>().add(UnfollowUser(user.id));
+                          } else {
+                            context.read<ProfileBloc>().add(FollowUser(user.id));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        child: Text(
+                          isFollowing ? 'Unfolloweeee' : 'Follow',
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          // TODO: Implement Message action
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          side: const BorderSide(color: Colors.grey),
+                        ),
+                        child: const Text(
+                          'Message',
+                          style: TextStyle(
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  user.bio ?? '',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: theme.colorScheme.onBackground,
+                    fontSize: 14
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(Icons.grid_view_rounded, color: theme.colorScheme.onBackground),
+                    Icon(Icons.favorite_border, color: theme.colorScheme.onBackground),
+                    Icon(Icons.bookmark_border, color: theme.colorScheme.onBackground),
+                    Icon(Icons.lock_outline, color: theme.colorScheme.onBackground),
+                  ],
+                ),
+                Divider(color: theme.colorScheme.onBackground.withOpacity(0.2), height: 20, thickness: 0.5),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 1.5,
+                    mainAxisSpacing: 1.5,
+                    childAspectRatio: 9 / 16,
+                  ),
+                  itemCount: videos.length,
+                  itemBuilder: (context, index) {
+                    final video = videos[index];
+                    return _buildVideoGridItem(context, index, video, videos);
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
-            itemCount: _userVideosList.length,
-            itemBuilder: (context, index) {
-              final video = _userVideosList[index];
-              return _buildVideoGridItem(context, index, video);
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 
-  Widget _buildStatColumn(String label, String count) {
+  Widget _buildStatColumn(BuildContext context, String label, String count) {
+    final theme = AppTheme.getTheme(context);
     return Column(
       children: [
         Text(
           count,
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: theme.colorScheme.onBackground,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        Text(
+          label,
+          style: TextStyle(
+            color: theme.colorScheme.onBackground.withOpacity(0.6),
+            fontSize: 14
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildVideoGridItem(BuildContext context, int index, VideoItem video) {
+  Widget _buildVideoGridItem(
+    BuildContext context,
+    int index,
+    VideoItem video,
+    List<VideoItem> videos,
+  ) {
     return GestureDetector(
       onTap: () {
         context.push(
           RouterEnum.profileVideoPlayerView.routeName,
-          extra: {'userVideos': _userVideosList, 'initialIndex': index},
+          extra: {'userVideos': videos, 'initialIndex': index},
         );
       },
       child: AspectRatio(
@@ -326,9 +299,7 @@ class ProfileView extends StatelessWidget {
                 );
               },
             ),
-
             Container(color: Colors.black26),
-
             if (video.isBookmarked)
               Positioned(
                 top: 5,
@@ -352,7 +323,6 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
               ),
-
             if (video.isPremiumContent == true)
               Positioned(
                 top: 5,
@@ -383,8 +353,6 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
               ),
-
-            // View Count
             Positioned(
               bottom: 5,
               left: 5,
@@ -403,7 +371,6 @@ class ProfileView extends StatelessWidget {
                 ],
               ),
             ),
-
             if (video.description.isNotEmpty)
               Positioned(
                 bottom: 25,
@@ -420,7 +387,6 @@ class ProfileView extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-
             if (video.privacy != null && video.privacy != PrivacyOption.public)
               Positioned(
                 bottom: 5,
