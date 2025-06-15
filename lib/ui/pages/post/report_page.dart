@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -78,7 +79,7 @@ class _ReportPageState extends State<ReportPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.push(RouteNames.feed);
+            context.pushReplacement(RouteNames.feed);
           } else if (state is PostReportFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -99,12 +100,7 @@ class _ReportPageState extends State<ReportPage> {
               style: TextStyle(color: Colors.white),
             ),
             centerTitle: true,
-            backgroundColor: const Color.fromRGBO(
-              143,
-              148,
-              251,
-              1,
-            ), // Add this lin
+            backgroundColor: const Color.fromRGBO(143, 148, 251, 1),
             foregroundColor: isDark ? Colors.white : Colors.black,
             elevation: 1,
           ),
@@ -204,48 +200,64 @@ class _ReportPageState extends State<ReportPage> {
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isFormValid
-                        ? () {
-                            final main = selectedCategory!;
-                            final sub = selectedSubReason == 'Please specify'
-                                ? _customReasonController.text.trim()
-                                : selectedSubReason;
+                  child: BlocSelector<PostReportBloc, PostReportState, bool>(
+                    selector: (state) => state is PostReportLoading,
+                    builder: (context, isLoading) {
+                      return ElevatedButton(
+                        onPressed: _isFormValid && !isLoading
+                            ? () {
+                                final main = selectedCategory!;
+                                final sub = selectedSubReason == 'Please specify'
+                                    ? _customReasonController.text.trim()
+                                    : selectedSubReason;
 
-                            final report = PostReport(
-                              id: '',
-                              content_id: widget.postId,
-                              reporterId: null,
-                              mainReason: main,
-                              subreason: sub,
-                              status: 'pending',
-                              resolvedBy: null,
-                              reportType: 'post',
-                              resolvedAt: null,
-                              createdAt: DateTime.now(),
-                              updatedAt: DateTime.now(),
-                            );
+                                final report = PostReport(
+                                  id: '',
+                                  content_id: widget.postId,
+                                  reporterId: null,
+                                  mainReason: main,
+                                  subreason: sub,
+                                  status: 'pending',
+                                  resolvedBy: null,
+                                  reportType: 'post',
+                                  resolvedAt: null,
+                                  createdAt: DateTime.now(),
+                                  updatedAt: DateTime.now(),
+                                );
 
-                            print("report: $report.toJson()");
-                            _postReportBloc.add(CreatePostReport(report));
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: _isFormValid
-                          ? theme.primaryColor
-                          : Colors.grey[400],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Submit Report',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: _isFormValid ? Colors.white : Colors.grey[700],
-                      ),
-                    ),
+                                print("report: $report.toJson()");
+                                _postReportBloc.add(CreatePostReport(report));
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: _isFormValid && !isLoading
+                              ? theme.primaryColor
+                              : Colors.grey[400],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Submit Report',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: _isFormValid && !isLoading
+                                      ? Colors.white
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                      );
+                    },
                   ),
                 ),
               ],

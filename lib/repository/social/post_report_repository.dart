@@ -8,6 +8,12 @@ class PostReportRepository extends BaseRepository {
     print('Creating post report with data: ${report.toJson()}');
     final prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
+
+      print('Token retrieved: $token');
+      print('Report content ID: ${report.content_id}');
+      print('Report main reason: ${report.mainReason}');
+      print('Report subreason: ${report.subreason}');
+      print('Report type: ${report.reportType}');
     try {
       await dio.post(
         '/social/posts/${report.content_id}/report',

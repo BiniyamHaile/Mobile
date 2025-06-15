@@ -15,7 +15,7 @@ class AppLogo extends StatelessWidget {
       style: textTheme.headlineMedium?.copyWith(
         fontFamily: 'EduNSWACTCursive',
         fontWeight: FontWeight.bold,
-        color: theme.colorScheme.onPrimary,
+        color: theme.colorScheme.primary,
         fontSize: 24
       ),
     );

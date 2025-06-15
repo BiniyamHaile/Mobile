@@ -63,15 +63,73 @@ class _FeedPageState extends State<FeedPage> {
             }
           },
           builder: (context, state) {
+            final appTheme = AppTheme.getTheme(context);
             if (state is PostInitial || state is PostLoading) {
               return const Center(
-                  child: CircularProgressIndicator(
-                backgroundColor: Colors.blue,
-              ));
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.blue,
+                ),
+              );
             } else if (state is PostError) {
               return Center(child: Text(state.message));
             } else if (state is PostLoaded) {
               final posts = state.posts.data;
+
+              if (posts.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.fileText,
+                        size: 80,
+                        color: appTheme.colorScheme.primary.withOpacity(0.6),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'No Posts Available',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Be the first to share a post or check back later!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: appTheme.colorScheme.primary.withOpacity(0.8),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.push(RouteNames.post);
+                        },
+                        icon: Icon(Icons.post_add_outlined,
+                            color: appTheme.colorScheme.onPrimary),
+                        label: Text(
+                          'Create a Post',
+                          style:
+                              TextStyle(color: appTheme.colorScheme.onPrimary),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: appTheme.colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
               return RefreshIndicator(
                 onRefresh: () async {
@@ -121,15 +179,12 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   AppBar _appBar(ThemeData theme, BuildContext context) {
-     final theme = AppTheme.getTheme(context);
-    final textTheme = theme.textTheme;
+    final appTheme = AppTheme.getTheme(context);
+    final textTheme = appTheme.textTheme;
 
     return AppBar(
-
-      
-      backgroundColor: theme.colorScheme.primary, // Add this lin
+      backgroundColor: appTheme.colorScheme.onPrimary,
       automaticallyImplyLeading: false,
-      
       flexibleSpace: ResponsivePadding(
         child: SafeArea(
           child: Padding(
@@ -146,7 +201,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         Icons.post_add_outlined,
-                        color: theme.colorScheme.onPrimary,
+                        color: appTheme.colorScheme.primary,
                         size: 30,
                       ),
                     ),
@@ -155,8 +210,8 @@ class _FeedPageState extends State<FeedPage> {
                         context.push(RouteNames.chat);
                       },
                       icon: Icon(
-                        Icons.send_sharp,
-                        color: theme.colorScheme.onPrimary,
+                        Icons.message_outlined,
+                        color: appTheme.colorScheme.primary,
                       ),
                     ),
                     IconButton(
@@ -165,7 +220,7 @@ class _FeedPageState extends State<FeedPage> {
                       },
                       icon: Icon(
                         LucideIcons.bell,
-                        color: theme.colorScheme.onPrimary,
+                        color: appTheme.colorScheme.primary,
                       ),
                     ),
                   ],

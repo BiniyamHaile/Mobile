@@ -267,6 +267,7 @@ class VideoFeedItem extends StatelessWidget {
                   videoItem.walletId,
                 ), // Pass the function
                 currentUserId: currentUserId,
+                ownerId: videoItem.ownerId, // Pass the ownerId
                 gift: gift,
               );
             },

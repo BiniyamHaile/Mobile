@@ -17,6 +17,7 @@ class InteractionButtons extends StatelessWidget {
   final String shareLink;
   final VoidCallback onShareTap;
   final String currentUserId;
+  final String ownerId;
   final VoidCallback onGiftStarsPressed;
 
   final appColors = AppColors();
@@ -34,6 +35,7 @@ class InteractionButtons extends StatelessWidget {
     required this.shareLink,
     required this.onShareTap,
     required this.currentUserId,
+    required this.ownerId,
     required this.onGiftStarsPressed,
   });
 
@@ -102,7 +104,10 @@ class InteractionButtons extends StatelessWidget {
                 context: context,
                 isScrollControlled: true,
                 builder: (BuildContext context) {
-                  return ShareBottomSheet(reelid: reelid);
+                  return ShareBottomSheet(
+                    reelid: reelid,
+                    isOwner: currentUserId == ownerId,
+                  );
                 },
               );
             },

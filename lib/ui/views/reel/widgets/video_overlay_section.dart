@@ -19,6 +19,7 @@ class VideoOverlaySection extends StatelessWidget {
     required this.shareLink,
     required this.onShareTap,
     required this.currentUserId,
+    required this.ownerId,
      required this.onGiftStarsPressed,
   }) : super(key: key);
 
@@ -36,6 +37,7 @@ class VideoOverlaySection extends StatelessWidget {
   final String shareLink;
   final VoidCallback onShareTap;
   final String currentUserId;
+  final String ownerId;
   final VoidCallback onGiftStarsPressed;
 
   @override
@@ -64,7 +66,8 @@ class VideoOverlaySection extends StatelessWidget {
             onShareTap: onShareTap,
             currentUserId: currentUserId,
             onGiftStarsPressed: onGiftStarsPressed,
-            gift:gift
+            gift:gift,
+            ownerId: ownerId, // Pass the ownerId
           ),
         ],
       ),

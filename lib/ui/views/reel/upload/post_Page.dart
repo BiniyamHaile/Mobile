@@ -12,6 +12,8 @@ import 'package:mobile/models/reel/mentioned_user.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 import 'widgets/more_options_sheet_content.dart';
 import 'widgets/post_options_section.dart';
@@ -207,11 +209,14 @@ class _PostScreenState extends State<PostScreen> {
     bool showSuggestions = postDetailsState.activeSuggestionType != '';
     bool showDefaultOptions = !showSuggestions;
 
+        final theme = AppTheme.getTheme(context);
+
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: theme.colorScheme.onPrimary,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon:  Icon(Icons.arrow_back,color: theme.colorScheme.primary,),
           onPressed: () {
             if (isLoading) {
               return;
@@ -219,7 +224,7 @@ class _PostScreenState extends State<PostScreen> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Create Post'),
+        title:  Text('Create Post',style: TextStyle(color: theme.colorScheme.primary),),
       ),
       body: BlocListener<ReelFeedAndActionBloc, ReelFeedAndActionState>(
         listenWhen: (previousState, currentState) {
@@ -228,11 +233,11 @@ class _PostScreenState extends State<PostScreen> {
         listener: (context, state) {
           if (state.actionStatus == ReelActionStatus.postSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+               SnackBar(
                 backgroundColor: Colors.green,
                 content: Text(
                   'Reel posted successfully!',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -241,14 +246,14 @@ class _PostScreenState extends State<PostScreen> {
               const MarkMoreVideosAvailable(),
             );
 
-            context.go(RouteNames.home);
+            context.go(RouterEnum.videoFeedView.routeName);
           } else if (state.actionStatus == ReelActionStatus.postFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.red,
                 content: Text(
                   'Failed to post reel: ${state.lastActionError}',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -278,10 +283,13 @@ class _PostScreenState extends State<PostScreen> {
                           expands: true,
                           maxLines: null,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
+                          decoration:  InputDecoration(
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: theme.colorScheme.onPrimary,
                             hintText: 'Add description...',
+                            hintStyle: TextStyle(
+                              color: theme.colorScheme.primary.withOpacity(0.6),
+                            ),
                             border: OutlineInputBorder(),
                             isDense: true,
                             contentPadding: EdgeInsets.all(8.0),
@@ -297,7 +305,7 @@ class _PostScreenState extends State<PostScreen> {
                         height: 150,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: theme.colorScheme.onPrimary,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(color: Colors.grey),
                           ),
@@ -395,11 +403,11 @@ class _PostScreenState extends State<PostScreen> {
 
                               if (currentDetailsState.durationInSeconds == 0) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                   SnackBar(
                                     backgroundColor: Colors.red,
                                     content: Text(
                                       'Please wait, video duration is loading...',
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: theme.colorScheme.primary),
                                     ),
                                   ),
                                 );
@@ -435,21 +443,21 @@ class _PostScreenState extends State<PostScreen> {
                               );
                             },
                       icon: buttonIsLoading
-                          ? const SizedBox(
+                          ?  SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: theme.colorScheme.primary,
                                 strokeWidth: 3,
                               ),
                             )
-                          : const Icon(Icons.send),
+                          :  Icon(Icons.send, color: theme.colorScheme.primary,),
                       label: buttonIsLoading
-                          ? const Text('Posting...')
-                          : const Text('Post'),
+                          ?  Text('Posting...', style: TextStyle(color: theme.colorScheme.primary),)
+                          :  Text('Post',style: TextStyle(color: theme.colorScheme.primary)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                        foregroundColor: Colors.white,
+                        backgroundColor: theme.colorScheme.onPrimary,
+                        foregroundColor: theme.colorScheme.primary,
                       ),
                     );
                   },
