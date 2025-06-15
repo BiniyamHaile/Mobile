@@ -10,18 +10,18 @@ import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
 import 'package:mobile/models/post.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/home_page.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import 'package:mobile/bloc/social/post/post_bloc.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:mobile/models/post.dart';
-import 'package:mobile/ui/theme/app_theme.dart';
 
 class PostingScreen extends StatefulWidget {
   final dynamic post;
 
-  const PostingScreen({super.key, this.post});
+  const PostingScreen({Key? key, this.post}) : super(key: key);
 
   @override
   _PostingScreenState createState() => _PostingScreenState();
@@ -29,6 +29,7 @@ class PostingScreen extends StatefulWidget {
 
 class _PostingScreenState extends State<PostingScreen> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _textFocusNode = FocusNode();
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _selectedMedia = [];
   final Map<String, VideoPlayerController> _videoControllers = {};
@@ -36,16 +37,13 @@ class _PostingScreenState extends State<PostingScreen> {
   final List<User> _mentionableUsers = [];
   final List<String> _mentions = [];
   final LayerLink _mentionLayerLink = LayerLink();
-  final FocusNode _textFocusNode = FocusNode();
-
-  Post? _editingPost;
+  OverlayEntry? _mentionOverlay;
+  String _currentMentionQuery = '';
   bool _isSubmitting = false;
   bool _isLoadingMentions = false;
   String currentProfilePic = '';
   String currentUserFullname = '';
-  OverlayEntry? _mentionOverlay;
-  String _currentMentionQuery = '';
-  int _currentMentionIndex = 0;
+  Post? _editingPost;
 
   @override
   void initState() {
@@ -57,54 +55,68 @@ class _PostingScreenState extends State<PostingScreen> {
     _textController.addListener(_onTextChanged);
   }
 
-  Future<List<User>> getCurrentUserFollowing() async {
-    var prefs = await SharedPreferences.getInstance();
-    var token = await prefs.getString('token') ?? '';
+  @override
+  void dispose() {
+    _textController.dispose();
+    _textFocusNode.dispose();
+    _mentionOverlay?.remove();
+    for (var c in _videoControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
 
-    try {
-      final response = await Dio().get(
-        '${ApiEndpoints.baseUrl}/auth/following',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data.map((json) => User.fromJson(json)).toList();
-      } else {
-        print('Failed to fetch following users');
-        return [];
-      }
-    } catch (e) {
-      print('Error fetching following users: $e');
-      return [];
+  void _initializePostData() {
+    final post = widget.post;
+    if (post is Post) {
+      _editingPost = post;
+      _textController.text = post.content;
+      _existingMediaUrls.addAll(post.files);
+      if (post.mentions != null) _mentions.addAll(post.mentions!);
     }
   }
 
   Future<void> fetchCurrentUserData() async {
-    var prefs = await SharedPreferences.getInstance();
-    var token = await prefs.getString('token') ?? '';
-
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
     try {
-      final loggedUser = await Dio().get(
+      final resp = await Dio().get(
         '${ApiEndpoints.baseUrl}/auth/profile',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
-
-      currentProfilePic = loggedUser.data['profilePic'] ?? '';
+      currentProfilePic = resp.data['profilePic'] ?? '';
       currentUserFullname =
-          '${loggedUser.data['firstName']} ${loggedUser.data['lastName']}';
-
+          '${resp.data['firstName']} ${resp.data['lastName']}';
       setState(() {});
     } catch (e) {
       print('Error fetching user data: $e');
     }
   }
 
+  Future<List<User>> getCurrentUserFollowing() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    try {
+      final resp = await Dio().get(
+        '${ApiEndpoints.baseUrl}/auth/following',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      if (resp.statusCode == 200) {
+        return (resp.data as List)
+            .map((j) => User.fromJson(j))
+            .toList();
+      }
+    } catch (e) {
+      print('Error fetching following users: $e');
+    }
+    return [];
+  }
+
   Future<void> _loadMentionableUsers() async {
     setState(() => _isLoadingMentions = true);
     try {
       final users = await getCurrentUserFollowing();
-      setState(() => _mentionableUsers.addAll(users));
+      _mentionableUsers.addAll(users);
     } catch (e) {
       print('Error loading mentionable users: $e');
     } finally {
@@ -112,61 +124,44 @@ class _PostingScreenState extends State<PostingScreen> {
     }
   }
 
-  void _initializePostData() {
-    final post = widget.post;
-    if (post != null && post is Post) {
-      _editingPost = post;
-      _textController.text = post.content;
-      _existingMediaUrls.addAll(post.files);
-      if (post.mentions != null) {
-        _mentions.addAll(post.mentions!);
-      }
-    }
-  }
-
   void _onTextFocusChange() {
-    if (!_textFocusNode.hasFocus && _mentionOverlay != null) {
+    if (!_textFocusNode.hasFocus) {
       _mentionOverlay?.remove();
       _mentionOverlay = null;
     }
   }
 
   void _onTextChanged() {
-    final text = _textController.text;
-    final mentionMatch = RegExp(r'@(\w*)$').firstMatch(text);
-    if (mentionMatch != null) {
-      _currentMentionQuery = mentionMatch.group(1) ?? '';
+    final match = RegExp(r'@(\w*)$').firstMatch(_textController.text);
+    if (match != null) {
+      _currentMentionQuery = match.group(1) ?? '';
       _showMentionOverlay();
-    } else if (_mentionOverlay != null) {
+    } else {
       _mentionOverlay?.remove();
       _mentionOverlay = null;
     }
   }
 
   void _showMentionOverlay() {
-    if (_mentionOverlay != null) {
-      _mentionOverlay?.remove();
-    }
-
-    final filteredUsers = _mentionableUsers.where((user) {
-      final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
-      final username = user.username?.toLowerCase() ?? '';
-      return fullName.contains(_currentMentionQuery.toLowerCase()) ||
-          username.contains(_currentMentionQuery.toLowerCase());
+    _mentionOverlay?.remove();
+    final filtered = _mentionableUsers.where((u) {
+      final full = '${u.firstName} ${u.lastName}'.toLowerCase();
+      final usr = u.username?.toLowerCase() ?? '';
+      return full.contains(_currentMentionQuery.toLowerCase()) ||
+          usr.contains(_currentMentionQuery.toLowerCase());
     }).toList();
-
-    if (filteredUsers.isEmpty) return;
+    if (filtered.isEmpty) return;
 
     final theme = AppTheme.getTheme(context);
     final isDark = theme.brightness == Brightness.dark;
 
     _mentionOverlay = OverlayEntry(
-      builder: (context) => Positioned(
+      builder: (_) => Positioned(
         width: 200,
         child: CompositedTransformFollower(
           link: _mentionLayerLink,
-          showWhenUnlinked: false,
           offset: const Offset(0, 40),
+          showWhenUnlinked: false,
           child: Material(
             elevation: 4,
             child: Container(
@@ -177,29 +172,24 @@ class _PostingScreenState extends State<PostingScreen> {
               ),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: filteredUsers.length,
-                itemBuilder: (context, index) {
-                  final user = filteredUsers[index];
+                itemCount: filtered.length,
+                itemBuilder: (_, i) {
+                  final u = filtered[i];
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: isDark
                           ? AppTheme.appColors.darkGreyColor5
                           : AppTheme.appColors.accent2,
-                      child: Icon(
-                        Icons.person,
-                        color: theme.colorScheme.onSurface,
-                      ),
+                      child:
+                          Icon(Icons.person, color: theme.colorScheme.onSurface),
                     ),
                     title: Text(
-                      '${user.firstName} ${user.lastName}',
-                      style: TextStyle(color: theme.colorScheme.onSurface),
+                      '${u.firstName} ${u.lastName}',
+                      style: theme.textTheme.bodyMedium,
                     ),
-                    subtitle: Text(
-                      '@${user.username}',
-                      style: TextStyle(color: theme.hintColor),
-                    ),
-                    onTap: () => _insertMention(user),
+                    subtitle: Text('@${u.username}',
+                        style: theme.textTheme.bodySmall),
+                    onTap: () => _insertMention(u),
                   );
                 },
               ),
@@ -208,135 +198,110 @@ class _PostingScreenState extends State<PostingScreen> {
         ),
       ),
     );
-
-    Overlay.of(context).insert(_mentionOverlay!);
+    Overlay.of(context)!.insert(_mentionOverlay!);
   }
 
-  void _insertMention(User user) {
+  void _insertMention(User u) {
     final text = _textController.text;
-    final mentionStart = text.lastIndexOf('@');
-    final newText = '${text.substring(0, mentionStart)}@${user.username} ';
+    final idx = text.lastIndexOf('@');
+    final newText = '${text.substring(0, idx)}@${u.username} ';
     _textController.text = newText;
-    _textController.selection = TextSelection.fromPosition(
-      TextPosition(offset: newText.length),
-    );
-
-    if (!_mentions.contains(user.id)) {
-      setState(() => _mentions.add(user.id));
-    }
-
+    _textController.selection =
+        TextSelection.fromPosition(TextPosition(offset: newText.length));
+    if (!_mentions.contains(u.id)) _mentions.add(u.id);
     _mentionOverlay?.remove();
     _mentionOverlay = null;
+  }
+
+  void _removeMentionFromText(String name) {
+    final uname = name.replaceFirst('@', '');
+    _textController.text = _textController.text
+        .replaceAll('@$uname ', '')
+        .replaceAll('@$uname', '');
   }
 
   Future<void> _pickImage() async {
     if (!mounted) return;
     try {
-      final List<XFile> pickedFiles = await _picker.pickMultiImage(
-        imageQuality: 85,
-      );
-      if (pickedFiles.isNotEmpty && mounted) {
-        setState(() => _selectedMedia.addAll(pickedFiles));
-      }
-    } catch (e) {
-      if (mounted) _showError('Error selecting photos');
+      final imgs = await _picker.pickMultiImage(imageQuality: 85);
+      if (imgs.isNotEmpty) setState(() => _selectedMedia.addAll(imgs));
+    } catch (_) {
+      _showError(AppStrings.errorSelectingPhotos.tr(context));
     }
   }
 
   Future<void> _pickVideos() async {
     if (!mounted) return;
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.video,
-        allowMultiple: true,
-      );
-
-      if (result != null && mounted) {
-        for (final file in result.files) {
-          final filePath = file.path;
-          if (filePath != null) {
-            final controller = VideoPlayerController.file(File(filePath));
-            await controller.initialize();
-            controller.setLooping(true);
-            controller.pause();
-            if (mounted) {
-              setState(() {
-                _selectedMedia.add(XFile(filePath));
-                _videoControllers[filePath] = controller;
-              });
-            }
+      final res = await FilePicker.platform
+          .pickFiles(type: FileType.video, allowMultiple: true);
+      if (res != null) {
+        for (var f in res.files) {
+          if (f.path != null) {
+            final c = VideoPlayerController.file(File(f.path!));
+            await c.initialize();
+            c.setLooping(true);
+            c.pause();
+            _selectedMedia.add(XFile(f.path!));
+            _videoControllers[f.path!] = c;
           }
         }
+        setState(() {});
       }
-    } catch (e) {
-      if (mounted) _showError('Error selecting videos');
+    } catch (_) {
+      _showError(AppStrings.errorSelectingVideos.tr(context));
     }
   }
 
   Future<void> _takePhoto() async {
     if (!mounted) return;
     try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 85,
-      );
-      if (pickedFile != null && mounted) {
-        setState(() => _selectedMedia.add(pickedFile));
-      }
-    } catch (e) {
-      if (mounted) _showError('Error taking photo');
+      final p = await _picker.pickImage(
+          source: ImageSource.camera, imageQuality: 85);
+      if (p != null) setState(() => _selectedMedia.add(p));
+    } catch (_) {
+      _showError(AppStrings.errorTakingPhoto.tr(context));
     }
   }
 
-  void _removeMedia(int index) {
-    if (!mounted) return;
-    if (index < _existingMediaUrls.length) {
-      setState(() => _existingMediaUrls.removeAt(index));
+  void _removeMedia(int i) {
+    if (i < _existingMediaUrls.length) {
+      _existingMediaUrls.removeAt(i);
     } else {
-      final localIndex = index - _existingMediaUrls.length;
-      final removed = _selectedMedia.removeAt(localIndex);
+      final removed = _selectedMedia.removeAt(i - _existingMediaUrls.length);
       _videoControllers.remove(removed.path)?.dispose();
-      setState(() {});
     }
+    setState(() {});
   }
 
   void _submitPost() {
-    if (!mounted || _isSubmitting) return;
-
+    if (_isSubmitting) return;
     final content = _textController.text.trim();
     if (content.isEmpty &&
         _selectedMedia.isEmpty &&
         _existingMediaUrls.isEmpty) {
-      _showError('Please add some content to post');
+      _showError(AppStrings.addContentToPost.tr(context));
       return;
     }
-
     setState(() => _isSubmitting = true);
-
-    final postBloc = context.read<PostBloc>();
-    if (postBloc.isClosed) {
-      _showError('Posting service unavailable');
+    final bloc = context.read<PostBloc>();
+    if (bloc.isClosed) {
+      _showError(AppStrings.postingServiceUnavailable.tr(context));
       return;
     }
-
-    if (_editingPost != null) {
-      postBloc.add(
-        UpdatePost(
-          postId: _editingPost!.id,
-          content: content,
-          mediaFiles: _selectedMedia,
-          mentions: _mentions,
-        ),
-      );
-    } else {
-      postBloc.add(
-        CreatePost(
-          content: content,
-          mediaFiles: _selectedMedia,
-          mentions: _mentions,
-        ),
-      );
-    }
+    final event = _editingPost != null
+        ? UpdatePost(
+            postId: _editingPost!.id,
+            content: content,
+            mediaFiles: _selectedMedia,
+            mentions: _mentions,
+          )
+        : CreatePost(
+            content: content,
+            mediaFiles: _selectedMedia,
+            mentions: _mentions,
+          );
+    bloc.add(event);
   }
 
   void _showError(String message) {
@@ -346,7 +311,8 @@ class _PostingScreenState extends State<PostingScreen> {
       SnackBar(
         content: Text(
           message,
-          style: TextStyle(color: theme.colorScheme.onError),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: theme.colorScheme.onError),
         ),
         backgroundColor: theme.colorScheme.error,
       ),
@@ -354,147 +320,113 @@ class _PostingScreenState extends State<PostingScreen> {
   }
 
   Widget _buildMediaPreview(bool isDark) {
-    final totalItems = _existingMediaUrls.length + _selectedMedia.length;
-    if (totalItems == 0) return const SizedBox();
-
+    final total = _existingMediaUrls.length + _selectedMedia.length;
+    if (total == 0) return const SizedBox();
     final theme = AppTheme.getTheme(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text('Media Preview', style: theme.textTheme.headlineSmall),
+        Text(AppStrings.mediaPreview.tr(context),
+            style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: List.generate(totalItems, (index) {
-              final isUrl = index < _existingMediaUrls.length;
+            children: List.generate(total, (i) {
+              final isUrl = i < _existingMediaUrls.length;
               final path = isUrl
-                  ? _existingMediaUrls[index]
-                  : _selectedMedia[index - _existingMediaUrls.length].path;
-              final isVideo =
-                  path.toLowerCase().endsWith('.mp4') ||
+                  ? _existingMediaUrls[i]
+                  : _selectedMedia[i - _existingMediaUrls.length].path;
+              final isVideo = path.toLowerCase().endsWith('.mp4') ||
                   path.toLowerCase().endsWith('.mov');
-
-              Widget mediaWidget;
+              Widget w;
               if (isUrl) {
-                mediaWidget = isVideo
-                    ? Stack(
-                        children: [
-                          Container(
-                            width: 120,
-                            height: 120,
-                            color: isDark
-                                ? AppTheme.appColors.darkGreyColor5
-                                : AppTheme.appColors.accent2,
-                          ),
-                          Center(
-                            child: Icon(
-                              Icons.play_circle_fill,
-                              color: theme.colorScheme.onSurface,
-                              size: 40,
-                            ),
-                          ),
-                        ],
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: path,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 120,
-                          height: 120,
-                          color: isDark
-                              ? AppTheme.appColors.darkGreyColor5
-                              : AppTheme.appColors.accent2,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 120,
-                          height: 120,
-                          color: isDark
-                              ? AppTheme.appColors.darkGreyColor5
-                              : AppTheme.appColors.accent2,
-                          child: Icon(
-                            Icons.broken_image,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      );
+                if (isVideo) {
+                  w = Stack(children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      color: isDark
+                          ? AppTheme.appColors.darkGreyColor5
+                          : AppTheme.appColors.accent2,
+                    ),
+                    Center(
+                        child: Icon(Icons.play_circle_fill,
+                            size: 40, color: theme.colorScheme.onSurface)),
+                  ]);
+                } else {
+                  w = CachedNetworkImage(
+                    imageUrl: path,
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      width: 120,
+                      height: 120,
+                      color: isDark
+                          ? AppTheme.appColors.darkGreyColor5
+                          : AppTheme.appColors.accent2,
+                      child: Center(
+                          child: CircularProgressIndicator(
+                              color: theme.colorScheme.onSurface)),
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      width: 120,
+                      height: 120,
+                      color: isDark
+                          ? AppTheme.appColors.darkGreyColor5
+                          : AppTheme.appColors.accent2,
+                      child: Icon(Icons.broken_image,
+                          color: theme.colorScheme.onSurface),
+                    ),
+                  );
+                }
               } else {
-                mediaWidget = isVideo
-                    ? (_videoControllers.containsKey(path)
-                          ? AspectRatio(
-                              aspectRatio:
-                                  _videoControllers[path]!.value.aspectRatio,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  VideoPlayer(_videoControllers[path]!),
-                                  Container(
-                                    color: theme.colorScheme.surface
-                                        .withOpacity(0.4),
-                                  ),
-                                  Icon(
-                                    Icons.play_circle_fill,
-                                    size: 40,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Center(
-                              child: CircularProgressIndicator(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ))
-                    : Image.file(
-                        File(path),
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      );
+                if (isVideo && _videoControllers.containsKey(path)) {
+                  w = AspectRatio(
+                    aspectRatio: _videoControllers[path]!.value.aspectRatio,
+                    child: Stack(alignment: Alignment.center, children: [
+                      VideoPlayer(_videoControllers[path]!),
+                      Container(
+                          color:
+                              theme.colorScheme.surface.withOpacity(0.4)),
+                      Icon(Icons.play_circle_fill,
+                          size: 40, color: theme.colorScheme.onSurface),
+                    ]),
+                  );
+                } else if (isVideo) {
+                  w = Center(
+                      child: CircularProgressIndicator(
+                          color: theme.colorScheme.onSurface));
+                } else {
+                  w = Image.file(File(path),
+                      width: 120, height: 120, fit: BoxFit.cover);
+                }
               }
-
               return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: 120,
-                        height: 120,
-                        child: mediaWidget,
-                      ),
-                    ),
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: GestureDetector(
-                        onTap: () => _removeMedia(index),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
+                padding: const EdgeInsets.only(right: 8),
+                child: Stack(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(width: 120, height: 120, child: w),
+                  ),
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: () => _removeMedia(i),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
+                            shape: BoxShape.circle),
+                        child: Icon(Icons.close,
+                            size: 16, color: theme.colorScheme.onSurface),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ]),
               );
             }),
           ),
@@ -505,80 +437,54 @@ class _PostingScreenState extends State<PostingScreen> {
 
   Widget _buildMentionsPreview(bool isDark) {
     if (_mentions.isEmpty) return const SizedBox();
-
     final theme = AppTheme.getTheme(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text('Mentioned Users', style: theme.textTheme.headlineSmall),
+        Text(AppStrings.mentionedUsers.tr(context),
+            style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: _mentions.map((userId) {
-            final userIndex = _mentionableUsers.indexWhere(
-              (u) => u.id == userId,
-            );
-
-            if (userIndex == -1) {
+          children: _mentions.map((uid) {
+            final idx = _mentionableUsers.indexWhere((u) => u.id == uid);
+            if (idx == -1) {
               return Chip(
                 avatar: CircleAvatar(
-                  backgroundColor: theme.hintColor,
-                  child: Icon(
-                    Icons.person_off,
-                    size: 16,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                label: Text(
-                  'User not found',
-                  style: TextStyle(color: theme.colorScheme.onSurface),
-                ),
-                deleteIcon: Icon(
-                  Icons.close,
-                  size: 16,
-                  color: theme.colorScheme.onSurface,
-                ),
-                onDeleted: () {
-                  setState(() => _mentions.remove(userId));
-                  _removeMentionFromText(userId);
-                },
+                    backgroundColor: theme.hintColor,
+                    child: Icon(Icons.person_off,
+                        size: 16, color: theme.colorScheme.onSurface)),
+                label: Text(AppStrings.userNotFound.tr(context),
+                    style: theme.textTheme.bodySmall),
+                deleteIcon: Icon(Icons.close,
+                    size: 16, color: theme.colorScheme.onSurface),
+                onDeleted: () => setState(() => _mentions.remove(uid)),
                 backgroundColor: isDark
                     ? AppTheme.appColors.darkGreyColor5
                     : AppTheme.appColors.accent2,
               );
             }
-
-            final user = _mentionableUsers[userIndex];
+            final u = _mentionableUsers[idx];
             return Chip(
               avatar: CircleAvatar(
-                backgroundImage: user.profilePic != null
-                    ? CachedNetworkImageProvider(user.profilePic!)
+                backgroundImage: u.profilePic != null
+                    ? CachedNetworkImageProvider(u.profilePic!)
                     : null,
                 backgroundColor: isDark
                     ? AppTheme.appColors.darkGreyColor5
                     : AppTheme.appColors.accent2,
-                child: user.profilePic == null
-                    ? Icon(
-                        Icons.person,
-                        size: 16,
-                        color: theme.colorScheme.onSurface,
-                      )
+                child: u.profilePic == null
+                    ? Icon(Icons.person,
+                        size: 16, color: theme.colorScheme.onSurface)
                     : null,
               ),
-              label: Text(
-                '@${user.username}',
-                style: TextStyle(color: theme.colorScheme.onSurface),
-              ),
-              deleteIcon: Icon(
-                Icons.close,
-                size: 16,
-                color: theme.colorScheme.onSurface,
-              ),
+              label: Text('@${u.username}', style: theme.textTheme.bodySmall),
+              deleteIcon: Icon(Icons.close,
+                  size: 16, color: theme.colorScheme.onSurface),
               onDeleted: () {
-                setState(() => _mentions.remove(userId));
-                _removeMentionFromText(user.username!);
+                setState(() => _mentions.remove(uid));
+                _removeMentionFromText(u.username ?? uid);
               },
               backgroundColor: isDark
                   ? AppTheme.appColors.darkGreyColor5
@@ -590,74 +496,37 @@ class _PostingScreenState extends State<PostingScreen> {
     );
   }
 
-  void _removeMentionFromText(String usernameOrId) {
-    final username = usernameOrId.startsWith('@')
-        ? usernameOrId.substring(1)
-        : usernameOrId;
-    _textController.text = _textController.text
-        .replaceAll('@$username ', '')
-        .replaceAll('@$username', '');
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _textFocusNode.dispose();
-    _mentionOverlay?.remove();
-    _videoControllers.forEach((_, controller) => controller.dispose());
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.getTheme(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return BlocListener<PostBloc, PostState>(
-      listener: (context, state) {
+      listener: (ctx, state) {
         if (state is PostCreationSuccess || state is PostUpdateSuccess) {
-          if (mounted) {
-            setState(() => _isSubmitting = false);
-
-            ScaffoldMessenger.of(context).clearSnackBars();
-
-            final message = state is PostCreationSuccess
-                ? 'Post created successfully'
-                : 'Post updated successfully';
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  message,
-                  style: TextStyle(color: theme.colorScheme.onPrimary),
-                ),
-                backgroundColor: theme.colorScheme.primary,
-                duration: const Duration(seconds: 2),
-              ),
-            );
-
-            if (_editingPost != null) {
-              _editingPost = null;
-              _textController.clear();
-              _selectedMedia.clear();
-              _existingMediaUrls.clear();
-              _mentions.clear();
-            }
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
-          }
-        } else if (state is PostCreationFailure || state is PostUpdateFailure) {
-          if (mounted) {
-            setState(() => _isSubmitting = false);
-            _showError(
-              state is PostCreationFailure
-                  ? 'Post creation failed'
-                  : 'Post update failed',
-            );
-          }
+          setState(() => _isSubmitting = false);
+          ScaffoldMessenger.of(ctx).clearSnackBars();
+          final msg = state is PostCreationSuccess
+              ? AppStrings.postCreatedSuccess.tr(ctx)
+              : AppStrings.postUpdatedSuccess.tr(ctx);
+          ScaffoldMessenger.of(ctx).showSnackBar(
+            SnackBar(
+              content: Text(msg,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.onPrimary)),
+              backgroundColor: theme.colorScheme.primary,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Navigator.push(
+              ctx, MaterialPageRoute(builder: (_) => const HomePage()));
+        } else if (state is PostCreationFailure ||
+            state is PostUpdateFailure) {
+          setState(() => _isSubmitting = false);
+          final err = state is PostCreationFailure
+              ? AppStrings.postCreationFailed.tr(ctx)
+              : AppStrings.postUpdateFailed.tr(ctx);
+          _showError(err);
         }
       },
       child: Scaffold(
@@ -666,19 +535,15 @@ class _PostingScreenState extends State<PostingScreen> {
           backgroundColor: theme.colorScheme.onPrimary,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
-            onPressed: () {
-              if (_isSubmitting) return;
-              Navigator.pop(context);
-            },
+            onPressed: _isSubmitting ? null : () => Navigator.pop(context),
           ),
           title: Text(
-            _editingPost != null ? 'Edit Post' : 'Create Post',
-            style: TextStyle(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+            _editingPost != null
+                ? AppStrings.editPost.tr(context)
+                : AppStrings.createPost.tr(context),
+            style: theme.textTheme.headlineSmall
+                ?.copyWith(color: theme.colorScheme.primary),
           ),
-         
         ),
         body: Container(
           color: theme.colorScheme.surface,
@@ -698,24 +563,20 @@ class _PostingScreenState extends State<PostingScreen> {
                                 ? AppTheme.appColors.darkGreyColor5
                                 : AppTheme.appColors.accent2,
                             backgroundImage: currentProfilePic.isNotEmpty
-                                ? CachedNetworkImageProvider(currentProfilePic)
+                                ? CachedNetworkImageProvider(
+                                    currentProfilePic)
                                 : null,
                             child: currentProfilePic.isEmpty
-                                ? Icon(
-                                    Icons.person,
-                                    color: theme.colorScheme.onSurface,
-                                  )
+                                ? Icon(Icons.person,
+                                    color: theme.colorScheme.onSurface)
                                 : null,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            currentUserFullname,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Text(currentUserFullname,
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -724,18 +585,22 @@ class _PostingScreenState extends State<PostingScreen> {
                         child: TextField(
                           controller: _textController,
                           focusNode: _textFocusNode,
-                          decoration: InputDecoration(
-                            hintText: "What's on your mind?",
-                            hintStyle: TextStyle(
-                              color: theme.colorScheme.primary,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.all(16),
-                          ),
-                          maxLines: 8,
                           minLines: 4,
+                          maxLines: 8,
+                          decoration: InputDecoration(
+                            hintText:
+                                AppStrings.whatsOnYourMind.tr(context),
+                            hintStyle: theme.textTheme.bodyMedium
+                                ?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.6)),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.all(16),
+                            filled: true,
+                            fillColor:
+                                theme.colorScheme.surfaceVariant,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -744,21 +609,21 @@ class _PostingScreenState extends State<PostingScreen> {
                         children: [
                           _MediaButton(
                             icon: Icons.photo_library,
-                            label: 'Gallery',
-                             color: theme.colorScheme.primary,
+                            label: AppStrings.gallery.tr(context),
+                            color: theme.colorScheme.primary,
                             iconColor: theme.colorScheme.primary,
                             onPressed: _pickImage,
                           ),
                           _MediaButton(
                             icon: Icons.video_library,
-                            label: 'Video',
+                            label: AppStrings.video.tr(context),
                             color: theme.colorScheme.primary,
                             iconColor: theme.colorScheme.primary,
                             onPressed: _pickVideos,
                           ),
                           _MediaButton(
                             icon: Icons.camera_alt,
-                            label: 'Camera',
+                            label: AppStrings.camera.tr(context),
                             color: theme.colorScheme.primary,
                             iconColor: theme.colorScheme.primary,
                             onPressed: _takePhoto,
@@ -778,27 +643,23 @@ class _PostingScreenState extends State<PostingScreen> {
                   child: ElevatedButton(
                     onPressed: _isSubmitting ? null : _submitPost,
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: _isSubmitting
                         ? CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.primary,
-                          )
+                            color: theme.colorScheme.onPrimary)
                         : Text(
                             _editingPost != null
-                                ? 'Update Post'
-                                : 'Create Post',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                                ? AppStrings.updatePost.tr(context)
+                                : AppStrings.createPost.tr(context),
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(
+                                    color:
+                                        theme.colorScheme.onPrimary,
+                                    fontWeight: FontWeight.w600),
                           ),
                   ),
                 ),
@@ -828,14 +689,14 @@ class _MediaButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = Theme.of(context)
+        .textTheme
+        .bodySmall
+        ?.copyWith(color: iconColor);
     return Column(
       children: [
-        IconButton(
-          icon: Icon(icon, size: 30),
-          color: color,
-          onPressed: onPressed,
-        ),
-        Text(label, style: TextStyle(color: iconColor)),
+        IconButton(icon: Icon(icon, size: 30), color: color, onPressed: onPressed),
+        Text(label, style: textStyle),
       ],
     );
   }

@@ -3,19 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/preference/preference_bloc.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:provider/provider.dart';
 
 class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final languageService = Provider.of<LanguageService>(context);
+
     return BlocProvider(
       create: (context) => PreferenceBloc()..add(LoadPreferences()),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-          title: const Text('Select Your Preferences'),
+          title: Text(
+            languageService.translate(AppStrings.contentPreferences),
+            style: const TextStyle(color: Colors.black),
+          ),
           centerTitle: true,
           elevation: 0,
           foregroundColor: Colors.black,
@@ -88,17 +96,28 @@ class PreferencesPage extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Select topics you\'re interested in',
-                        style: TextStyle(
-                          fontSize: 18,
+                      Text(
+                        languageService.translate(AppStrings.selectPreferences),
+                        style: const TextStyle(
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'This will help us personalize your experience',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      Text(
+                        languageService.translate(AppStrings.selectTopics),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        languageService.translate(AppStrings.personalizeExperience),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       ...categories
@@ -127,9 +146,9 @@ class PreferencesPage extends StatelessWidget {
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
-                              : const Text(
-                                  'Continue',
-                                  style: TextStyle(
+                              : Text(
+                                  languageService.translate(AppStrings.continueText),
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -153,6 +172,8 @@ class PreferencesPage extends StatelessWidget {
     BuildContext context,
     PreferenceCategory category,
   ) {
+    final languageService = Provider.of<LanguageService>(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

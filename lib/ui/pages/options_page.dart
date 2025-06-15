@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 
 class OptionsScreen extends StatelessWidget {
   const OptionsScreen({super.key});
@@ -30,9 +32,9 @@ class OptionsScreen extends StatelessWidget {
                       const SizedBox(width: 6),
                       TextButton(
                         onPressed: () {},
-                        child: const Text(
-                          'Follow',
-                          style: TextStyle(
+                        child: Text(
+                          AppStrings.follow.tr(context),
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
                         ),
@@ -42,13 +44,13 @@ class OptionsScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   const Text('Flutter is beautiful and fast 💙❤💛 ..'),
                   const SizedBox(height: 10),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.music_note,
                         size: 15,
                       ),
-                      Text('Original Audio - some music track--'),
+                      Text('${AppStrings.originalAudio.tr(context)} - ${AppStrings.musicTrack.tr(context)}'),
                     ],
                   ),
                 ],
@@ -56,15 +58,16 @@ class OptionsScreen extends StatelessWidget {
               Column(
                 children: [
                   const Icon(Icons.favorite_outline),
-                  const Text('601k'),
+                  Text(AppStrings.likes.tr(context)),
                   const SizedBox(height: 20),
                   const Icon(Icons.comment_rounded),
-                  const Text('1123'),
+                  Text(AppStrings.comments.tr(context)),
                   const SizedBox(height: 20),
                   Transform(
                     transform: Matrix4.rotationZ(5.8),
-                    child: const Icon(Icons.send),
+                    child: Icon(Icons.send),
                   ),
+                  Text(AppStrings.share.tr(context)),
                   const SizedBox(height: 50),
                   const Icon(Icons.more_vert),
                 ],

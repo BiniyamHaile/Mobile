@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/views/auth/signup_form_view.dart';
 
 class SignupPage extends StatelessWidget {
@@ -66,9 +68,9 @@ class SignupPage extends StatelessWidget {
                             duration: const Duration(milliseconds: 1600),
                             child: Container(
                               margin: const EdgeInsets.only(top: 50),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
-                                  "Register",
+                                  AppStrings.register.tr(context),
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 40,

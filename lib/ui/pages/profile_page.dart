@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/models/models.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/widgets/image.dart';
 import 'package:mobile/ui/widgets/widgets.dart';
@@ -70,6 +72,7 @@ class ProfilePage extends StatelessWidget {
                     owner.isMe ? Icons.settings : Icons.more_vert,
                     color: Colors.white,
                   ),
+                  tooltip: owner.isMe ? AppStrings.settings.tr(context) : AppStrings.more.tr(context),
                 ),
               ],
             ),
@@ -112,7 +115,7 @@ class ProfilePage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text('Followers'),
+                      Text(AppStrings.followers.tr(context)),
                     ],
                   ),
                   const SizedBox(width: 48),
@@ -125,7 +128,7 @@ class ProfilePage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text('Following'),
+                      Text(AppStrings.following.tr(context)),
                     ],
                   ),
                 ],
@@ -174,13 +177,13 @@ class ProfilePage extends StatelessWidget {
             style: textTheme.bodySmall,
             textAlign: TextAlign.center,
           ),
-          user.isMe ? const SizedBox(height: 24) : _profileButtons(),
+          user.isMe ? const SizedBox(height: 24) : _profileButtons(context),
         ],
       ),
     );
   }
 
-  Widget _profileButtons() {
+  Widget _profileButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Row(
@@ -188,16 +191,16 @@ class ProfilePage extends StatelessWidget {
         children: [
           FilledButton(
             onPressed: () {},
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text('Follow'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Text(AppStrings.follow.tr(context)),
             ),
           ),
           OutlinedButton(
             onPressed: () {},
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              child: Text('Message'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              child: Text(AppStrings.message.tr(context)),
             ),
           ),
         ],

@@ -80,6 +80,7 @@ dependencies:
   decimal: ^3.2.1
   provider: ^6.1.5
   jwt_decoder: ^2.0.1
+  easy_localization: ^3.0.5
 
 dev_dependencies:
   flutter_test:

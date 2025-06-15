@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/profile/passwordsettings_bloc.dart';
 import 'package:mobile/core/validators/auth_validator.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';
 
 class PasswordSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+     context.watch<LanguageService>();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Change Password', style: TextStyle(color: Colors.white)),
+        title: Text(AppStrings.changePassword.tr(context), style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Color.fromRGBO(143, 148, 251, 1),
         leading: IconButton(
@@ -99,7 +103,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Password updated successfully',
+                AppStrings.passwordUpdatedSuccess.tr(context),
                 style: TextStyle(color: Colors.white),
               ),
               backgroundColor: Colors.green,
@@ -122,7 +126,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Update Your Password',
+             AppStrings.changePassword.tr(context),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -135,7 +139,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               obscureText: _obscureCurrent,
               cursorColor: Color.fromRGBO(143, 148, 251, 1),
               decoration: InputDecoration(
-                labelText: 'Current Password',
+                labelText: AppStrings.currentPassword.tr(context),
                 labelStyle: TextStyle(color: Colors.grey[600]),
                 prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600]),
                 suffixIcon: IconButton(
@@ -163,7 +167,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Current password is required';
+                  return ;
                 }
                 return null;
               },
@@ -174,7 +178,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               obscureText: _obscureNew,
               cursorColor: Color.fromRGBO(143, 148, 251, 1),
               decoration: InputDecoration(
-                labelText: 'New Password',
+                labelText: AppStrings.newPassword.tr(context),
                 labelStyle: TextStyle(color: Colors.grey[600]),
                 prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600]),
                 suffixIcon: IconButton(
@@ -205,7 +209,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'New password is required';
+                  return AppStrings.newPasswordRequired.tr(context);
                 }
 
                 final validator = Validator(context);
@@ -230,7 +234,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               obscureText: _obscureConfirm,
               cursorColor: Color.fromRGBO(143, 148, 251, 1),
               decoration: InputDecoration(
-                labelText: 'Confirm New Password',
+                labelText: AppStrings.confirmPassword.tr(context),
                 labelStyle: TextStyle(color: Colors.grey[600]),
                 prefixIcon: Icon(Icons.lock_reset, color: Colors.grey[600]),
                 suffixIcon: IconButton(
@@ -258,10 +262,10 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
+                  return AppStrings.pleaseConfirmPassword.tr(context);
                 }
                 if (value != _newPasswordController.text) {
-                  return 'Passwords do not match';
+                  return AppStrings.passwordsDoNotMatch.tr(context);
                 }
                 return null;
               },
@@ -297,7 +301,7 @@ class _PasswordSettingsFormState extends State<PasswordSettingsForm> {
                     child: isLoading
                         ? CircularProgressIndicator(color: Colors.white)
                         : Text(
-                            'UPDATE PASSWORD',
+                            AppStrings.changePassword.tr(context),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

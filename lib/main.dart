@@ -25,6 +25,7 @@ import 'package:mobile/repository/social/post_repository.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
 import 'package:mobile/services/api/profile/profile_repository.dart';
 import 'package:mobile/services/api/wallet/wallet_repository_impl.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/app_routes.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
@@ -52,7 +53,12 @@ void main() async {
   );
 
   runApp(
-    MultiProvider(
+
+    ChangeNotifierProvider(
+      create: (context) => LanguageService(),
+      child: MultiProvider(
+        providers: [
+        MultiProvider(
       providers: [
         MultiBlocProvider(
           providers: [
@@ -126,8 +132,13 @@ void main() async {
           child: App(),
         ),
       ],
+
     ),
-  );
+        ],
+      ),
+
+
+  ));
 }
 
 Future<void> _initNotifications() async {

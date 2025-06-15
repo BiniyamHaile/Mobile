@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/models/token.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/widgets/wallet/buy_stars_widget.dart';
 import 'package:mobile/ui/widgets/wallet/star_reaction_modal.dart';
@@ -95,7 +97,7 @@ class _WalletScreenState extends State<WalletScreen> {
         walletService.connectedNetwork?.chainId !=
             walletService.sepoliaChainId) {
       walletService.appKitModal.onModalError.broadcast(
-        ModalError('Please connect to Sepolia network to buy stars.'),
+        ModalError(AppStrings.connectSepoliaNetwork.tr(context)),
       );
       return;
     }
@@ -127,7 +129,7 @@ class _WalletScreenState extends State<WalletScreen> {
         walletService.connectedNetwork?.chainId !=
             walletService.sepoliaChainId) {
       walletService.appKitModal.onModalError.broadcast(
-        ModalError('Please connect to Sepolia network to gift stars.'),
+        ModalError(AppStrings.connectSepoliaNetworkGift.tr(context)),
       );
       return;
     }
@@ -135,18 +137,18 @@ class _WalletScreenState extends State<WalletScreen> {
     final recipientAddressString = _giftRecipientAddressController.text.trim();
     if (recipientAddressString.isEmpty) {
       walletService.appKitModal.onModalError.broadcast(
-        ModalError('Default recipient address not set.'),
+        ModalError(AppStrings.defaultRecipientNotSet.tr(context)),
       );
       return;
     }
     try {
       if (!recipientAddressString.startsWith('0x') ||
           recipientAddressString.length != 42) {
-        throw const FormatException("Invalid address format");
+        throw const FormatException(AppStrings.invalidAddress);
       }
     } catch (e) {
       walletService.appKitModal.onModalError.broadcast(
-        ModalError('Invalid default recipient address format.'),
+        ModalError(AppStrings.invalidRecipientFormat.tr(context)),
       );
       print('Recipient address parsing error before modal: $e');
       return;
@@ -496,15 +498,12 @@ class _WalletScreenState extends State<WalletScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 30),
                 children: [
                   ClipPath(
-                    // <-- Wrap with ClipPath
                     clipper: ConcaveBottomClipper(
                       curveHeight: 20.0,
-                    ), // <-- Use your custom clipper here, adjust curveHeight
+                    ),
                     child: SizedBox(
-                      // Use SizedBox to give the header a defined height
-                      height: 80, // Adjust height as needed
+                      height: 80,
                       child: Container(
-                        // NO borderRadius needed here, the shape is defined by the clipper
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primary, 
                           border: Border(
@@ -530,38 +529,31 @@ class _WalletScreenState extends State<WalletScreen> {
                           // Set the background color to green
                           // Remove the borderRadius property
                         ),
-                        // Center the content within the container
                         alignment: Alignment.center,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
-                          ), // Add some horizontal padding for the text
+                          ),
                           child: Text(
-                            'Wallet Settings',
+                            AppStrings.walletSettings.tr(context),
                             style: TextStyle(
                               color: theme.colorScheme.onPrimary, // Make text white for visibility on green
                               fontSize: 20, // Adjust font size
                               fontWeight: FontWeight.bold, // Make text bold
                             ),
-                            textAlign:
-                                TextAlign.center, // Center the text itself
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
                     ),
                   ),
-
-                  // Add some vertical spacing after the header before the list items start
-                  SizedBox(height: 16.0), // Adjust spacing as needed
-
+                  SizedBox(height: 16.0),
                   ListTile(
                     leading: Icon(Icons.shopping_cart),
-                    title: Text('Buy Stars'),
+                    title: Text(AppStrings.buyStars.tr(context)),
                     onTap: enableBuyButton
                         ? () {
-                            Navigator.pop(
-                              context,
-                            ); // Close drawer before showing modal
+                            Navigator.pop(context);
                             _showBuyStarsModal();
                           }
                         : null,
@@ -569,7 +561,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   ListTile(
                     leading: Icon(Icons.token),
-                    title: Text('Add STARS Token to Wallet'),
+                    title: Text(AppStrings.addStarsToken.tr(context)),
                     onTap: enableTxActions
                         ? walletService.addStarsTokenToWallet
                         : null,
@@ -582,7 +574,6 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                     child: Material(
                       elevation: isConnected ? 4.0 : 0.0,
-
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -592,21 +583,24 @@ class _WalletScreenState extends State<WalletScreen> {
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
                         ),
-                        leading: Icon(
-                          Icons.logout,
 
-                          color: isConnected ? theme.colorScheme.onPrimary : Colors.grey[500],
-                        ),
                         title: Text(
-                          'Disconnect',
+                          AppStrings.disconnect.tr(context),
+
                           style: TextStyle(
-                            color: isConnected
+                             color: isConnected
                                 ? theme.colorScheme.onPrimary
                                 : Colors.grey[500],
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
+                          ),
+                        leading: Icon(
+                          Icons.logout,
 
+                          color: isConnected ? Colors.white : Colors.grey[500],
+
+
+                        ),
                         onTap: isConnected
                             ? () {
                                 walletService.disconnect();
@@ -627,22 +621,17 @@ class _WalletScreenState extends State<WalletScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Welcome to the Secure Wallet',
+                    AppStrings.welcomeWallet.tr(context),
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   Text(
-                    'Connect your wallet to get started.',
+                    AppStrings.connectWalletMessage.tr(context),
                     style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 30),
-                  // AppKitModalConnectButton handles the connection logic
-                  // AppKitModalConnectButton(
-                  //   appKit: walletService.appKitModal,
-                  //   context: context,
-                  // ),
                   ElevatedButton(
                     onPressed: () => _connectWallet(context),
                     style: ElevatedButton.styleFrom(
@@ -668,7 +657,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Connect Wallet',
+                          AppStrings.connectWallet.tr(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -682,22 +671,21 @@ class _WalletScreenState extends State<WalletScreen> {
                   SizedBox(height: 20),
                   if (walletService.status == ReownAppKitModalStatus.error)
                     Text(
-                      'Connection failed.',
+                      AppStrings.connectionFailed.tr(context),
                       style: TextStyle(
                         fontStyle: FontStyle.italic,
                         color: Colors.red,
                       ),
                     ),
                   SizedBox(height: 20),
-                  if (walletService.status ==
-                      ReownAppKitModalStatus.initializing)
+                  if (walletService.status == ReownAppKitModalStatus.initializing)
                     Text(
-                      'Initializing wallet service...',
+                      AppStrings.initializingWallet.tr(context),
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
                   if (walletService.status == ReownAppKitModalStatus.error)
                     Text(
-                      'Initialization failed.',
+                      AppStrings.initializationFailed.tr(context),
                       style: TextStyle(
                         fontStyle: FontStyle.italic,
                         color: Colors.red,
@@ -716,7 +704,6 @@ class _WalletScreenState extends State<WalletScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 8),
-
                   Card(
                     margin: EdgeInsets.zero,
                     elevation: 1.0,
@@ -756,7 +743,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                         ),
                                         SizedBox(width: 8),
                                         Text(
-                                          '$formattedStarsBalance ${walletService.starsTokenSymbol}', // Use service symbol
+                                          '$formattedStarsBalance ${walletService.starsTokenSymbol}',
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Colors.white,
@@ -769,14 +756,14 @@ class _WalletScreenState extends State<WalletScreen> {
                                       children: [
                                         Icon(
                                           Icons.account_balance_wallet_outlined,
-                                          color: Colors.green,
-                                          size: 20,
+                                          color: Colors.white,
+                                          size: 16,
                                         ),
                                         SizedBox(width: 8),
                                         Text(
-                                          '${formattedNativeBalance} ${walletService.connectedNetwork?.currency ?? "Native"}', // Use service state for currency symbol
+                                          '$formattedNativeBalance ${walletService.connectedNetwork?.currency ?? "Native"}',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             color: Colors.white,
                                           ),
                                         ),

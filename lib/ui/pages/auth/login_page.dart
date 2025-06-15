@@ -4,10 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/login/login_bloc.dart';
 import 'package:mobile/core/validators/auth_validator.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -66,6 +70,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final lang = context.watch<LanguageService>();
+
     final theme = AppTheme.getTheme(context);
 
     return BlocConsumer<LoginBloc, LoginState>(
@@ -208,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Column(
                             children: [
                               Text(
-                                'Welcome back! Please login to continue',
+                                AppStrings.welcomeLogin.tr(context),
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(color: Colors.grey[600]),
                               ),
@@ -218,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                                 cursorColor: Colors.deepPurple,
                                 style:  TextStyle(color: theme.colorScheme.primary),
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
                                     color: theme.colorScheme.primary,
                                   ),
@@ -254,7 +261,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
 
                                 decoration: InputDecoration(
-                                  labelText: 'Password',
+                                  labelText: AppStrings.password.tr(context),
                                   labelStyle: TextStyle(
                                     color: theme.colorScheme.primary,
                                   ),
@@ -282,19 +289,19 @@ class _LoginPageState extends State<LoginPage> {
                                     _updatePasswordStrength(value),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
-                                    return 'Password is required';
+                                    return AppStrings.passwordRequired.tr(context);
                                   }
                                   if (val.length < 8) {
-                                    return 'Password must be at least 8 characters';
+                                    return AppStrings.passwordMinLength.tr(context);
                                   }
                                   if (!RegExp(r'[A-Z]').hasMatch(val)) {
-                                    return 'Password must contain an uppercase letter';
+                                    return AppStrings.passwordUppercase.tr(context);
                                   }
                                   if (!RegExp(r'[0-9]').hasMatch(val)) {
-                                    return 'Password must contain a number';
+                                    return AppStrings.passwordNumber.tr(context);
                                   }
                                   if (!RegExp(r'[(@$!%*?&)]').hasMatch(val)) {
-                                    return 'Password must contain a special character';
+                                    return AppStrings.passwordSpecialChar.tr(context);
                                   }
                                   return null;
                                 },
@@ -313,8 +320,8 @@ class _LoginPageState extends State<LoginPage> {
                                       : () {
                                           context.go('/forgot-password');
                                         },
-                                  child: const Text(
-                                    'Forgot Password?',
+                                  child: Text(
+                                    AppStrings.forgotPassword.tr(context),
                                     style: TextStyle(
                                       color: Color.fromRGBO(143, 148, 251, 1),
                                     ),
@@ -343,8 +350,8 @@ class _LoginPageState extends State<LoginPage> {
                                       ? const CircularProgressIndicator(
                                           color: Colors.white,
                                         )
-                                      : const Text(
-                                          'Login',
+                                      :  Text(
+                                          AppStrings.login.tr(context),
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -357,7 +364,7 @@ class _LoginPageState extends State<LoginPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Don't have an account? ",
+                                    AppStrings.dontHaveAccount.tr(context),
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
                                   TextButton(
@@ -366,8 +373,8 @@ class _LoginPageState extends State<LoginPage> {
                                         : () {
                                             context.go('/register');
                                           },
-                                    child: const Text(
-                                      'Register',
+                                    child: Text(
+                                      AppStrings.register.tr(context),
                                       style: TextStyle(
                                         color: Color.fromRGBO(143, 148, 251, 1),
                                         fontWeight: FontWeight.bold,

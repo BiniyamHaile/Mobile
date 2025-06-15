@@ -85,6 +85,7 @@ class AppRoutes {
       print('Allowing navigation to: ${state.uri.path}');
       return null;
     },
+    
     routes: [
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

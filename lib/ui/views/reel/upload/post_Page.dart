@@ -5,13 +5,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_event.dart';
+import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_bloc.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_event.dart';
-import 'package:mobile/bloc/reel/reel_state.dart';
+import 'package:mobile/bloc/reel/reel_post_details/post_details_state.dart';
 import 'package:mobile/models/reel/mentioned_user.dart';
-import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
+import 'package:mobile/models/reel/privacy_option.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:provider/provider.dart';
+
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 
@@ -202,9 +209,9 @@ class _PostScreenState extends State<PostScreen> {
   @override
   Widget build(BuildContext context) {
     final postDetailsState = context.watch<PostDetailsBloc>().state;
-
     final postReelState = context.watch<ReelFeedAndActionBloc>().state;
     final bool isLoading = postReelState == ReelActionStatus.loading;
+    final languageService = context.read<LanguageService>();
 
     bool showSuggestions = postDetailsState.activeSuggestionType != '';
     bool showDefaultOptions = !showSuggestions;
@@ -224,7 +231,9 @@ class _PostScreenState extends State<PostScreen> {
             Navigator.pop(context);
           },
         ),
-        title:  Text('Create Post',style: TextStyle(color: theme.colorScheme.primary),),
+
+        title:  Text(AppStrings.createPost.tr(context),style: TextStyle(color: theme.colorScheme.primary),),
+
       ),
       body: BlocListener<ReelFeedAndActionBloc, ReelFeedAndActionState>(
         listenWhen: (previousState, currentState) {
@@ -233,11 +242,11 @@ class _PostScreenState extends State<PostScreen> {
         listener: (context, state) {
           if (state.actionStatus == ReelActionStatus.postSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-               SnackBar(
+              SnackBar(
                 backgroundColor: Colors.green,
                 content: Text(
-                  'Reel posted successfully!',
-                  style: TextStyle(color: theme.colorScheme.primary),
+                  languageService.translate(AppStrings.reelPostedSuccess),
+                style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -252,8 +261,8 @@ class _PostScreenState extends State<PostScreen> {
               SnackBar(
                 backgroundColor: Colors.red,
                 content: Text(
-                  'Failed to post reel: ${state.lastActionError}',
-                  style: TextStyle(color: theme.colorScheme.primary),
+       AppStrings.failedToPostReel.tr(context) + state.lastActionError,
+           style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ),
             );
@@ -286,7 +295,7 @@ class _PostScreenState extends State<PostScreen> {
                           decoration:  InputDecoration(
                             filled: true,
                             fillColor: theme.colorScheme.onPrimary,
-                            hintText: 'Add description...',
+                             hintText: languageService.translate(AppStrings.addDescription),
                             hintStyle: TextStyle(
                               color: theme.colorScheme.primary.withOpacity(0.6),
                             ),
@@ -417,10 +426,6 @@ class _PostScreenState extends State<PostScreen> {
                               final List<MentionedUser> mentionedUsersToPost =
                                   currentDetailsState.mentionedUsers;
 
-                              print(
-                                "Post Button Tapped - Current Details State: ${currentDetailsState}",
-                              );
-
                               context.read<ReelFeedAndActionBloc>().add(
                                 PostReel(
                                   videoPath: widget.videoPath,
@@ -453,8 +458,8 @@ class _PostScreenState extends State<PostScreen> {
                             )
                           :  Icon(Icons.send, color: theme.colorScheme.primary,),
                       label: buttonIsLoading
-                          ?  Text('Posting...', style: TextStyle(color: theme.colorScheme.primary),)
-                          :  Text('Post',style: TextStyle(color: theme.colorScheme.primary)),
+                          ?  Text(AppStrings.posting.tr(context), style: TextStyle(color: theme.colorScheme.primary),)
+                          :  Text(AppStrings.post.tr(context),style: TextStyle(color: theme.colorScheme.primary)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.onPrimary,
                         foregroundColor: theme.colorScheme.primary,

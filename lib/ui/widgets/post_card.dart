@@ -11,6 +11,8 @@ import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/widgets/image_gallery.dart';
@@ -62,7 +64,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
               Icon(LucideIcons.wallet, color: Color.fromRGBO(143, 148, 251, 1)),
               SizedBox(width: 12),
               Text(
-                'Connect Wallet',
+                AppStrings.connectWallet.tr(context),
                 style: TextStyle(
                   color: Color.fromRGBO(143, 148, 251, 1),
                   fontWeight: FontWeight.bold,
@@ -71,13 +73,13 @@ void _showStarReactionModal(BuildContext context, Post post) {
             ],
           ),
           content: Text(
-            'Please connect your wallet to send star reactions.',
+            AppStrings.pleaseConnectWalletToSendStarReactions.tr(context),
             style: TextStyle(fontSize: 16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
+              child: Text(AppStrings.cancel.tr(context), style: TextStyle(color: Colors.grey[600])),
             ),
             ElevatedButton(
               onPressed: () {
@@ -92,7 +94,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               child: Text(
-                'Connect Wallet',
+                AppStrings.connectWallet.tr(context),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -110,7 +112,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
       walletService.connectedAddress == null ||
       walletService.connectedNetwork?.chainId != walletService.sepoliaChainId) {
     walletService.appKitModal.onModalError.broadcast(
-      ModalError('Please connect to Sepolia network to gift stars.'),
+      ModalError(AppStrings.pleaseConnectToSepoliaNetworkToGiftStars.tr(context)),
     );
     return;
   }
@@ -122,7 +124,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
   if (recipientAddressString.isEmpty) {
     walletService.appKitModal.onModalError.broadcast(
       ModalError(
-        'Recipient wallet address not available for this post author.',
+        AppStrings.recipientWalletAddressNotAvailableForThisPostAuthor.tr(context),
       ),
     );
     return;
@@ -135,7 +137,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
     }
   } catch (e) {
     walletService.appKitModal.onModalError.broadcast(
-      ModalError('Invalid recipient address format for this post author.'),
+      ModalError(AppStrings.invalidRecipientAddressFormatForThisPostAuthor.tr(context)),
     );
     print('Recipient address parsing error before modal: $e');
     return;
@@ -147,7 +149,7 @@ void _showStarReactionModal(BuildContext context, Post post) {
     backgroundColor: Colors.transparent,
     builder: (BuildContext context) {
       return StarReactionModal(
-        recipientName: recipientName.isNotEmpty ? recipientName : "Post Author",
+        recipientName: recipientName.isNotEmpty ? recipientName : AppStrings.postAuthor.tr(context),
         recipientAddress: recipientAddressString,
       );
     },
@@ -936,7 +938,7 @@ class _PostActions extends StatelessWidget {
           Expanded(
             child: PostButton(
               icon: Icon(LucideIcons.star),
-              text: 'Gift',
+              text: AppStrings.gift.tr(context),
               onTap: () {
                 _showStarReactionModal(context, post);
               },
@@ -991,10 +993,10 @@ class _LikeButtonState extends State<_LikeButton> {
           onTap: () {
             if (currentUserId == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   backgroundColor: Colors.red,
                   content: Text(
-                    'Please login to like posts',
+                    AppStrings.pleaseLoginToLikePosts.tr(context),
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -1054,7 +1056,7 @@ class _ShareButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PostButton(
       icon: const Icon(Icons.share_outlined),
-      text: 'Share',
+      text: AppStrings.share.tr(context),
       onTap: () => _sharePost(context),
     );
   }
@@ -1066,10 +1068,10 @@ class _ShareButton extends StatelessWidget {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.red,
           content: Text(
-            'Failed to share post',
+            AppStrings.failedToSharePost.tr(context),
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -1102,8 +1104,8 @@ void _showPostOptions(
           children: [
             ListTile(
               leading: const Icon(Icons.report, color: Colors.red),
-              title: const Text(
-                'Report Post',
+              title: Text(
+                AppStrings.reportPostTitle.tr(context),
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () => context.push(RouteNames.reportPost, extra: post.id),
@@ -1111,7 +1113,7 @@ void _showPostOptions(
             if (isOwner) ...[
               ListTile(
                 leading: const Icon(Icons.edit),
-                title: const Text('Edit Post'),
+                title: Text(AppStrings.editPost.tr(context)),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -1124,14 +1126,14 @@ void _showPostOptions(
               ),
               ListTile(
                 leading: const Icon(Icons.delete),
-                title: const Text('Delete Post'),
+                title: Text(AppStrings.deletePost.tr(context)),
                 onTap: () {
                   context.read<PostBloc>().add(DeletePost(post.id));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'Post deleted',
+                        AppStrings.postDeletedSuccess.tr(context),
                         style: TextStyle(color: Colors.white),
                       ),
                       backgroundColor: Colors.green,
@@ -1145,14 +1147,14 @@ void _showPostOptions(
             ],
             ListTile(
               leading: const Icon(Icons.repeat),
-              title: const Text('Repost Post'),
+              title: Text(AppStrings.repostPost.tr(context)),
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     backgroundColor: Colors.green,
                     content: Text(
-                      'Post reposted',
+                      AppStrings.postReposted.tr(context),
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

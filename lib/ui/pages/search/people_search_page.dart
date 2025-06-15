@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/search/search_bloc.dart';
-
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 
 class PeopleSearchPage extends StatelessWidget {
   @override
@@ -14,7 +15,7 @@ class PeopleSearchPage extends StatelessWidget {
         if (state is SearchLoaded) {
           final people = state.results; // Should be a List<Person>
           if (people.isEmpty) {
-            return Center(child: Text('No people found.'));
+            return Center(child: Text(AppStrings.noResultsFound.tr(context)));
           }
           return ListView.separated(
             padding: EdgeInsets.symmetric(vertical: 8),
@@ -29,7 +30,7 @@ class PeopleSearchPage extends StatelessWidget {
         if (state is SearchError) {
           return Center(child: Text(state.error));
         }
-        return Center(child: Text('Search for people'));
+        return Center(child: Text(AppStrings.searchPeople.tr(context)));
       },
     );
   }
@@ -71,23 +72,23 @@ class _PeopleActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (person['isFollowing'] == true) {
-  return OutlinedButton(
-    onPressed: () {},
-    child: Text('Following'),
-    style: OutlinedButton.styleFrom(
-      foregroundColor: Color.fromRGBO(143, 148, 251, 1),
-      side: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
-    ),
-  );
-}
-return ElevatedButton(
-  onPressed: () {},
-  child: Text('Follow'),
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.blue[50],
-    foregroundColor: Colors.blue[800],
-    elevation: 0,
-  ),
-);
+      return OutlinedButton(
+        onPressed: () {},
+        child: Text(AppStrings.following.tr(context)),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Color.fromRGBO(143, 148, 251, 1),
+          side: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+        ),
+      );
+    }
+    return ElevatedButton(
+      onPressed: () {},
+      child: Text(AppStrings.follow.tr(context)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue[50],
+        foregroundColor: Colors.blue[800],
+        elevation: 0,
+      ),
+    );
   }
 }

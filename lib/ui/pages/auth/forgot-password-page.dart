@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 
@@ -27,6 +30,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+        context.watch<LanguageService>();
     return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
       listener: (context, state) {
         if (state is ForgotPasswordFailure) {
@@ -127,9 +131,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           duration: const Duration(milliseconds: 1600),
                           child: Container(
                             margin: const EdgeInsets.only(top: 50),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                "Forgot Password",
+                                AppStrings.forgotPassword.tr(context),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 40,
@@ -171,7 +175,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           child: Column(
                             children: [
                               Text(
-                                'Enter your email to receive a password reset code',
+                                AppStrings.enterEmailForReset.tr(context),
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(color: Colors.grey[600]),
                               ),
@@ -181,7 +185,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 cursorColor: Colors.deepPurple,
                                 style: TextStyle(color: theme.colorScheme.primary),
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
                                     color: Colors.grey[600],
                                   ),
@@ -193,7 +197,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   fillColor:theme.colorScheme.onPrimary ,
                                 ),
                                 validator: (val) => val == null || val.isEmpty
-                                    ? 'Email is required'
+                                    ? AppStrings.emailRequired.tr(context)
                                     : null,
                                 keyboardType: TextInputType.emailAddress,
                               ),
@@ -221,8 +225,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       ? const CircularProgressIndicator(
                                           color: Colors.white,
                                         )
-                                      : const Text(
-                                          'Send Reset Code',
+                                      : Text(
+                                          AppStrings.sendResetCode.tr(context),
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -237,8 +241,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     : () {
                                         context.go('/login');
                                       },
-                                child: const Text(
-                                  'Back to Login',
+                                child:  Text(
+                                  AppStrings.backToLogin.tr(context),
                                   style: TextStyle(
                                     color: Color.fromRGBO(143, 148, 251, 1),
                                     fontWeight: FontWeight.bold,
