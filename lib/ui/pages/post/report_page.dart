@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/social/postReport/post_report_bloc.dart';
 import 'package:mobile/bloc/social/postReport/post_report_event.dart';
 import 'package:mobile/bloc/social/postReport/post_report_state.dart';
-import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/models/report_post.dart';

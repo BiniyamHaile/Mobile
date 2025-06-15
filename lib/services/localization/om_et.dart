@@ -1,6 +1,6 @@
 // lib/lang/om_et.dart
 
-import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/app_string.dart';
 
 const Map<String, String> omET = {
   // ... (previous keys)
@@ -23,7 +23,6 @@ const Map<String, String> omET = {
   AppStrings.passwordUppercase: 'Jecha darbi keessatti qubee ol aanaa qabaachuu qaba',
   AppStrings.passwordNumber: 'Jecha darbi keessatti lakkoofsa qabaachuu qaba',
   AppStrings.passwordSpecialChar: 'Jecha darbi keessatti mallattoo addaa qabaachuu qaba',
-  AppStrings.passwordMatch: 'Jecha darbi fi Jecha darbi mirkaneessi wal simachuu qabu',
   AppStrings.loginSuccess: 'Seensa milkaa\'aa',
   AppStrings.completeDetails: 'Maaloo odeeffannoo keessan guutuu gochuu',
   AppStrings.selectGender: 'Maaloo saala keessan filadhaa.',
@@ -93,6 +92,170 @@ const Map<String, String> omET = {
   AppStrings.newPassword: 'Jecha Darbi Haaraa',
   AppStrings.newPasswordRequired: 'Jecha Darbi Haaraa barbaachisaa dha',
   AppStrings.pleaseConfirmPassword: 'Maaloo jecha darbi haaraa mirkaneessi',
-  AppStrings.passwordsDoNotMatch: 'Jecha darbi fi jecha darbi mirkaneessi wal simachuu qabu',
+  AppStrings.passwordsDoNotMatch: 'Jecha darbiiwwan wal hin qabatan',
 
+  // Navigation
+  AppStrings.home: 'Mana',
+  AppStrings.reels: 'Riilota',
+  AppStrings.notifications: 'Beekumsa',
+  AppStrings.profile: 'Seenaa',
+  AppStrings.wallet: 'Boorsa',
+
+  // Notifications
+  AppStrings.notificationChannelName: 'Beekumsa Aladia',
+  AppStrings.notificationChannelDescription: 'Odeeffannoo haaraa, oduu fi beekumsa Aladia irraa argachuuf itti fufaa.',
+  AppStrings.notificationTitle: 'maqaa',
+  AppStrings.notificationBody: 'qabiyyee',
+
+  // Chat
+  AppStrings.photo: 'Suuraa',
+  AppStrings.file: 'Fayilii',
+  AppStrings.cancel: 'Dhiisi',
+  AppStrings.openLink: 'Linkii Bana\'aa?',
+  AppStrings.openLinkQuestion: 'Linkii kana browser keessan keessatti banachuu barbaadduu?',
+  AppStrings.openLinkDescription: 'Linkii kana browser keessan keessatti banachuu barbaadduu?\n',
+  AppStrings.yes: 'Eeyyee',
+  AppStrings.no: 'Lakki',
+  AppStrings.couldNotLaunchUrl: 'URL banachuu hin dandeenye: ',
+  AppStrings.typing: 'barreessaa jira...',
+
+  // Profile
+  AppStrings.followers: 'Hordofaa',
+  AppStrings.following: 'Hordofaa jiru',
+  AppStrings.follow: 'Hordofaa',
+  AppStrings.message: 'Ergaa',
+  AppStrings.settings: 'Qindaawwan',
+  AppStrings.more: 'Dabalata',
+
+  // Options Page
+  AppStrings.originalAudio: 'Dubbii Jalqabaa',
+  AppStrings.musicTrack: 'track muuziqaa',
+  AppStrings.likes: 'jaalala',
+  AppStrings.comments: 'yaada',
+  AppStrings.share: 'qooda',
+
+  // Wallet Screen
+  AppStrings.walletSettings: 'Qindaawwan Boorsaa',
+  AppStrings.buyStars: 'Urjii Bitadhaa',
+  AppStrings.addStarsToken: 'STARS Token Boorsa Keessatti Galchaa',
+  AppStrings.disconnect: 'Walitti Hidhami',
+  AppStrings.welcomeWallet: 'Boorsa Nagaa Qabeessa Keessatti Baga Nagaan Dhuftan',
+  AppStrings.connectWalletMessage: 'Jalqabuuuf boorsa keessan walitti hidhaa.',
+  AppStrings.connectWallet: 'Boorsa Walitti Hidhaa',
+  AppStrings.connectionFailed: 'Walitti hidhamni hin milkaane.',
+  AppStrings.initializingWallet: 'Tajaajila boorsaa jijjiiruu jira...',
+  AppStrings.initializationFailed: 'Jijjiiruu hin milkaane.',
+  AppStrings.token: 'Token',
+  AppStrings.to: 'Gara',
+  AppStrings.from: 'Irratti',
+  AppStrings.viewOnEtherscan: 'Etherscan irratti ilaalaa',
+  AppStrings.invalidAddress: 'Qubeewwan addressii dogoggora',
+  AppStrings.defaultRecipientNotSet: 'Addressii fudhataa defaultii hin qabne.',
+  AppStrings.invalidRecipientFormat: 'Qubeewwan addressii fudhataa defaultii dogoggora.',
+  AppStrings.connectSepoliaNetwork: 'Urjii bitachuuf maaloo Sepolia network walitti hidhaa.',
+  AppStrings.connectSepoliaNetworkGift: 'Urjii kennuuf maaloo Sepolia network walitti hidhaa.',
+  AppStrings.couldNotOpenTransaction: 'Linkii transactionii banachuu hin dandeenye.',
+
+  // OTP Screen
+  AppStrings.otpVerification: 'OTP Mirkaneessa',
+  AppStrings.enterOtpSent: 'OTP email keessan irratti ergame galchaa',
+  AppStrings.verifyOtp: 'OTP Mirkaneessa',
+  AppStrings.resendOtp: 'OTP Haaraa Ergaa',
+  AppStrings.otpSent: 'OTP milkaa\'e',
+  AppStrings.otpVerificationSuccess: 'OTP mirkaneessa milkaa\'e',
+  AppStrings.otpVerificationFailed: 'OTP mirkaneessa hin milkaane',
+  AppStrings.invalidOtp: 'OTP sirrii miti',
+  AppStrings.verifying: 'Mirkaneessa jira...',
+  AppStrings.didntReceiveCode: 'Koodii hin argitanii?',
+
+  // Signup Validation
+  AppStrings.termsAndPrivacyRequired: 'Mee haala fi dhaabbilee dhuunfaa fudhaa',
+  AppStrings.nameRequired: 'Maqaa jalqabaa barbaachisa',
+  AppStrings.surnameRequired: 'Maqaa abbaa barbaachisa',
+  AppStrings.emailInvalid: 'Mee email sirrii galchaa',
+  AppStrings.passwordTooShort: 'Jecha darbii yeroo dheeraa 8 qubeewwan qabaachuu qaba',
+  AppStrings.passwordNoUppercase: 'Jecha darbii yeroo dheeraa tokko qabaachuu qaba',
+  AppStrings.passwordNoNumber: 'Jecha darbii lakki tokko qabaachuu qaba',
+  AppStrings.passwordNoSpecialChar: 'Jecha darbii qubeewwan addaa tokko qabaachuu qaba',
+  AppStrings.signupSuccess: 'Galmaa\'iinsa milkaa\'e',
+  AppStrings.signupFailed: 'Galmaa\'iinsa hin milkaane',
+  AppStrings.emailAlreadyExists: 'Email jira',
+
+  // Post Screen
+  AppStrings.addDescription: 'Ibsa Galchaa...',
+  AppStrings.posting: 'Galmaa\'aa jira...',
+  AppStrings.post: 'Galmaa\'i',
+  AppStrings.reelPostedSuccess: 'Riilota milkaa\'inaan galmaa\'e!',
+  AppStrings.failedToPostReel: 'Riilota galmaa\'uu hin dandeenye: ',
+  AppStrings.errorSelectingPhotos: 'Suuraa filachuu keessatti dogoggora',
+  AppStrings.errorSelectingVideos: 'Viidiyoo filachuu keessatti dogoggora',
+  AppStrings.errorTakingPhoto: 'Suuraa fudhachuu keessatti dogoggora',
+  AppStrings.addContentToPost: 'Maaloo galmaa\'aaf qabiyyee galchaa',
+  AppStrings.postingServiceUnavailable: 'Tajaajila galmaa\'aa hin argamne',
+  AppStrings.postCreationFailed: 'Galmaa\'i uumuu hin dandeenye: ',
+  AppStrings.sharePost: 'Qooda',
+  AppStrings.failedToSharePost: 'Postii qooduun hin milkaane',
+  AppStrings.checkOutPost: 'Postii kana ilaalaa: ',
+
+  // Profile Settings
+  AppStrings.settingsAndPrivacy: 'Qindaa\'inaafi Dhuunfaa',
+  AppStrings.account: 'Herrega',
+  AppStrings.changeProfilePicture: 'Suuraa Profaayilii Jijjiiruu',
+  AppStrings.contentPreferences: 'Filannoo Qubeewwan',
+  AppStrings.supportAndAbout: 'Deeggarsaafi Waa\'ee',
+  AppStrings.termsAndPolicies: 'Haalaafi Imaammata',
+  AppStrings.logOut: 'Ba\'i',
+  AppStrings.logOutConfirmation: 'Ba\'uu barbaadda?',
+  AppStrings.loggedOutSuccess: 'Milkaa\'e ba\'e',
+  AppStrings.chooseProfilePic: 'Suuraa Profaayilii Filadhu',
+  AppStrings.update: 'Jijjiiruu',
+  AppStrings.profilePicUpdated: 'Suuraa Profaayilii Jijjiirrame!',
+
+  // Content Preferences
+  AppStrings.selectPreferences: 'Filannoo Keessan Filadhaa',
+  AppStrings.selectTopics: 'Mata Dureewwan Barbaaddan Filadhaa',
+  AppStrings.personalizeExperience: 'Kun yaada keessan guutuuf nu gargaaru',
+  AppStrings.continueText: 'Itti Fufe',
+  AppStrings.profileUpdatedSuccess: 'Profaayilii Milkaa\'e Jijjiirrame!',
+  AppStrings.failedToLoadPreferences: 'Filannoo Guutuu Hin Milkaane',
+  AppStrings.retry: 'Irra Deebi\'aa',
+
+  // User Profile
+  AppStrings.gift: 'Kennaa',
+
+  // Search Page
+  AppStrings.search: 'Barbaadi',
+  AppStrings.all: 'Hunda',
+  AppStrings.people: 'Namoota',
+  AppStrings.posts: 'Postoota',
+  AppStrings.videos: 'Viidiyoota',
+  AppStrings.searchHint: 'Barbaadi...',
+  AppStrings.noResultsFound: 'Himannaa hin argamne',
+  AppStrings.searchPeople: 'Namoota Barbaadi',
+  AppStrings.searchPosts: 'Postoota Barbaadi',
+  AppStrings.searchVideos: 'Viidiyoota Barbaadi',
+
+  // Share and Gift
+  AppStrings.shareTo: 'Qooda',
+  AppStrings.copyLink: 'Linkii Galchaa',
+  AppStrings.linkCopied: 'Linkii clipboard irratti galchame',
+  AppStrings.giftStars: 'Urjii Kennaa',
+  AppStrings.enterAmount: 'Baay\'ii Galchaa',
+  AppStrings.sendGift: 'Kennaa Ergaa',
+  AppStrings.giftSent: 'Kennaa milkaa\'e',
+  AppStrings.giftFailed: 'Kennaa erguu hin dandeenye',
+  AppStrings.pleaseConnectWalletToSendStarReactions: 'Mee urjii erguuf boorsa keessan walitti hidhaa.',
+  AppStrings.pleaseConnectToSepoliaNetworkToGiftStars: 'Urjii kennuuf Sepolia network walitti hidhaa.',
+  AppStrings.recipientWalletAddressNotAvailableForThisPostAuthor: 'Teessoon boorsaa fudhattootaa barreessaa postii kanaaf hin jiru.',
+  AppStrings.invalidRecipientAddressFormatForThisPostAuthor: 'Teessoon boorsaa fudhattootaa barreessaa postii kanaaf dogoggora.',
+  AppStrings.postAuthor: 'Barreessaa Postii',
+  AppStrings.pleaseLoginToLikePosts: 'Postoota jaalattuuf seenaa',
+  AppStrings.deletePost: 'Postii Haqi',
+  AppStrings.repostPost: 'Postii Irra Deebi''i',
+  AppStrings.postReposted: 'Postiin irra deebi''ame',
+  AppStrings.language: 'Afaan',
+  AppStrings.amharic: 'Amariffaa',
+  AppStrings.afaanOromo: 'Afaan Oromoo',
+  AppStrings.english: 'Ingiliiffaa',
+  AppStrings.selectLanguage: 'Afaan Filadhu',
 };

@@ -5,13 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/reel/reel_bloc.dart';
 import 'package:mobile/bloc/reel/reel_event.dart';
+import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_bloc.dart';
 import 'package:mobile/bloc/reel/reel_post_details/post_details_event.dart';
-import 'package:mobile/bloc/reel/reel_state.dart';
-import 'package:mobile/models/reel/mentioned_user.dart';
-import 'package:mobile/models/reel/privacy_option.dart';
+import 'package:mobile/bloc/reel/reel_post_details/post_details_state.dart';
 import 'package:mobile/models/reel/user_suggestion.dart';
+import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
+import 'package:provider/provider.dart';
 
 import 'widgets/more_options_sheet_content.dart';
 import 'widgets/post_options_section.dart';
@@ -200,9 +203,9 @@ class _PostScreenState extends State<PostScreen> {
   @override
   Widget build(BuildContext context) {
     final postDetailsState = context.watch<PostDetailsBloc>().state;
-
     final postReelState = context.watch<ReelFeedAndActionBloc>().state;
     final bool isLoading = postReelState == ReelActionStatus.loading;
+    final languageService = context.read<LanguageService>();
 
     bool showSuggestions = postDetailsState.activeSuggestionType != '';
     bool showDefaultOptions = !showSuggestions;
@@ -219,7 +222,7 @@ class _PostScreenState extends State<PostScreen> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Create Post'),
+        title: Text(languageService.translate(AppStrings.createPost)),
       ),
       body: BlocListener<ReelFeedAndActionBloc, ReelFeedAndActionState>(
         listenWhen: (previousState, currentState) {
@@ -228,10 +231,10 @@ class _PostScreenState extends State<PostScreen> {
         listener: (context, state) {
           if (state.actionStatus == ReelActionStatus.postSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 backgroundColor: Colors.green,
                 content: Text(
-                  'Reel posted successfully!',
+                  languageService.translate(AppStrings.reelPostedSuccess),
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -247,7 +250,7 @@ class _PostScreenState extends State<PostScreen> {
               SnackBar(
                 backgroundColor: Colors.red,
                 content: Text(
-                  'Failed to post reel: ${state.lastActionError}',
+                  languageService.translate(AppStrings.failedToPostReel) + state.lastActionError,
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -278,10 +281,10 @@ class _PostScreenState extends State<PostScreen> {
                           expands: true,
                           maxLines: null,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
-                            hintText: 'Add description...',
+                            hintText: languageService.translate(AppStrings.addDescription),
                             border: OutlineInputBorder(),
                             isDense: true,
                             contentPadding: EdgeInsets.all(8.0),
@@ -389,29 +392,10 @@ class _PostScreenState extends State<PostScreen> {
                       onPressed: buttonIsLoading
                           ? null
                           : () {
-                              final currentDetailsState = context
-                                  .read<PostDetailsBloc>()
-                                  .state;
-
-                              if (currentDetailsState.durationInSeconds == 0) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.red,
-                                    content: Text(
-                                      'Please wait, video duration is loading...',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              final List<MentionedUser> mentionedUsersToPost =
+                              final currentDetailsState =
+                                  context.read<PostDetailsBloc>().state;
+                              final mentionedUsersToPost =
                                   currentDetailsState.mentionedUsers;
-
-                              print(
-                                "Post Button Tapped - Current Details State: ${currentDetailsState}",
-                              );
 
                               context.read<ReelFeedAndActionBloc>().add(
                                 PostReel(
@@ -445,8 +429,8 @@ class _PostScreenState extends State<PostScreen> {
                             )
                           : const Icon(Icons.send),
                       label: buttonIsLoading
-                          ? const Text('Posting...')
-                          : const Text('Post'),
+                          ? Text(languageService.translate(AppStrings.posting))
+                          : Text(languageService.translate(AppStrings.post)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(143, 148, 251, 1),
                         foregroundColor: Colors.white,

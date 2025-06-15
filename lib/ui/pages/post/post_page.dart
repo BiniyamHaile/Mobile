@@ -10,7 +10,7 @@ import 'package:mobile/bloc/social/post/post_bloc.dart';
 import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/new_user.dart';
 import 'package:mobile/models/post.dart';
-import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/home_page.dart';
@@ -218,6 +218,16 @@ class _PostingScreenState extends State<PostingScreen> {
     _mentionOverlay = null;
   }
 
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(message, style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
   Future<void> _pickImage() async {
     if (!mounted) return;
     try {
@@ -228,7 +238,7 @@ class _PostingScreenState extends State<PostingScreen> {
         setState(() => _selectedMedia.addAll(pickedFiles));
       }
     } catch (e) {
-      if (mounted) _showError('Error selecting photos');
+      if (mounted) _showError(AppStrings.errorSelectingPhotos.tr(context));
     }
   }
 
@@ -258,7 +268,7 @@ class _PostingScreenState extends State<PostingScreen> {
         }
       }
     } catch (e) {
-      if (mounted) _showError('Error selecting videos');
+      if (mounted) _showError(AppStrings.errorSelectingVideos.tr(context));
     }
   }
 
@@ -273,7 +283,7 @@ class _PostingScreenState extends State<PostingScreen> {
         setState(() => _selectedMedia.add(pickedFile));
       }
     } catch (e) {
-      if (mounted) _showError('Error taking photo');
+      if (mounted) _showError(AppStrings.errorTakingPhoto.tr(context));
     }
   }
 
@@ -296,7 +306,7 @@ class _PostingScreenState extends State<PostingScreen> {
     if (content.isEmpty &&
         _selectedMedia.isEmpty &&
         _existingMediaUrls.isEmpty) {
-      _showError('Please add some content to post');
+      _showError(AppStrings.addContentToPost.tr(context));
       return;
     }
 
@@ -304,11 +314,9 @@ class _PostingScreenState extends State<PostingScreen> {
 
     final postBloc = context.read<PostBloc>();
     if (postBloc.isClosed) {
-      _showError('Posting service unavailable');
+      _showError(AppStrings.postingServiceUnavailable.tr(context));
       return;
     }
-
-    print("mentions here>>> ${_mentions}");
 
     if (_editingPost != null) {
       postBloc.add(
@@ -328,16 +336,6 @@ class _PostingScreenState extends State<PostingScreen> {
         ),
       );
     }
-  }
-
-  void _showError(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(message, style: TextStyle(color: Colors.white)),
-      ),
-    );
   }
 
   Widget _buildMediaPreview() {
@@ -566,7 +564,6 @@ class _PostingScreenState extends State<PostingScreen> {
 
   @override
   Widget build(BuildContext context) {
-        context.watch<LanguageService>();
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
         if (state is PostCreationSuccess || state is PostUpdateSuccess) {
@@ -593,7 +590,7 @@ class _PostingScreenState extends State<PostingScreen> {
             } else if (state is PostUpdateSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                  SnackBar(
-                  content: Text(AppStrings.postUpdatedSuccess.tr(context) ,  style: TextStyle(color: Colors.white)),
+                  content: Text(AppStrings.postUpdatedSuccess.tr(context), style: TextStyle(color: Colors.white)),
                   backgroundColor: Colors.green,
                   duration: Duration(seconds: 2),
                 ),
@@ -616,19 +613,14 @@ class _PostingScreenState extends State<PostingScreen> {
         } else if (state is PostCreationFailure || state is PostUpdateFailure) {
           if (mounted) {
             setState(() => _isSubmitting = false);
-            _showError("Post creation failed: ${state}");
+            _showError(AppStrings.postCreationFailed.tr(context) + state.toString());
           }
         }
       },
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: const Color.fromRGBO(
-            143,
-            148,
-            251,
-            1,
-          ), // Add this lin
+          backgroundColor: const Color.fromRGBO(143, 148, 251, 1),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {

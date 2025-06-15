@@ -5,7 +5,7 @@ import 'package:mobile/services/localization/om_et.dart';
 
 class LanguageService extends ChangeNotifier {
   // Default language is English
-  String _currentLanguage = 'om';
+  String _currentLanguage = 'am';
 
   String get currentLanguage => _currentLanguage;
 

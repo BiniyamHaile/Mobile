@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/auth_form/auth_form_bloc.dart';
 import 'package:mobile/bloc/auth/signup/signup_bloc.dart';
-import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/utils/screen_size_utils.dart';
 import 'package:mobile/ui/views/auth/form_wrapper.dart';
@@ -184,8 +184,8 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                     widget.onGenderChanged(value);
                   }
                 },
-                decoration: const InputDecoration(
-                  hintText: AppStrings.selectGender,
+                decoration: InputDecoration(
+                  hintText: AppStrings.selectGender.tr(context),
                   prefixIcon: Icon(Icons.people),
                 ),
               ),

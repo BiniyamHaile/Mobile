@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/profile/passwordsettings_bloc.dart';
 import 'package:mobile/core/validators/auth_validator.dart';
-import 'package:mobile/services/localization/app_text.dart';
+import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';

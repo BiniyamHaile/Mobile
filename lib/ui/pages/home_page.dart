@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mobile/common/common.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/pages.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/wallet_screen.dart';
@@ -41,13 +43,13 @@ void initState() {
   initNotifications().then((_) {
     flutterLocalNotificationsPlugin.show(
       22,
-      'title',
-      'body',
-      const NotificationDetails(
+      AppStrings.notificationTitle.tr(context),
+      AppStrings.notificationBody.tr(context),
+      NotificationDetails(
         android: AndroidNotificationDetails(
           channelId,
-          channelName,
-          channelDescription: channelDescription,
+          AppStrings.notificationChannelName.tr(context),
+          channelDescription: AppStrings.notificationChannelDescription.tr(context),
           importance: Importance.max,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
@@ -147,7 +149,7 @@ Future<void> initNotifications() async {
             Icons.home,
             color: theme.colorScheme.primary,
           ),
-          label: const Text('Home'),
+          label: Text(AppStrings.home.tr(context)),
         ),
         NavigationRailDestination(
           icon: const Icon(Icons.videocam),
@@ -155,7 +157,7 @@ Future<void> initNotifications() async {
             Icons.photo_camera,
             color: theme.colorScheme.primary,
           ),
-          label: const Text('Reels'),
+          label: Text(AppStrings.reels.tr(context)),
         ),
         NavigationRailDestination(
           icon: const Icon(Icons.notifications_outlined),
@@ -163,7 +165,7 @@ Future<void> initNotifications() async {
             Icons.notifications,
             color: theme.colorScheme.primary,
           ),
-          label: const Text('Notifications'),
+          label: Text(AppStrings.notifications.tr(context)),
         ),
         NavigationRailDestination(
           icon: const Icon(Icons.person_outlined),
@@ -171,7 +173,7 @@ Future<void> initNotifications() async {
             Icons.person,
             color: theme.colorScheme.primary,
           ),
-          label: const Text('Profile'),
+          label: Text(AppStrings.profile.tr(context)),
         ),
         NavigationRailDestination(
           icon: const Icon(Icons.wallet),
@@ -179,7 +181,7 @@ Future<void> initNotifications() async {
             Icons.wallet,
             color: theme.colorScheme.primary,
           ),
-          label: const Text('wallet'),
+          label: Text(AppStrings.wallet.tr(context)),
         ),
       ],
     );
@@ -200,7 +202,7 @@ Future<void> initNotifications() async {
             Icons.home,
             color: theme.colorScheme.primary,
           ),
-          label: 'Home',
+          label: AppStrings.home.tr(context),
         ),
         NavigationDestination(
           icon: Icon(Icons.videocam),
@@ -208,7 +210,7 @@ Future<void> initNotifications() async {
             Icons.photo_camera,
             color: theme.colorScheme.primary,
           ),
-          label: 'Reels',
+          label: AppStrings.reels.tr(context),
         ),
         NavigationDestination(
           icon: const Icon(Icons.notifications_outlined),
@@ -216,7 +218,7 @@ Future<void> initNotifications() async {
             Icons.notifications,
             color: theme.colorScheme.primary,
           ),
-          label: 'Notifications',
+          label: AppStrings.notifications.tr(context),
         ),
         NavigationDestination(
           icon: const Icon(Icons.person_outlined),
@@ -224,7 +226,7 @@ Future<void> initNotifications() async {
             Icons.person,
             color: theme.colorScheme.primary,
           ),
-          label: 'Profile',
+          label: AppStrings.profile.tr(context),
         ),
         NavigationDestination(
           icon: const Icon(Icons.wallet),
@@ -232,7 +234,7 @@ Future<void> initNotifications() async {
             Icons.wallet,
             color: theme.colorScheme.primary,
           ),
-          label: 'wallet',
+          label: AppStrings.wallet.tr(context),
         ),
       ],
     );

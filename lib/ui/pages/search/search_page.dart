@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/search/search_bloc.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'all_search_page.dart';
 import 'people_search_page.dart';
 import 'posts_search_page.dart';
@@ -29,10 +31,10 @@ class SearchPage extends StatelessWidget {
               unselectedLabelColor: Colors.white70,
               indicatorWeight: 3,
               tabs: [
-                Tab(text: 'All'),
-                Tab(text: 'People'),
-                Tab(text: 'Posts'),
-                Tab(text: 'Videos'),
+                Tab(text: AppStrings.all.tr(context)),
+                Tab(text: AppStrings.people.tr(context)),
+                Tab(text: AppStrings.posts.tr(context)),
+                Tab(text: AppStrings.videos.tr(context)),
               ],
             ),
           ),
@@ -56,7 +58,7 @@ class _SearchBar extends StatelessWidget {
     return Center(
       child: TextField(
         decoration: InputDecoration(
-          hintText: 'Search',
+          hintText: AppStrings.searchHint.tr(context),
           prefixIcon: Icon(Icons.search, color: Color.fromRGBO(143, 148, 251, 1)),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
           filled: true,

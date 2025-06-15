@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/otp/otp_bloc.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 
@@ -142,10 +144,10 @@ class _OtpPageState extends State<OtpPage> {
                           duration: const Duration(milliseconds: 1600),
                           child: Container(
                             margin: const EdgeInsets.only(top: 50),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                "OTP Verification",
-                                style: TextStyle(
+                                AppStrings.otpVerification.tr(context),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold,
@@ -186,7 +188,7 @@ class _OtpPageState extends State<OtpPage> {
                           child: Column(
                             children: [
                               Text(
-                                'Enter the OTP sent to your email',
+                                AppStrings.enterOtpSent.tr(context),
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(color: Colors.grey[600]),
                               ),
@@ -195,7 +197,7 @@ class _OtpPageState extends State<OtpPage> {
                                 controller: _emailController,
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
                                     color: Colors.grey[600],
                                   ),
@@ -216,7 +218,7 @@ class _OtpPageState extends State<OtpPage> {
                                 controller: _otpController,
                                 cursorColor: Colors.deepPurple,
                                 decoration: InputDecoration(
-                                  labelText: 'OTP Code',
+                                  labelText: AppStrings.verifyOtp.tr(context),
                                   labelStyle: TextStyle(
                                     color: Colors.grey[600],
                                   ),
@@ -254,9 +256,11 @@ class _OtpPageState extends State<OtpPage> {
                                       ? const CircularProgressIndicator(
                                           color: Colors.white,
                                         )
-                                      : const Text(
-                                          'Verify',
-                                          style: TextStyle(
+                                      : Text(
+                                          isLoading
+                                              ? AppStrings.verifying.tr(context)
+                                              : AppStrings.verifyOtp.tr(context),
+                                          style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -268,7 +272,7 @@ class _OtpPageState extends State<OtpPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Didn't receive code? ",
+                                    AppStrings.didntReceiveCode.tr(context),
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
                                   TextButton(
@@ -282,9 +286,9 @@ class _OtpPageState extends State<OtpPage> {
                                               ),
                                             );
                                           },
-                                    child: const Text(
-                                      'Resend',
-                                      style: TextStyle(
+                                    child: Text(
+                                      AppStrings.resendOtp.tr(context),
+                                      style: const TextStyle(
                                         color: Color.fromRGBO(143, 148, 251, 1),
                                         fontWeight: FontWeight.bold,
                                       ),

@@ -10,7 +10,10 @@ import 'package:mobile/bloc/chat/retrieve_messages/retrieve_messages_bloc.dart';
 import 'package:mobile/bloc/chat/send_message/send_message_bloc.dart';
 import 'package:mobile/core/injections/get_it.dart';
 import 'package:mobile/models/chat/chat_messages.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/string_extension.dart';
 import 'package:mobile/services/socket/websocket-service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 class ChatPage extends StatefulWidget {
@@ -107,9 +110,9 @@ class _ChatPageState extends State<ChatPage> {
                   Navigator.pop(context);
                   _handleImageSelection();
                 },
-                child: const Align(
+                child: Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Photo'),
+                  child: Text(AppStrings.photo.tr(context)),
                 ),
               ),
               TextButton(
@@ -117,16 +120,16 @@ class _ChatPageState extends State<ChatPage> {
                   Navigator.pop(context);
                   _handleFileSelection();
                 },
-                child: const Align(
+                child: Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('File'),
+                  child: Text(AppStrings.file.tr(context)),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Align(
+                child: Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Cancel'),
+                  child: Text(AppStrings.cancel.tr(context)),
                 ),
               ),
             ],
@@ -194,98 +197,43 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // void _handleMessageTap(BuildContext context, types.Message message) async {
-  //   if (message is types.TextMessage && message.previewData?.link != null) {
-  //     showDialog<bool>(
-  //       context: context,
-  //       builder: (BuildContext context) => AlertDialog(
-  //         title: const Text('Open Link?'),
-  //         content: Text(
-  //             'Do you want to open this link in your browser?\n${message.previewData!.link!}'),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(false),
-  //             child: const Text('No'),
-  //           ),
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(true),
-  //             child: const Text('Yes'),
-  //           ),
-  //         ],
-  //       ),
-  //     ).then((value) async {
-  //       if (value == true) {
-  //         final Uri url = Uri.parse(message.previewData!.link!);
-  //         try {
-  //           if (await canLaunchUrl(url)) {
-  //             await launchUrl(url);
-  //           } else {
-  //             throw 'Could not launch $url';
-  //           }
-  //         } catch (e) {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             SnackBar(content: Text('Could not launch URL: $e')),
-  //           );
-  //         }
-  //       }
-  //     });
-  //   } else if (message is types.FileMessage) {
-  //     var localPath = message.uri;
-
-  //     if (message.uri.startsWith('http')) {
-  //       try {
-  //         final index =
-  //             _messages.indexWhere((element) => element.id == message.id);
-  //         final updatedMessage =
-  //             (_messages[index] as types.FileMessage).copyWith(
-  //           isLoading: true,
-  //         );
-
-  //         setState(() {
-  //           _messages[index] = updatedMessage;
-  //         });
-
-  //         final client = http.Client();
-  //         final request = await client.get(Uri.parse(message.uri));
-  //         final bytes = request.bodyBytes;
-  //         final documentsDir = (await getApplicationDocumentsDirectory()).path;
-  //         localPath = '$documentsDir/${message.name}';
-
-  //         if (!File(localPath).existsSync()) {
-  //           final file = File(localPath);
-  //           await file.writeAsBytes(bytes);
-  //         }
-  //       } finally {
-  //         final index =
-  //             _messages.indexWhere((element) => element.id == message.id);
-  //         final updatedMessage =
-  //             (_messages[index] as types.FileMessage).copyWith(
-  //           isLoading: null,
-  //         );
-
-  //         setState(() {
-  //           _messages[index] = updatedMessage;
-  //         });
-  //       }
-  //     }
-
-  //     await OpenFilex.open(localPath);
-  //   }
-  // }
-
-  // void _handlePreviewDataFetched(
-  //   types.TextMessage message,
-  //   types.PreviewData previewData,
-  // ) {
-  //   final index = _messages.indexWhere((element) => element.id == message.id);
-  //   final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
-  //     previewData: previewData,
-  //   );
-
-  //   setState(() {
-  //     _messages[index] = updatedMessage;
-  //   });
-  // }
+  void _handleMessageTap(BuildContext context, types.Message message) async {
+    if (message is types.TextMessage && message.previewData?.link != null) {
+      showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text(AppStrings.openLink.tr(context)),
+          content: Text(
+              '${AppStrings.openLinkDescription.tr(context)}${message.previewData!.link!}'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppStrings.no.tr(context)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(AppStrings.yes.tr(context)),
+            ),
+          ],
+        ),
+      ).then((value) async {
+        if (value == true) {
+          final Uri url = Uri.parse(message.previewData!.link!);
+          try {
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              throw 'Could not launch $url';
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${AppStrings.couldNotLaunchUrl.tr(context)}$e')),
+            );
+          }
+        }
+      });
+    }
+  }
 
   void _handleSendPressed(types.PartialText partialText) {
     final content = partialText.text.trim();
@@ -304,20 +252,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // void _handleEditSendPressed() {
-  //   if (_editingMessage != null) {
-  //     final index = _messages.indexOf(_editingMessage!);
-  //     if (index >= 0) {
-  //       setState(() {
-  //         _messages[index] = _editingMessage!
-  //             .copyWith(text: _editingController.text) as types.Message;
-  //         _editingMessage = null;
-  //         _editingController.clear();
-  //       });
-  //     }
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -328,18 +262,15 @@ class _ChatPageState extends State<ChatPage> {
             Navigator.pop(context);
           },
         ),
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundImage: widget.friend.imageUrl != null
-                  ? AssetImage(widget.friend.imageUrl!)
-                  : null, // Use AssetImage if imageUrl is available
-              child: widget.friend.imageUrl == null
-                  ? Text(widget.friend.firstName![0].toUpperCase())
-                  : null, // Display first letter if no image
-            ),
-            const SizedBox(width: 8),
-            Text(widget.friend.firstName ?? 'Unknown'),
+            Text(widget.friend.firstName ?? ''),
+            if (isTyping)
+              Text(
+                AppStrings.typing.tr(context),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
           ],
         ),
       ),
@@ -384,12 +315,11 @@ class _ChatPageState extends State<ChatPage> {
               return Chat(
                 messages: chatMessages,
                 onAttachmentPressed: _handleAttachmentPressed,
-                // onMessageTap: _handleMessageTap,
+                onMessageTap: _handleMessageTap,
                 videoMessageBuilder:
                     (types.VideoMessage message, {required int messageWidth}) {
                       return _buildVideoMessage(message, messageWidth);
                     },
-                // onPreviewDataFetched: _handlePreviewDataFetched,
                 onSendPressed: (types.PartialText partialText) =>
                     _handleSendPressed(partialText),
                 showUserAvatars: true,
@@ -427,7 +357,6 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.send),
-                              // onPressed: _handleEditSendPressed,
                               onPressed: () {},
                             ),
                             IconButton(

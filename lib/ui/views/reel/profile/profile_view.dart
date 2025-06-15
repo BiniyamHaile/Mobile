@@ -6,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:mobile/models/reel/privacy_option.dart';
 import 'package:mobile/models/reel/video_item.dart';
+import 'package:mobile/services/localization/app_string.dart';
+import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:provider/provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 const String _profileImageUrl =
@@ -90,35 +93,24 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final languageService = Provider.of<LanguageService>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back, color: Colors.white),
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //   },
-        // ),
         title: const Text(
           'Daniel Tilahun',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.notifications_none, color: Colors.white),
-          //   onPressed: () {
-          //     // TODO: Implement notification action
-          //   },
-          // ),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () {
               context.go(RouteNames.profileSetting);
             },
           ),
-
           IconButton(
             onPressed: () {
               context.push(RouteNames.notifications);
@@ -152,9 +144,18 @@ class ProfileView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildStatColumn('Following', _followingCount.toString()),
-              _buildStatColumn('Followers', _followersCount),
-              _buildStatColumn('Likes', _likesCount),
+              _buildStatColumn(
+                languageService.translate(AppStrings.following),
+                _followingCount.toString(),
+              ),
+              _buildStatColumn(
+                languageService.translate(AppStrings.followers),
+                _followersCount,
+              ),
+              _buildStatColumn(
+                languageService.translate(AppStrings.likes),
+                _likesCount,
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -173,9 +174,9 @@ class ProfileView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  child: const Text(
-                    'Follow',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  child: Text(
+                    languageService.translate(AppStrings.follow),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
@@ -192,24 +193,15 @@ class ProfileView extends StatelessWidget {
                     ),
                     side: const BorderSide(color: Colors.grey),
                   ),
-                  child: const Text(
-                    'Message',
-                    style: TextStyle(
+                  child: Text(
+                    languageService.translate(AppStrings.message),
+                    style: const TextStyle(
                       color: Color.fromRGBO(143, 148, 251, 1),
                       fontSize: 16,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     border: Border.all(color: Colors.grey),
-              //     borderRadius: BorderRadius.circular(4),
-              //   ),
-              //   padding: const EdgeInsets.all(8),
-              //   child: const Icon(Icons.arrow_drop_down, color: Colors.green),
-              // ),
             ],
           ),
           const SizedBox(height: 20),
@@ -218,6 +210,8 @@ class ProfileView extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black, fontSize: 14),
           ),
+          const SizedBox(height: 20),
+          _buildActionButtons(context),
           const SizedBox(height: 20),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -439,6 +433,51 @@ class ProfileView extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    final languageService = Provider.of<LanguageService>(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildActionButton(
+          icon: Icons.share,
+          label: languageService.translate(AppStrings.share),
+          onTap: () {
+            // TODO: Implement share functionality
+          },
+        ),
+        _buildActionButton(
+          icon: Icons.card_giftcard,
+          label: languageService.translate(AppStrings.gift),
+          onTap: () {
+            // TODO: Implement gift functionality
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
   }
