@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/models/token.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/widgets/wallet/buy_stars_widget.dart';
 import 'package:mobile/ui/widgets/wallet/star_reaction_modal.dart';
 import 'package:provider/provider.dart';
@@ -469,16 +470,20 @@ class _WalletScreenState extends State<WalletScreen> {
         );
       }
     }
+    final theme = AppTheme.getTheme(context);
+
+
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:theme.colorScheme.onPrimary ,
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: theme.colorScheme.onPrimary,
         elevation: 0,
         leading: isConnected
             ? Builder(
                 builder: (context) => IconButton(
                   icon: const Icon(Icons.menu),
+                  color: theme.colorScheme.primary,
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               )
@@ -486,7 +491,7 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
       drawer: isConnected
           ? Drawer(
-              backgroundColor: Colors.white,
+              backgroundColor: theme.colorScheme.onPrimary,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 30),
                 children: [
@@ -501,12 +506,28 @@ class _WalletScreenState extends State<WalletScreen> {
                       child: Container(
                         // NO borderRadius needed here, the shape is defined by the clipper
                         decoration: BoxDecoration(
-                          color: Color.fromRGBO(
-                            143,
-                            148,
-                            251,
-                            1,
-                          ), // Set the background color to green
+                          color: theme.colorScheme.primary, 
+                          border: Border(
+                            top: BorderSide(
+                              color: theme.colorScheme.onPrimary, // Top border color
+                              width: 2.0, // Top border width
+                            ),
+                            bottom: 
+                            BorderSide(
+                              color: theme.colorScheme.onPrimary, // Bottom border color
+                              width: 2.0, // Bottom border width
+                            ),
+                            left: BorderSide(
+                              color: theme.colorScheme.onPrimary, // Left border color
+                              width: 2.0, // Left border width
+                            ),
+                            right: BorderSide(
+                              color: theme.colorScheme.onPrimary, // Right border color
+                              width: 2.0, // Right border width
+                            ),
+
+                          )
+                          // Set the background color to green
                           // Remove the borderRadius property
                         ),
                         // Center the content within the container
@@ -518,8 +539,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           child: Text(
                             'Wallet Settings',
                             style: TextStyle(
-                              color: Colors
-                                  .white, // Make text white for visibility on green
+                              color: theme.colorScheme.onPrimary, // Make text white for visibility on green
                               fontSize: 20, // Adjust font size
                               fontWeight: FontWeight.bold, // Make text bold
                             ),
@@ -567,7 +587,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
 
-                      color: Color.fromRGBO(143, 148, 251, 1),
+                      color: theme.colorScheme.onPrimary,
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -575,13 +595,13 @@ class _WalletScreenState extends State<WalletScreen> {
                         leading: Icon(
                           Icons.logout,
 
-                          color: isConnected ? Colors.white : Colors.grey[500],
+                          color: isConnected ? theme.colorScheme.onPrimary : Colors.grey[500],
                         ),
                         title: Text(
                           'Disconnect',
                           style: TextStyle(
                             color: isConnected
-                                ? Colors.white
+                                ? theme.colorScheme.onPrimary
                                 : Colors.grey[500],
                             fontWeight: FontWeight.bold,
                           ),
@@ -626,10 +646,10 @@ class _WalletScreenState extends State<WalletScreen> {
                   ElevatedButton(
                     onPressed: () => _connectWallet(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.onPrimary,
+                      foregroundColor: theme.colorScheme.primary,
                       elevation: 4,
-                      shadowColor: Color.fromRGBO(143, 148, 251, 1),
+                      shadowColor: theme.colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -644,7 +664,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         Icon(
                           Icons.account_balance_wallet_rounded,
                           size: 24,
-                          color: Colors.white,
+                          color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 12),
                         Text(
@@ -653,6 +673,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
+                            color: theme.colorScheme.primary
                           ),
                         ),
                       ],
@@ -699,7 +720,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   Card(
                     margin: EdgeInsets.zero,
                     elevation: 1.0,
-                    color: Color.fromRGBO(143, 148, 251, 1),
+                    color: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -711,13 +732,13 @@ class _WalletScreenState extends State<WalletScreen> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: Colors.white,
+                                backgroundColor: theme.colorScheme.onPrimary,
                                 radius: 18,
                                 child: Text(
                                   walletService.starsTokenSymbol[0],
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(143, 148, 251, 1),
+                                    color: theme.colorScheme.primary,
                                   ),
                                 ),
                               ),

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/forgot_password/forgot_password_bloc.dart';
 import 'package:mobile/ui/pages/auth/otp-params.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -56,6 +57,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       },
       builder: (context, state) {
         final isLoading = state is ForgotPasswordLoading;
+            final theme = AppTheme.getTheme(context);
+
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -176,6 +179,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               TextFormField(
                                 controller: _emailController,
                                 cursorColor: Colors.deepPurple,
+                                style: TextStyle(color: theme.colorScheme.primary),
                                 decoration: InputDecoration(
                                   labelText: 'Email',
                                   labelStyle: TextStyle(
@@ -186,7 +190,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor:theme.colorScheme.onPrimary ,
                                 ),
                                 validator: (val) => val == null || val.isEmpty
                                     ? 'Email is required'

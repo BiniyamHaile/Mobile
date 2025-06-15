@@ -12,6 +12,7 @@ import 'package:mobile/ui/pages/chat_page.dart';
 import 'package:mobile/ui/pages/notification/notifications_page.dart';
 import 'package:mobile/ui/pages/post/feed_page.dart';
 import 'package:mobile/ui/pages/post/post_page.dart';
+import 'package:mobile/ui/pages/post/report_page.dart';
 import 'package:mobile/ui/pages/profile/profile-setting-page.dart';
 import 'package:mobile/ui/pages/search/search_page.dart';
 import 'package:mobile/ui/pages/story/user_story_page.dart';
@@ -232,10 +233,17 @@ class AppRoutes {
         builder: (context, state) => const SignupPage(),
       ),
       GoRoute(path: RouteNames.chat, builder: (context, state) => ChatPage()),
+
       // GoRoute(
       //   path: RouterEnum.videoFeedView.routeName,
       //   builder: (context, state) => const VideoFeedView(),
       // ),
+      GoRoute(
+        path: RouteNames.reportPost,
+        builder: (context, state) {
+          return ReportPage(postId: state.extra as String? ?? '');
+        },
+      ),
       GoRoute(
         path: RouterEnum.cameraScreen.routeName,
         builder: (context, state) => const CameraScreen(),

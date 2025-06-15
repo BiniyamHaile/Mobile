@@ -8,6 +8,7 @@ import 'package:mobile/bloc/reel/reel_state.dart';
 import 'package:mobile/models/reel/video_item.dart';
 import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/views/reel/widgets/video_feed_item.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -170,7 +171,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
       return controller;
     } catch (e) {
-      debugPrint('Error initializing controller for ${video.videoUrl}: $e');
+      debugPrint('The device does not allow this operation for ${video.videoUrl}...');
       return null;
     }
   }
@@ -345,13 +346,18 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.getTheme(context);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+        backgroundColor: theme.colorScheme.onPrimary,
         actions: [
           IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.white),
+            icon: Icon(Icons.videocam, color: theme.colorScheme.primary),
+            color: Colors.red,
             tooltip: 'Create Reel',
+            focusColor: theme.colorScheme.primary.withOpacity(0.2),
+            highlightColor: theme.colorScheme.primary.withOpacity(0.2),
             onPressed: () {
               GoRouter.of(context).go(RouterEnum.cameraScreen.routeName);
             },
@@ -360,7 +366,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
             onPressed: () {
               context.push(RouteNames.notifications);
             },
-            icon: Icon(LucideIcons.bell, color: Colors.white),
+            icon: Icon(LucideIcons.bell, color: theme.colorScheme.primary),
           ),
         ],
       ),
@@ -377,8 +383,10 @@ class _VideoFeedViewState extends State<VideoFeedView>
             _manageControllerWindow(_currentPage);
 
             if (state.isLoadingFeed) {
+              // Optionally handle loading state
             } else {}
             if (state.isPaginatingFeed) {
+              // Optionally handle pagination
             } else {}
 
             if (state.actionStatus == ReelActionStatus.reportSuccess &&
@@ -398,7 +406,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
                         size: 40,
                       ),
                     ),
-                    content: const Column(
+                    content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
@@ -407,14 +415,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
                           'Your report has been submitted successfully. It will be reviewed. Thank you for helping keep the community safe.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 15, color: Colors.black54),
+                          style: TextStyle(fontSize: 15, color: theme.colorScheme.primary),
                         ),
                       ],
                     ),
@@ -427,12 +435,12 @@ class _VideoFeedViewState extends State<VideoFeedView>
             if (state.actionStatus == ReelActionStatus.deleteSuccess &&
                 _lastHandledActionStatus != ReelActionStatus.deleteSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
                     'Reel deleted successfully.',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: theme.colorScheme.primary),
                   ),
-                  backgroundColor: Colors.green,
+                  backgroundColor: theme.colorScheme.onPrimary,
                   duration: const Duration(seconds: 3),
                 ),
               );
@@ -445,27 +453,79 @@ class _VideoFeedViewState extends State<VideoFeedView>
               _lastHandledActionStatus = null;
             }
           },
-          child: PreloadPageView.builder(
-            scrollDirection: Axis.vertical,
-            controller: _pageController,
-            itemCount: _videos.length,
-            physics: const AlwaysScrollableScrollPhysics(),
-            onPageChanged: (index) => _handlePageChange(index),
-            itemBuilder: (context, index) {
-              if (index < 0 || index >= _videos.length) {
-                return const SizedBox.shrink();
-              }
-              return RepaintBoundary(
-                child: VideoFeedItem(
-                  key: ValueKey(_videos[index].id),
-                  controller: _getController(_videos[index].id),
-                  videoItem: _videos[index],
-                  currentUserId: _currentUserId!,
+          child: _videos.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.videoOff,
+                        size: 80,
+                        color: theme.colorScheme.primary.withOpacity(0.6),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'No Reels Available',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Be the first to create a reel or check back later!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.primary.withOpacity(0.8),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          GoRouter.of(context).go(RouterEnum.cameraScreen.routeName);
+                        },
+                        icon: Icon(Icons.videocam, color: theme.colorScheme.onPrimary),
+                        label: Text(
+                          'Create a Reel',
+                          style: TextStyle(color: theme.colorScheme.onPrimary),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : PreloadPageView.builder(
+                  scrollDirection: Axis.vertical,
+                  controller: _pageController,
+                  itemCount: _videos.length,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  onPageChanged: (index) => _handlePageChange(index),
+                  itemBuilder: (context, index) {
+                    if (index < 0 || index >= _videos.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return RepaintBoundary(
+                      child: VideoFeedItem(
+                        key: ValueKey(_videos[index].id),
+                        controller: _getController(_videos[index].id),
+                        videoItem: _videos[index],
+                        currentUserId: _currentUserId ?? '',
+                      ),
+                    );
+                  },
+                  preloadPagesCount: 1,
                 ),
-              );
-            },
-            preloadPagesCount: 1,
-          ),
         ),
       ),
     );

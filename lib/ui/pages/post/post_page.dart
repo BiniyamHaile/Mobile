@@ -663,9 +663,9 @@ class _PostingScreenState extends State<PostingScreen> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: theme.colorScheme.onPrimary,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: theme.colorScheme.onPrimary),
+            icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
             onPressed: () {
               if (_isSubmitting) return;
               Navigator.pop(context);
@@ -674,7 +674,7 @@ class _PostingScreenState extends State<PostingScreen> {
           title: Text(
             _editingPost != null ? 'Edit Post' : 'Create Post',
             style: TextStyle(
-              color: theme.colorScheme.onPrimary,
+              color: theme.colorScheme.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -746,21 +746,21 @@ class _PostingScreenState extends State<PostingScreen> {
                             icon: Icons.photo_library,
                             label: 'Gallery',
                              color: theme.colorScheme.primary,
-                            iconColor: theme.colorScheme.onPrimary,
+                            iconColor: theme.colorScheme.primary,
                             onPressed: _pickImage,
                           ),
                           _MediaButton(
                             icon: Icons.video_library,
                             label: 'Video',
                             color: theme.colorScheme.primary,
-                            iconColor: theme.colorScheme.onPrimary,
+                            iconColor: theme.colorScheme.primary,
                             onPressed: _pickVideos,
                           ),
                           _MediaButton(
                             icon: Icons.camera_alt,
                             label: 'Camera',
                             color: theme.colorScheme.primary,
-                            iconColor: theme.colorScheme.onPrimary,
+                            iconColor: theme.colorScheme.primary,
                             onPressed: _takePhoto,
                           ),
                         ],
@@ -782,21 +782,21 @@ class _PostingScreenState extends State<PostingScreen> {
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: Theme.of(context).colorScheme.outline,
-                          width: 1.5,
+                          width: 1,
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                     child: _isSubmitting
                         ? CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.primary,
                           )
                         : Text(
                             _editingPost != null
                                 ? 'Update Post'
                                 : 'Create Post',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

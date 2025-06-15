@@ -33,9 +33,7 @@ class PostCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: context.responsive<Widget>(
@@ -50,13 +48,12 @@ class PostCard extends StatelessWidget {
 void _showStarReactionModal(BuildContext context, Post post) {
   final walletService = Provider.of<WalletService>(context, listen: false);
 
-  // Check if wallet is connected first
   if (!walletService.isConnected || walletService.currentSession == null) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-           backgroundColor: Colors.white,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -84,8 +81,8 @@ void _showStarReactionModal(BuildContext context, Post post) {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Close dialog
-                GoRouter.of(context).go(RouteNames.wallet); // Navigate to wallet screen
+                Navigator.pop(context);
+                GoRouter.of(context).go(RouteNames.wallet);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color.fromRGBO(143, 148, 251, 1),
@@ -109,7 +106,6 @@ void _showStarReactionModal(BuildContext context, Post post) {
     return;
   }
 
-  // Check network and contracts after wallet connection
   if (!walletService.areContractsLoaded ||
       walletService.connectedAddress == null ||
       walletService.connectedNetwork?.chainId != walletService.sepoliaChainId) {
@@ -173,20 +169,22 @@ class _MobilePostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _PostHeader(post: post, onDeleted: onDeleted),
-        SizedBox(height: 10,),
-        if (post.content.isNotEmpty) 
+        SizedBox(height: 10),
+        if (post.content.isNotEmpty)
           Padding(
-            padding:  EdgeInsets.only(left: 16, right: 16, bottom: post.files.isNotEmpty ? 12 : 16),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: post.files.isNotEmpty ? 12 : 16,
+            ),
             child: _PostContent(content: post.content),
           ),
-        if (post.files.isNotEmpty) 
+        if (post.files.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: _PostMedia(files: post.files),
@@ -226,11 +224,15 @@ class _TabletPostCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _PostHeader(post: post, onDeleted: onDeleted),
-                            SizedBox(height: 10,),
-
+                    SizedBox(height: 10),
                     if (post.content.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 16),
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 8,
+                          bottom: 16,
+                        ),
                         child: _PostContent(content: post.content),
                       ),
                   ],
@@ -263,7 +265,9 @@ class _PostHeader extends StatelessWidget {
           post.owner?.profilePic != null && post.owner!.profilePic!.isNotEmpty
               ? CircleAvatar(
                   radius: 20,
-                  backgroundImage: CachedNetworkImageProvider(post.owner!.profilePic!),
+                  backgroundImage: CachedNetworkImageProvider(
+                    post.owner!.profilePic!,
+                  ),
                 )
               : const CircleAvatar(
                   radius: 20,
@@ -316,10 +320,7 @@ class _PostContent extends StatelessWidget {
     final parts = <String>[];
 
     if (matches.isEmpty) {
-      return Text(
-        content,
-        style: const TextStyle(fontSize: 15, height: 1.4),
-      );
+      return Text(content, style: const TextStyle(fontSize: 15, height: 1.4));
     }
 
     int lastEnd = 0;
@@ -336,10 +337,7 @@ class _PostContent extends StatelessWidget {
 
     return RichText(
       text: TextSpan(
-        style: DefaultTextStyle.of(context).style.copyWith(
-          fontSize: 15,
-          height: 1.4,
-        ),
+        style: DefaultTextStyle.of(context).style.copyWith(fontSize: 15, height: 1.4),
         children: parts.map((part) {
           if (mentionRegex.hasMatch(part)) {
             return TextSpan(
@@ -378,17 +376,12 @@ class _PostMedia extends StatelessWidget {
         )
         .toList();
 
-    final imageFiles = files
-        .where((file) => !videoFiles.contains(file))
-        .toList();
+    final imageFiles = files.where((file) => !videoFiles.contains(file)).toList();
 
     if (videoFiles.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: _buildMediaGrid(
-          items: videoFiles,
-          isVideo: true,
-        ),
+        child: _buildMediaGrid(items: videoFiles, isVideo: true),
       );
     }
 
@@ -466,19 +459,28 @@ class _PostMedia extends StatelessWidget {
     bool isVideo, {
     VoidCallback? onImageTap,
   }) {
-    return GestureDetector(
-      onTap: !isVideo ? onImageTap : null,
-      child: ClipRRect(
+    if (isVideo) {
+      return ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: Colors.grey.shade100,
           ),
-          child: isVideo
-              ? _VideoItem(url: url, width: width, height: width * 9 / 16)
-              : _ImageItem(url: url, width: width, height: width),
+          child: _VideoItem(url: url, width: width, height: width * 9 / 16),
         ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey.shade100,
+        ),
+        child: _ImageItem(url: url, onTap: onImageTap),
       ),
     );
   }
@@ -490,50 +492,40 @@ class _PostMedia extends StatelessWidget {
     Function(int)? onImageTap,
   }) {
     final itemWidth = (width - spacing) / 2;
-    final height = isVideo ? itemWidth * 1.2 : itemWidth;
 
-    return SizedBox(
-      height: height,
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: !isVideo ? () => onImageTap?.call(0) : null,
-              child: Container(
-                margin: EdgeInsets.only(right: spacing / 2),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: isVideo
-                      ? _VideoItem(url: urls[0], width: itemWidth, height: height)
-                      : _ImageItem(url: urls[0], width: itemWidth, height: height),
-                ),
-              ),
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(right: spacing / 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: isVideo
+                  ? _VideoItem(url: urls[0], width: itemWidth, height: itemWidth)
+                  : _ImageItem(url: urls[0], onTap: () => onImageTap?.call(0)),
             ),
           ),
-          Expanded(
-            child: GestureDetector(
-              onTap: !isVideo ? () => onImageTap?.call(1) : null,
-              child: Container(
-                margin: EdgeInsets.only(left: spacing / 2),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: isVideo
-                      ? _VideoItem(url: urls[1], width: itemWidth, height: height)
-                      : _ImageItem(url: urls[1], width: itemWidth, height: height),
-                ),
-              ),
+        ),
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(left: spacing / 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: isVideo
+                  ? _VideoItem(url: urls[1], width: itemWidth, height: itemWidth)
+                  : _ImageItem(url: urls[1], onTap: () => onImageTap?.call(1)),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -545,18 +537,29 @@ class _PostMedia extends StatelessWidget {
   }) {
     final leftWidth = (width - spacing) * 0.6;
     final rightWidth = (width - spacing) * 0.4;
-    final leftHeight = isVideo ? leftWidth * 1.1 : leftWidth;
 
-    return SizedBox(
-      height: leftHeight,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: !isVideo ? () => onImageTap?.call(0) : null,
-            child: Container(
-              width: leftWidth,
-              height: leftHeight,
-              margin: EdgeInsets.only(right: spacing / 2),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: leftWidth,
+          margin: EdgeInsets.only(right: spacing / 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade100,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: isVideo
+                ? _VideoItem(url: urls[0], width: leftWidth, height: leftWidth)
+                : _ImageItem(url: urls[0], onTap: () => onImageTap?.call(0)),
+          ),
+        ),
+        Column(
+          children: [
+            Container(
+              width: rightWidth,
+              margin: EdgeInsets.only(bottom: spacing / 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey.shade100,
@@ -564,57 +567,27 @@ class _PostMedia extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: isVideo
-                    ? _VideoItem(url: urls[0], width: leftWidth, height: leftHeight)
-                    : _ImageItem(url: urls[0], width: leftWidth, height: leftHeight),
+                    ? _VideoItem(url: urls[1], width: rightWidth, height: rightWidth)
+                    : _ImageItem(url: urls[1], onTap: () => onImageTap?.call(1)),
               ),
             ),
-          ),
-          Container(
-            width: rightWidth,
-            height: leftHeight,
-            child: Column(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(1) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[1], width: rightWidth, height: null)
-                            : _ImageItem(url: urls[1], width: rightWidth, height: null),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(2) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(top: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[2], width: rightWidth, height: null)
-                            : _ImageItem(url: urls[2], width: rightWidth, height: null),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            Container(
+              width: rightWidth,
+              margin: EdgeInsets.only(top: spacing / 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey.shade100,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: isVideo
+                    ? _VideoItem(url: urls[2], width: rightWidth, height: rightWidth)
+                    : _ImageItem(url: urls[2], onTap: () => onImageTap?.call(2)),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -625,98 +598,78 @@ class _PostMedia extends StatelessWidget {
     Function(int)? onImageTap,
   }) {
     final itemSize = (width - spacing) / 2;
-    final height = isVideo ? itemSize : itemSize;
 
-    return SizedBox(
-      height: height * 2 + spacing,
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(0) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(right: spacing / 2, bottom: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[0], width: itemSize, height: height)
-                            : _ImageItem(url: urls[0], width: itemSize, height: height),
-                      ),
-                    ),
-                  ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: spacing / 2, bottom: spacing / 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
                 ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(1) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(left: spacing / 2, bottom: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[1], width: itemSize, height: height)
-                            : _ImageItem(url: urls[1], width: itemSize, height: height),
-                      ),
-                    ),
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: isVideo
+                      ? _VideoItem(url: urls[0], width: itemSize, height: itemSize)
+                      : _ImageItem(url: urls[0], onTap: () => onImageTap?.call(0)),
                 ),
-              ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(2) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(right: spacing / 2, top: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[2], width: itemSize, height: height)
-                            : _ImageItem(url: urls[2], width: itemSize, height: height),
-                      ),
-                    ),
-                  ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(left: spacing / 2, bottom: spacing / 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
                 ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: !isVideo ? () => onImageTap?.call(3) : null,
-                    child: Container(
-                      margin: EdgeInsets.only(left: spacing / 2, top: spacing / 2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade100,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: isVideo
-                            ? _VideoItem(url: urls[3], width: itemSize, height: height)
-                            : _ImageItem(url: urls[3], width: itemSize, height: height),
-                      ),
-                    ),
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: isVideo
+                      ? _VideoItem(url: urls[1], width: itemSize, height: itemSize)
+                      : _ImageItem(url: urls[1], onTap: () => onImageTap?.call(1)),
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: spacing / 2, top: spacing / 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: isVideo
+                      ? _VideoItem(url: urls[2], width: itemSize, height: itemSize)
+                      : _ImageItem(url: urls[2], onTap: () => onImageTap?.call(2)),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(left: spacing / 2, top: spacing / 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey.shade100,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: isVideo
+                      ? _VideoItem(url: urls[3], width: itemSize, height: itemSize)
+                      : _ImageItem(url: urls[3], onTap: () => onImageTap?.call(3)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -728,18 +681,42 @@ class _PostMedia extends StatelessWidget {
   }) {
     final itemSize = (width - spacing * 2) / 3;
     final remainingCount = urls.length - 3;
-    final height = isVideo ? itemSize : itemSize;
 
-    return SizedBox(
-      height: height,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: !isVideo ? () => onImageTap?.call(0) : null,
-            child: Container(
+    return Row(
+      children: [
+        Container(
+          width: itemSize,
+          margin: EdgeInsets.only(right: spacing / 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade100,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: isVideo
+                ? _VideoItem(url: urls[0], width: itemSize, height: itemSize)
+                : _ImageItem(url: urls[0], onTap: () => onImageTap?.call(0)),
+          ),
+        ),
+        Container(
+          width: itemSize,
+          margin: EdgeInsets.symmetric(horizontal: spacing / 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade100,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: isVideo
+                ? _VideoItem(url: urls[1], width: itemSize, height: itemSize)
+                : _ImageItem(url: urls[1], onTap: () => onImageTap?.call(1)),
+          ),
+        ),
+        Stack(
+          children: [
+            Container(
               width: itemSize,
-              height: height,
-              margin: EdgeInsets.only(right: spacing / 2),
+              margin: EdgeInsets.only(left: spacing / 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey.shade100,
@@ -747,103 +724,104 @@ class _PostMedia extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: isVideo
-                    ? _VideoItem(url: urls[0], width: itemSize, height: height)
-                    : _ImageItem(url: urls[0], width: itemSize, height: height),
+                    ? _VideoItem(url: urls[2], width: itemSize, height: itemSize)
+                    : _ImageItem(url: urls[2], onTap: () => onImageTap?.call(2)),
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: !isVideo ? () => onImageTap?.call(1) : null,
-            child: Container(
-              width: itemSize,
-              height: height,
-              margin: EdgeInsets.symmetric(horizontal: spacing / 2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey.shade100,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: isVideo
-                    ? _VideoItem(url: urls[1], width: itemSize, height: height)
-                    : _ImageItem(url: urls[1], width: itemSize, height: height),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: !isVideo ? () => onImageTap?.call(2) : null,
-            child: Stack(
-              children: [
-                Container(
-                  width: itemSize,
-                  height: height,
-                  margin: EdgeInsets.only(left: spacing / 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey.shade100,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: isVideo
-                        ? _VideoItem(url: urls[2], width: itemSize, height: height)
-                        : _ImageItem(url: urls[2], width: itemSize, height: height),
-                  ),
-                ),
-                if (remainingCount > 0)
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: !isVideo ? () => onImageTap?.call(2) : null,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.black54,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '+$remainingCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+            if (remainingCount > 0)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: !isVideo ? () => onImageTap?.call(2) : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black54,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '+$remainingCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
-        ],
-      ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
 
-class _ImageItem extends StatelessWidget {
+class _ImageItem extends StatefulWidget {
   final String url;
-  final double width;
-  final double? height;
+  final VoidCallback? onTap;
 
-  const _ImageItem({required this.url, required this.width, this.height});
+  const _ImageItem({required this.url, this.onTap});
+
+  @override
+  _ImageItemState createState() => _ImageItemState();
+}
+
+class _ImageItemState extends State<_ImageItem> {
+  double? _aspectRatio;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchImageDimensions();
+  }
+
+  Future<void> _fetchImageDimensions() async {
+    final imageProvider = CachedNetworkImageProvider(widget.url);
+    final imageStream = imageProvider.resolve(const ImageConfiguration());
+    imageStream.addListener(
+      ImageStreamListener(
+        (ImageInfo info, bool synchronousCall) {
+          if (mounted) {
+            setState(() {
+              _aspectRatio = info.image.width / info.image.height;
+            });
+          }
+        },
+        onError: (exception, stackTrace) {
+          if (mounted) {
+            setState(() {
+              _aspectRatio = 16 / 9; // Fallback aspect ratio
+            });
+          }
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: url,
-      width: width,
-      height: height,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => Container(
-        color: Colors.grey[200],
-        child: const Center(child: CircularProgressIndicator()),
-      ),
-      errorWidget: (context, url, error) => Container(
-        color: Colors.grey[200],
-        child: const Icon(Icons.broken_image),
-      ),
-      memCacheHeight: height != null ? (height! * 2).toInt() : null,
-      memCacheWidth: width != null ? (width * 2).toInt() : null,
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: _aspectRatio == null
+          ? Container(
+              color: Colors.grey[200],
+              child: const Center(child: CircularProgressIndicator()),
+            )
+          : CachedNetworkImage(
+              imageUrl: widget.url,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              alignment: Alignment.center,
+              placeholder: (context, url) => Container(
+                color: Colors.grey[200],
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[200],
+                child: const Icon(Icons.broken_image),
+              ),
+            ),
     );
   }
 }
@@ -878,9 +856,7 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
   }
 
   Future<void> _initializeVideo() async {
-    // Get cached file or download if not cached
     final file = await DefaultCacheManager().getSingleFile(widget.url);
-
     _videoPlayerController = VideoPlayerController.file(file);
     await _videoPlayerController.initialize();
 
@@ -949,10 +925,6 @@ class _PostActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showGiftButton =
-        post.owner?.walletAddress != null &&
-        post.owner!.walletAddress!.isNotEmpty;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -961,19 +933,6 @@ class _PostActions extends StatelessWidget {
           Expanded(child: _LikeButton(post: post)),
           Expanded(child: _CommentButton(post: post)),
           Expanded(child: _ShareButton(post: post)),
-
-          // if (showGiftButton) // Show only if the condition is true
-          //   Expanded(
-          //     child: PostButton(
-          //       // Assuming LucideIcons is available and imported
-          //       icon: Icon(LucideIcons.star),
-          //       text: 'Gift', // Or 'Stars', 'Tip', etc.
-          //       onTap: () {
-          //         // Call the helper function defined above
-          //         _showStarReactionModal(context, post);
-          //       },
-          //     ),
-          //   ),
           Expanded(
             child: PostButton(
               icon: Icon(LucideIcons.star),
@@ -1043,8 +1002,8 @@ class _LikeButtonState extends State<_LikeButton> {
               return;
             }
             context.read<PostBloc>().add(
-              ToggleReaction(postId: widget.post.id),
-            );
+                  ToggleReaction(postId: widget.post.id),
+                );
           },
         );
       },
@@ -1124,11 +1083,8 @@ void _showPostOptions(
   Post post,
   VoidCallback? onDeleted,
 ) async {
-  // Get current user ID from shared preferences
   final prefs = await SharedPreferences.getInstance();
   final currentUserId = prefs.getString('userId');
-
-  // Check if current user is the post owner
   final isOwner =
       currentUserId != null &&
       post.owner != null &&

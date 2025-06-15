@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/views/reel/upload/widgets/video_controls_overlay.dart';
 import 'package:video_player/video_player.dart';
 
@@ -137,13 +138,15 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isControllerInitialized = _isInitialized;
+        final theme = AppTheme.getTheme(context);
+
 
     Widget content;
     if (!isControllerInitialized) {
       if (widget.videoPath != null && _controller == null) {
-        content = const Text(
+        content =  Text(
           "Failed to load video.",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(color: theme.colorScheme.primary, fontSize: 18),
         );
       } else {
         content = const CircularProgressIndicator();
@@ -188,7 +191,7 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: theme.colorScheme.onPrimary,
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: Column(
@@ -201,7 +204,7 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
               child: IgnorePointer(
                 ignoring: !_showControls,
                 child: Container(
-                  color: Color.fromRGBO(143, 148, 251, 1),
+                  color: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12.0,
                     vertical: 16.0,
@@ -220,14 +223,14 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     Navigator.pop(context);
                                   }
                                 : null,
-                            icon: const Icon(
+                            icon:  Icon(
                               Icons.videocam,
-                              color: Colors.white,
+                              color: theme.colorScheme.primary,
                             ),
-                            label: const Text(
+                            label:  Text(
                               'Record Again',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: theme.colorScheme.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -255,11 +258,11 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                                     );
                                   }
                                 : null,
-                            icon: const Icon(Icons.send, color: Colors.white),
-                            label: const Text(
+                            icon:  Icon(Icons.send, color:theme.colorScheme.primary),
+                            label:  Text(
                               'Next',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: theme.colorScheme.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
