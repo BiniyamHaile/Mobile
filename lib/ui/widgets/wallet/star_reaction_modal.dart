@@ -1,12 +1,16 @@
 import 'dart:async'; // For Timer
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For input formatters
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // For number formatting
+import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/services/Wallet_service/wallet_service.dart';
 // Import the service
 import 'package:provider/provider.dart'; // Import Provider
 import 'package:reown_appkit/modal/models/public/appkit_modal_events.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart'; // For opening ToS link
 import 'package:web3dart/web3dart.dart'; // Needed for EthereumAddress in validation
 
@@ -16,6 +20,8 @@ class StarReactionModal extends StatefulWidget {
   // The recipient's blockchain address. This is UI-specific data for this gift action,
   // not general wallet state, so it stays as a required parameter.
   final String recipientAddress;
+
+  final String recipientId;
 
   // Remove wallet-related parameters - these are now accessed via WalletService
   // final BigInt currentStarsBalanceWei;
@@ -27,6 +33,7 @@ class StarReactionModal extends StatefulWidget {
     Key? key,
     required this.recipientName,
     required this.recipientAddress,
+    required this.recipientId,
     // No required wallet parameters needed now
   }) : super(key: key);
 
@@ -228,7 +235,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
 
   // --- Send Button Logic ---
   // Modified to pop the modal with the selected amount
-  void _handleSendStars() {
+  void _handleSendStars() async {
     // Access the WalletService instance
     final walletService = Provider.of<WalletService>(context, listen: false);
 
@@ -612,7 +619,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 30,),
+                      Icon(Icons.star, color: Colors.amber, size: 30),
                       SizedBox(width: 8),
                       Text(
                         // Button text changes based on enabled state
@@ -624,7 +631,7 @@ class _StarReactionModalState extends State<StarReactionModal> {
                                         ? 'Insufficient Balance'
                                         : 'Enter Amount') // Show if connected but invalid state
                                     ),
-                        style: TextStyle(fontSize: 18 , color: Colors.white),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ],
                   ),
