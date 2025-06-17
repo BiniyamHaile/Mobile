@@ -261,4 +261,6 @@ const Map<String, String> omET = {
 
   AppStrings.waitingForVideoDuration: 'viidiyoo eeggachaa jira...',
   AppStrings.postUpdateFailed: 'postii fooyyessu hin dandeenye',
+
+  AppStrings.invalidEmail: 'Imeelii sirrii miti',
 };

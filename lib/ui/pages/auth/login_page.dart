@@ -88,9 +88,9 @@ class _LoginPageState extends State<LoginPage> {
         } else if (state is LoginSuccess) {
           // Navigate to home page after successful login
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+             SnackBar(
               content: Text(
-                'Login successful!',
+                AppStrings.loginSuccess.tr(context),
                 style: TextStyle(color: Colors.white),
               ),
               behavior: SnackBarBehavior.floating,
@@ -171,9 +171,9 @@ class _LoginPageState extends State<LoginPage> {
                           duration: const Duration(milliseconds: 1600),
                           child: Container(
                             margin: const EdgeInsets.only(top: 50),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                "Login",
+                               AppStrings.login.tr(context),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 40,
@@ -239,13 +239,13 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
-                                    return 'Email is required';
+                                    return AppStrings.emailRequired.tr(context);
                                   }
                                   final emailRegex = RegExp(
                                     r'^[^@\s]+@[^@\s]+\.[^@\s]+?',
                                   );
                                   if (!emailRegex.hasMatch(val)) {
-                                    return 'Enter a valid email address';
+                                    return AppStrings.invalidEmail.tr(context);
                                   }
                                   return null;
                                 },
