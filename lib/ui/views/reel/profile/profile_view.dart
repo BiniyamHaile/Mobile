@@ -70,18 +70,22 @@ class ProfileView extends StatelessWidget {
           return Scaffold(
             backgroundColor: theme.colorScheme.surface,
             appBar: AppBar(
-              backgroundColor: theme.colorScheme.primary,
+              backgroundColor: theme.colorScheme.onPrimary,
               centerTitle: true,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
+                onPressed: () => context.go(RouteNames.feed),
+              ),
               title: Text(
                 user.name,
                 style: theme.textTheme.titleLarge
-                    ?.copyWith(color: theme.colorScheme.onPrimary),
+                    ?.copyWith(color: theme.colorScheme.primary),
               ),
               actions: [
                 // language selector
                 PopupMenuButton<Locale>(
                   icon: Icon(Icons.language,
-                      color: theme.colorScheme.onPrimary),
+                      color: theme.colorScheme.primary),
                   onSelected: languageService.changeLocale,
                   itemBuilder: (_) => languageService.supportedLocales
                       .map((loc) => PopupMenuItem(
@@ -92,13 +96,14 @@ class ProfileView extends StatelessWidget {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings,
-                      color: theme.colorScheme.onPrimary),
+                      color: theme.colorScheme.primary),
                   onPressed: () =>
                       context.go(RouteNames.profileSetting),
                 ),
                 IconButton(
                   icon: Icon(LucideIcons.bell,
-                      color: theme.colorScheme.onPrimary),
+                      color: theme.colorScheme.primary,
+                  ),
                   onPressed: () =>
                       context.push(RouteNames.notifications),
                 ),
