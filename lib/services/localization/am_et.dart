@@ -261,4 +261,6 @@ const Map<String, String> amET = {
 
   AppStrings.waitingForVideoDuration: 'ቪዲዮ ጊዜ ለመጠበቅ እየቆየ ነው...',
   AppStrings.postUpdateFailed: 'የልጥፍ አዘምን አልተሳካም: ',
+
+  AppStrings.invalidEmail: 'የተሳሳተ ኢሜይል አድራሻ',
 };

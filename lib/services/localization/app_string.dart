@@ -182,6 +182,7 @@ class AppStrings {
   static const String connectSepoliaNetwork = 'connect_sepolia_network';
   static const String connectSepoliaNetworkGift = 'connect_sepolia_network_gift';
   static const String couldNotOpenTransaction = 'could_not_open_transaction';
+  static const String invalidEmail = 'invalid_email';
 
   // OTP Screen
   static const String otpVerification = 'otp_verification';

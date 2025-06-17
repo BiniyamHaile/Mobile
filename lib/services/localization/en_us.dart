@@ -263,4 +263,5 @@ const Map<String, String> enUS = {
 
   AppStrings.waitingForVideoDuration: 'Waiting for video duration...',
   AppStrings.postUpdateFailed: 'Post update failed: ',
+  AppStrings.invalidEmail: 'Invalid email address',
 };
