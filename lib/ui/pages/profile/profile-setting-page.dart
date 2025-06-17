@@ -5,6 +5,7 @@ import 'package:mobile/services/localization/localizations_service.dart';
 import 'package:mobile/ui/pages/auth/preference_page.dart';
 import 'package:mobile/ui/routes/router_enum.dart';
 import 'package:mobile/ui/routes/route_names.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -16,13 +17,20 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.getTheme(context);
     final languageService = Provider.of<LanguageService>(context);
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: theme.colorScheme.onPrimary,
+        leading: IconButton(
+          icon:  Icon(Icons.arrow_back, color: theme.colorScheme.primary,
+          ),
+          onPressed: () => context.go(RouteNames.profile),
+        ),
         title: Text(
           languageService.translate(AppStrings.settingsAndPrivacy),
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: theme.colorScheme.primary),
         ),
       ),
       body: SingleChildScrollView(
@@ -30,13 +38,13 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              languageService.translate(AppStrings.settingsAndPrivacy),
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // Text(
+            //   languageService.translate(AppStrings.settingsAndPrivacy),
+            //   style: const TextStyle(
+            //     fontSize: 24,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
             const SizedBox(height: 20),
             // Language selection setting
             _buildLanguageSetting(context, languageService),
