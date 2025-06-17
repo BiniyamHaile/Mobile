@@ -44,7 +44,7 @@ class SearchPage extends StatelessWidget {
                   unselectedLabelColor: theme.colorScheme.primary,
                   indicatorWeight: 3,
                   tabs: [
-               Tab(text: AppStrings.all.tr(context)),
+              //  Tab(text: AppStrings.all.tr(context)),
                 Tab(text: AppStrings.people.tr(context)),
                 Tab(text: AppStrings.posts.tr(context)),
                 Tab(text: AppStrings.videos.tr(context)),
@@ -54,7 +54,7 @@ class SearchPage extends StatelessWidget {
               body: TabBarView(
                 
                 children: [
-                  AllSearchPage(),
+                  // AllSearchPage(),
                   PeopleSearchPage(),
                   PostsSearchPage(),
                   VideosSearchPage(),
