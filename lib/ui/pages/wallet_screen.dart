@@ -162,12 +162,13 @@ class _WalletScreenState extends State<WalletScreen> {
         return StarReactionModal(
           recipientName: "Default Recipient",
           recipientAddress: recipientAddressString,
+          recipientId: '', // Assuming recipientId is not needed here
         );
       },
     ).then((amountInStars) {
       if (amountInStars != null && amountInStars > 0) {
         print('Modal returned amount: $amountInStars. Initiating gift...');
-        walletService.sendGiftStars(recipientAddressString, amountInStars);
+        walletService.sendGiftStars(recipientAddressString, amountInStars, '');
       } else {
         print('Modal closed or no amount selected.');
       }
@@ -339,7 +340,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 //         ],
                 //       ),
                 //     ),
-                  // ),
+                // ),
               ],
             ],
           ),
@@ -474,10 +475,8 @@ class _WalletScreenState extends State<WalletScreen> {
     }
     final theme = AppTheme.getTheme(context);
 
-
-
     return Scaffold(
-      backgroundColor:theme.colorScheme.onPrimary ,
+      backgroundColor: theme.colorScheme.onPrimary,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.onPrimary,
         elevation: 0,
@@ -498,46 +497,50 @@ class _WalletScreenState extends State<WalletScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 30),
                 children: [
                   ClipPath(
-                    clipper: ConcaveBottomClipper(
-                      curveHeight: 20.0,
-                    ),
+                    clipper: ConcaveBottomClipper(curveHeight: 20.0),
                     child: SizedBox(
                       height: 80,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary, 
+                          color: theme.colorScheme.primary,
                           border: Border(
                             top: BorderSide(
-                              color: theme.colorScheme.onPrimary, // Top border color
+                              color: theme
+                                  .colorScheme
+                                  .onPrimary, // Top border color
                               width: 2.0, // Top border width
                             ),
-                            bottom: 
-                            BorderSide(
-                              color: theme.colorScheme.onPrimary, // Bottom border color
+                            bottom: BorderSide(
+                              color: theme
+                                  .colorScheme
+                                  .onPrimary, // Bottom border color
                               width: 2.0, // Bottom border width
                             ),
                             left: BorderSide(
-                              color: theme.colorScheme.onPrimary, // Left border color
+                              color: theme
+                                  .colorScheme
+                                  .onPrimary, // Left border color
                               width: 2.0, // Left border width
                             ),
                             right: BorderSide(
-                              color: theme.colorScheme.onPrimary, // Right border color
+                              color: theme
+                                  .colorScheme
+                                  .onPrimary, // Right border color
                               width: 2.0, // Right border width
                             ),
-
-                          )
+                          ),
                           // Set the background color to green
                           // Remove the borderRadius property
                         ),
                         alignment: Alignment.center,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Text(
                             AppStrings.walletSettings.tr(context),
                             style: TextStyle(
-                              color: theme.colorScheme.onPrimary, // Make text white for visibility on green
+                              color: theme
+                                  .colorScheme
+                                  .onPrimary, // Make text white for visibility on green
                               fontSize: 20, // Adjust font size
                               fontWeight: FontWeight.bold, // Make text bold
                             ),
@@ -588,18 +591,16 @@ class _WalletScreenState extends State<WalletScreen> {
                           AppStrings.disconnect.tr(context),
 
                           style: TextStyle(
-                             color: isConnected
+                            color: isConnected
                                 ? theme.colorScheme.onPrimary
                                 : Colors.grey[500],
                             fontWeight: FontWeight.bold,
                           ),
-                          ),
+                        ),
                         leading: Icon(
                           Icons.logout,
 
                           color: isConnected ? Colors.white : Colors.grey[500],
-
-
                         ),
                         onTap: isConnected
                             ? () {
@@ -662,7 +663,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
-                            color: theme.colorScheme.primary
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ],
@@ -678,7 +679,8 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                     ),
                   SizedBox(height: 20),
-                  if (walletService.status == ReownAppKitModalStatus.initializing)
+                  if (walletService.status ==
+                      ReownAppKitModalStatus.initializing)
                     Text(
                       AppStrings.initializingWallet.tr(context),
                       style: TextStyle(fontStyle: FontStyle.italic),

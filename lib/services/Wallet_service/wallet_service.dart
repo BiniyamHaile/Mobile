@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile/core/network/api_endpoints.dart';
 import 'package:mobile/models/token.dart';
 import 'package:mobile/services/api/wallet/wallet_repository.dart';
 import 'package:reown_appkit/modal/i_appkit_modal_impl.dart';
 import 'package:reown_appkit/modal/services/coinbase_service/i_coinbase_service.dart';
 import 'package:reown_appkit/modal/services/third_party_wallet_service.dart';
 import 'package:reown_appkit/reown_appkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final String _etherscanApiKey = dotenv.env['ETHERSCAN_API_KEY'] ?? '';
 
@@ -43,7 +46,8 @@ class WalletService extends ChangeNotifier {
   String _starsBalanceDisplay = 'Connect to see balance';
 
   final String _sepoliaChainId = 'eip155:11155111';
-  final String _starsTokenAddress = dotenv.env['STARS_TOKEN_ADDRESS'] ?? 'DefaultTokenAddress';
+  final String _starsTokenAddress =
+      dotenv.env['STARS_TOKEN_ADDRESS'] ?? 'DefaultTokenAddress';
   final String _starsPlatformAddress =
       dotenv.env['STARS_PLATFORM_ADDRESS'] ?? 'DefaultPlatformAddress';
   final int _starsTokenDecimals = 18;
@@ -733,9 +737,11 @@ class WalletService extends ChangeNotifier {
             ScaffoldMessenger.of(_context!).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.red,
-                content: Text('Wallet Error: ${event.message}' , style: TextStyle(
-                  color: Colors.white
-                ),)),
+                content: Text(
+                  'Wallet Error: ${event.message}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             );
           }
         });
@@ -1279,6 +1285,7 @@ class WalletService extends ChangeNotifier {
   Future<void> sendGiftStars(
     String recipientAddressString,
     int amountInStars,
+    String? recipientId,
   ) async {
     print(
       "WalletService: Attempting to send gift of $amountInStars STARS to $recipientAddressString",
@@ -1389,6 +1396,45 @@ class WalletService extends ChangeNotifier {
         _transactionStatus = 'Gift sent. Ready.';
         notifyListeners();
       });
+
+      try {
+        // Get SharedPreferences and userId before making the HTTP request
+        final prefs = await SharedPreferences.getInstance();
+        var userId = prefs.getString('userId');
+        var token = prefs.getString('token');
+
+        print("WalletService: User ID from SharedPreferences: $userId ");
+        print("WalletService: Recipient ID for gift: $recipientId");
+        print("WalletService: Amount in stars for gift: $amountInStars");
+
+        final response = await http.post(
+          Uri.parse(ApiEndpoints.baseUrl + '/social/posts/gift'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({
+            'recipientId': recipientId,
+            'amount': amountInStars,
+            'senderId': userId,
+          }),
+        );
+
+        print(
+          "WalletService: Response from backend after sending gift: ${response.statusCode} - ${response.body}",
+        );
+
+        if (response.statusCode == 200) {
+          print("Gift recorded successfully in backend");
+        } else {
+          print("Failed to record gift in backend: ${response.body}");
+          // You might want to show a message to the user here
+        }
+      } catch (e) {
+        print("Error sending gift data to backend: $e");
+        // Even if the backend call fails, we still consider the stars sent successfully
+        // since the blockchain transaction succeeded
+      }
     } catch (e, s) {
       print('WalletService: Error sending gift stars: $e\n$s');
       _transactionStatus = 'Gift transaction failed or rejected.';

@@ -151,12 +151,17 @@ void _showStarReactionModal(BuildContext context, Post post) {
       return StarReactionModal(
         recipientName: recipientName.isNotEmpty ? recipientName : AppStrings.postAuthor.tr(context),
         recipientAddress: recipientAddressString,
+        recipientId: post.owner?.id ?? '',
       );
     },
   ).then((amountInStars) {
     if (amountInStars != null && amountInStars > 0) {
       print('Modal returned amount: $amountInStars. Initiating gift...');
-      walletService.sendGiftStars(recipientAddressString, amountInStars);
+      walletService.sendGiftStars(
+        recipientAddressString,
+        amountInStars,
+        post.owner?.id ?? '',
+      );
     } else {
       print('Modal closed or no amount selected.');
     }
