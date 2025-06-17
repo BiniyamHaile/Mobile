@@ -105,6 +105,7 @@ class _PostCard extends StatelessWidget {
                   image: DecorationImage(
                     image: NetworkImage(post['files'][0]),
                     fit: BoxFit.cover,
+                    alignment: Alignment(0, -0.3),
                   ),
                 ),
               ),
