@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/search/search_bloc.dart';
 import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/string_extension.dart';
@@ -31,6 +32,7 @@ class SearchPage extends StatelessWidget {
             return Scaffold(
               backgroundColor: Colors.white,
               appBar: AppBar(
+                leading: IconButton(onPressed: context.pop, icon: Icon(Icons.arrow_back)),
                 backgroundColor: theme.colorScheme.onPrimary,
                 elevation: 0,
                 centerTitle: true,

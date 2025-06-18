@@ -140,12 +140,12 @@ class _FeedPageState extends State<FeedPage> {
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () {
-                          context.push(RouteNames.post);
+                          context.push(RouteNames.search);
                         },
-                        icon: Icon(Icons.post_add_outlined,
+                        icon: Icon(Icons.search,
                             color: appTheme.colorScheme.onPrimary),
                         label: Text(
-                          'Create a Post',
+                          'Search',
                           style:
                               TextStyle(color: appTheme.colorScheme.onPrimary),
                         ),
@@ -230,10 +230,10 @@ class _FeedPageState extends State<FeedPage> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        context.push(RouteNames.post);
+                        context.push(RouteNames.search);
                       },
                       icon: Icon(
-                        Icons.post_add_outlined,
+                        Icons.search,
                         color: appTheme.colorScheme.primary,
                         size: 30,
                       ),

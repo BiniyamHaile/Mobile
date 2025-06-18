@@ -43,8 +43,7 @@ class _NotificationTileState extends State<NotificationTile> {
       decoration: BoxDecoration(
         color: _notification.isRead
             ? theme.colorScheme.surface
-            : theme.colorScheme.secondary,
-        borderRadius: BorderRadius.circular(8),
+            : theme.primaryColor.withOpacity(0.1),
       ),
       child: Row(
         children: [
@@ -62,8 +61,8 @@ class _NotificationTileState extends State<NotificationTile> {
                       ? CachedNetworkImageProvider(
                           widget.notification.senders[0].profilePic!,
                         ) as ImageProvider<Object>
-                      : const AssetImage(
-                          'assets/images/user.png',
+                      :  AssetImage(
+                         widget.notification.senders.isNotEmpty ?  'assets/images/user.png' :  'assets/app_logo.png',
                         ),
                   backgroundColor: Colors.transparent,
                 ),
@@ -103,6 +102,7 @@ class _NotificationTileState extends State<NotificationTile> {
                     color: _notification.isRead
                         ? theme.colorScheme.onSurface.withAlpha(150)
                         : null,
+                    fontSize: 14
                   ),
                 ),
                 const SizedBox(height: 5),
