@@ -29,9 +29,7 @@ class ProfileRepository {
 
   Future<Map<String, String>> _getAuthHeaders() async {
     final token = await _getToken();
-    return {
-      'Authorization': 'Bearer $token',
-    };
+    return {'Authorization': 'Bearer $token'};
   }
 
   Future<UserRto> getUserProfile() async {
@@ -97,7 +95,7 @@ class ProfileRepository {
         '${ApiEndpoints.baseUrl}/auth/follow-status/$targetId',
         options: Options(headers: headers),
       );
-      
+
       // Handle different response types
       if (response.data is bool) {
         return response.data as bool;
@@ -112,7 +110,7 @@ class ProfileRepository {
           if (value is String) return value.toLowerCase() == 'true';
         }
       }
-      
+
       return false; // Default to false if we can't determine the status
     } catch (e) {
       throw Exception('Failed to check follow status: $e');
@@ -126,7 +124,7 @@ class ProfileRepository {
         '${ApiEndpoints.baseUrl}/auth/followers',
         options: Options(headers: headers),
       );
-      
+
       if (response.data == null) {
         return [];
       }
@@ -145,7 +143,7 @@ class ProfileRepository {
         '${ApiEndpoints.baseUrl}/auth/following',
         options: Options(headers: headers),
       );
-      
+
       if (response.data == null) {
         return [];
       }
@@ -161,11 +159,21 @@ class ProfileRepository {
     try {
       final userId = await _getUserId();
       final headers = await _getAuthHeaders();
+      print('Fetching videos for user ID>>>>>>>>>>: $userId');
+      print('Headers>>>>>>>>>: $headers');
+      print('Base URL>>>>>>>>>: ${ApiEndpoints.baseUrl}');
+      print('${ApiEndpoints.baseUrl}/reel/user/$userId');
       final response = await _dio.get(
         '${ApiEndpoints.baseUrl}/reel/user/$userId',
         options: Options(headers: headers),
       );
+
       
+
+      print(
+        'Response data===========================================: ${response.data}',
+      );
+
       if (response.data == null) {
         return [];
       }
@@ -176,4 +184,4 @@ class ProfileRepository {
       throw Exception('Failed to load user videos: $e');
     }
   }
-} 
+}

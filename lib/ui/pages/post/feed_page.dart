@@ -21,21 +21,11 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
-  String? _targetPostId;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final extra = GoRouterState.of(context).extra;
-    if (extra is Map<String, dynamic> && extra.containsKey('postId')) {
-      _targetPostId = extra['postId'] as String;
-    }
   }
 
   @override
@@ -56,27 +46,6 @@ class _FeedPageState extends State<FeedPage> {
     }
   }
 
-  void _scrollToPost(List posts) {
-    if (_targetPostId == null) return;
-    
-    final index = posts.indexWhere((post) => post.id == _targetPostId);
-    if (index != -1) {
-      // Calculate approximate height of each post (adjust this value based on your post card height)
-      const postHeight = 600.0; // Approximate height of a post card
-      final scrollPosition = index * postHeight;
-      
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          scrollPosition,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      });
-      
-      _targetPostId = null; // Reset after scrolling
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -91,9 +60,6 @@ class _FeedPageState extends State<FeedPage> {
           listener: (context, state) {
             if (state is PostLoaded) {
               setState(() => _isLoadingMore = false);
-              if (_targetPostId != null) {
-                _scrollToPost(state.posts.data);
-              }
             }
           },
           builder: (context, state) {
@@ -181,6 +147,7 @@ class _FeedPageState extends State<FeedPage> {
                           PostCard(
                             post: posts[index],
                             onDeleted: () {
+                              // Update your state here to remove the deleted post
                               setState(() {
                                 posts.removeWhere((p) => p.id == posts[index].id);
                               });

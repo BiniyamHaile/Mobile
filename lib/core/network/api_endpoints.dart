@@ -1,10 +1,10 @@
 class ApiEndpoints {
-  static const String baseUrl = "http://172.20.10.3:3000";
+  static const String baseUrl = "http://192.168.43.5:3000";
   static const String _authUrl = '$baseUrl/auth';
   static const String _notificationUrl = '$baseUrl/notifications';
   static const String _reelUrl = '$baseUrl/reel';
   static const String _reelCommentUrl = '$baseUrl/reel-comment';
-  static const String ip = "http://192.168.43.4";
+  static const String ip = "http://192.168.43.5";
   static const String _chatUrl = '$baseUrl/chat';
 
   String get socketServerUrl => "$ip:4000";
