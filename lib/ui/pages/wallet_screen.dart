@@ -591,9 +591,8 @@ class _WalletScreenState extends State<WalletScreen> {
                           AppStrings.disconnect.tr(context),
 
                           style: TextStyle(
-                            color: isConnected
-                                ? theme.colorScheme.onPrimary
-                                : Colors.grey[500],
+                            color: 
+                                theme.colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
