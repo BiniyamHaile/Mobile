@@ -11,7 +11,7 @@ class AppLogo extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Text(
-      'EthioMedia',
+      'Instagram',
       style: textTheme.headlineMedium?.copyWith(
         fontFamily: 'EduNSWACTCursive',
         fontWeight: FontWeight.bold,
