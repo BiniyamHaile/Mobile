@@ -88,7 +88,6 @@ class PostRepository extends BaseRepository {
       final prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
 
-      print("mentions>>>: ${mentions}");
 
       final formData = FormData.fromMap({
         'content': content,
