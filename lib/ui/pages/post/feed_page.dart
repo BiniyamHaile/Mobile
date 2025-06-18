@@ -62,7 +62,7 @@ class _FeedPageState extends State<FeedPage> {
     final index = posts.indexWhere((post) => post.id == _targetPostId);
     if (index != -1) {
       // Calculate approximate height of each post (adjust this value based on your post card height)
-      const postHeight = 750.0; // Approximate height of a post card
+      const postHeight = 600.0; // Approximate height of a post card
       final scrollPosition = index * postHeight;
       
       WidgetsBinding.instance.addPostFrameCallback((_) {
