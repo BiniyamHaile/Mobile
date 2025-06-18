@@ -13,6 +13,10 @@ enum NotificationType {
   message,
   friendRequest,
   friendRequestAccepted,
+  gift,
+  commentRemoved,
+  postRemoved,
+  reelRemoved,
 }
 
 NotificationType? notificationTypeFromString(String type) {
@@ -37,6 +41,15 @@ NotificationType? notificationTypeFromString(String type) {
       return NotificationType.friendRequest;
     case 'friend_request_accepted':
       return NotificationType.friendRequestAccepted;
+    case 'gift':
+      return NotificationType.gift;
+    // New cases
+    case 'comment-removed':
+      return NotificationType.commentRemoved;
+    case 'post-removed':
+      return NotificationType.postRemoved;
+    case 'reel-removed':
+      return NotificationType.reelRemoved;
     default:
       return null;
   }
@@ -64,6 +77,15 @@ String? notificationTypeToString(NotificationType? type) {
       return 'friend_request';
     case NotificationType.friendRequestAccepted:
       return 'friend_request_accepted';
+    case NotificationType.gift:
+      return 'gift';
+    // New cases
+    case NotificationType.commentRemoved:
+      return 'comment-removed';
+    case NotificationType.postRemoved:
+      return 'post-removed';
+    case NotificationType.reelRemoved:
+      return 'reel-removed';
     default:
       return null;
   }
@@ -91,6 +113,15 @@ String _getActionText(NotificationType type) {
       return 'sent you a friend request';
     case NotificationType.friendRequestAccepted:
       return 'accepted your friend request';
+    case NotificationType.gift:
+      return 'sent you a gift';
+    // New action texts
+    case NotificationType.commentRemoved:
+      return 'Your comment was removed';
+    case NotificationType.postRemoved:
+      return 'Your post was removed';
+    case NotificationType.reelRemoved:
+      return 'Your reel was removed';
     default:
       return 'interacted with you';
   }
@@ -126,10 +157,36 @@ class NotificationModel {
     final NotificationType type =
         notificationTypeFromString(json['type']) ?? NotificationType.comment;
 
-    // Build sender name list
-    String text = '';
-    final actionText = _getActionText(type);
-    if (senderProfiles.isNotEmpty) {
+    String text;
+    
+    // Determine the core action text first.
+    String actionText;
+    if (type == NotificationType.gift) {
+      // For gifts, the 'message' field is the amount.
+      // We construct a more descriptive action text that includes the amount.
+      final String amount = json['message'] as String;
+      actionText = 'sent you a gift of $amount';
+    }else if(type == NotificationType.commentRemoved ||
+              type == NotificationType.postRemoved ||
+              type == NotificationType.reelRemoved) {
+      actionText = "${_getActionText(type)} ${json['message']}";
+    }
+     else {
+      actionText = _getActionText(type);
+    }
+
+    // Now, construct the final display text using the sender information.
+    if (senderProfiles.isEmpty) {
+      // Handles sender-less notifications like "Your post was removed".
+      // For a sender-less gift, this provides a clear message to the user.
+      if (type == NotificationType.gift) {
+        final String amount = json['message'] as String;
+        text = 'You have received a gift of $amount';
+      } else {
+        text = actionText;
+      }
+    } else {
+      // Constructs the text with one or more sender names.
       if (senderProfiles.length == 1) {
         text = '${senderProfiles[0].firstName} ${senderProfiles[0].lastName} $actionText';
       } else if (senderProfiles.length == 2) {
