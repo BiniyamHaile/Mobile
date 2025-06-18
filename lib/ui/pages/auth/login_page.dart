@@ -230,7 +230,8 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.black,
                                   ),
                                   prefixIcon: const Icon(Icons.email_outlined),
-                                  prefixIconColor: theme.colorScheme.primary,
+                                  prefixIconColor:                                    Colors.black,
+
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -263,10 +264,10 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: InputDecoration(
                                   labelText: AppStrings.password.tr(context),
                                   labelStyle: TextStyle(
-                                    color: theme.colorScheme.primary,
+                                    color: Colors.black,
                                   ),
                                   prefixIcon: const Icon(Icons.lock_outline),
-                                  prefixIconColor: theme.colorScheme.primary,
+                                  prefixIconColor: Colors.black,
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
