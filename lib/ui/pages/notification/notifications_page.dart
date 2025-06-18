@@ -130,11 +130,17 @@ class _NotificationsPageState extends State<NotificationsPage>
                       );
                     }
                   
-                    return ListView.builder(
+                    return ListView.separated(
                       itemCount: notifications.length,
                       itemBuilder: (_, index) {
                         return NotificationTile(notification: notifications[index]);
                       },
+                      separatorBuilder: (context, index) => 
+                        Divider(
+                          color: theme1.colorScheme.primary.withOpacity(0.15),
+                          thickness: 1,
+                          height: 1,
+                        ),
                     );
                   }
                   
