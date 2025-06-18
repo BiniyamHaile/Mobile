@@ -382,13 +382,6 @@ class _VideoFeedViewState extends State<VideoFeedView>
             setState(() => _videos = state.videos);
             _manageControllerWindow(_currentPage);
 
-            if (state.isLoadingFeed) {
-              // Optionally handle loading state
-            } else {}
-            if (state.isPaginatingFeed) {
-              // Optionally handle pagination
-            } else {}
-
             if (state.actionStatus == ReelActionStatus.reportSuccess &&
                 _lastHandledActionStatus != ReelActionStatus.reportSuccess) {
               showDialog(
@@ -453,8 +446,20 @@ class _VideoFeedViewState extends State<VideoFeedView>
               _lastHandledActionStatus = null;
             }
           },
-          child: _videos.isEmpty
-              ? Center(
+          child: BlocBuilder<ReelFeedAndActionBloc, ReelFeedAndActionState>(
+            builder: (context, state) {
+              // Show loading indicator while fetching reels
+              if (state.isLoadingFeed) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.blue,
+                  ),
+                );
+              }
+              
+              // Show "No Reels Available" only after loading is complete and no reels found
+              if (state.videos.isEmpty && !state.isLoadingFeed) {
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -504,28 +509,33 @@ class _VideoFeedViewState extends State<VideoFeedView>
                       ),
                     ],
                   ),
-                )
-              : PreloadPageView.builder(
-                  scrollDirection: Axis.vertical,
-                  controller: _pageController,
-                  itemCount: _videos.length,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  onPageChanged: (index) => _handlePageChange(index),
-                  itemBuilder: (context, index) {
-                    if (index < 0 || index >= _videos.length) {
-                      return const SizedBox.shrink();
-                    }
-                    return RepaintBoundary(
-                      child: VideoFeedItem(
-                        key: ValueKey(_videos[index].id),
-                        controller: _getController(_videos[index].id),
-                        videoItem: _videos[index],
-                        currentUserId: _currentUserId ?? '',
-                      ),
-                    );
-                  },
-                  preloadPagesCount: 1,
-                ),
+                );
+              }
+              
+              // Show reels if available
+              return PreloadPageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _pageController,
+                itemCount: state.videos.length,
+                physics: const AlwaysScrollableScrollPhysics(),
+                onPageChanged: (index) => _handlePageChange(index),
+                itemBuilder: (context, index) {
+                  if (index < 0 || index >= state.videos.length) {
+                    return const SizedBox.shrink();
+                  }
+                  return RepaintBoundary(
+                    child: VideoFeedItem(
+                      key: ValueKey(state.videos[index].id),
+                      controller: _getController(state.videos[index].id),
+                      videoItem: state.videos[index],
+                      currentUserId: _currentUserId ?? '',
+                    ),
+                  );
+                },
+                preloadPagesCount: 1,
+              );
+            },
+          ),
         ),
       ),
     );
