@@ -80,8 +80,6 @@ class InteractionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final outlineShadows = _getOutlineShadows();
-
     return InkWell(
       onTap: () async {
         if (onTap != null) {
@@ -98,8 +96,7 @@ class InteractionButton extends StatelessWidget {
           Icon(
             icon,
             color: color,
-            size: 36,
-            shadows: outlineShadows,
+            size: 28,
           ),
           // Only show count if it's not -1
           if (count != -1)
@@ -107,7 +104,7 @@ class InteractionButton extends StatelessWidget {
               count.toString(),
               style: TextStyle(
                 color: appColors.whiteColor,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),

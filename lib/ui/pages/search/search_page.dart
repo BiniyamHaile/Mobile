@@ -45,8 +45,9 @@ class SearchPage extends StatelessWidget {
                   labelColor: theme.colorScheme.primary,
                   unselectedLabelColor: theme.colorScheme.primary,
                   indicatorWeight: 3,
+                  dividerColor: Colors.transparent,
                   tabs: [
-               Tab(text: AppStrings.all.tr(context)),
+              //  Tab(text: AppStrings.all.tr(context)),
                 Tab(text: AppStrings.people.tr(context)),
                 Tab(text: AppStrings.posts.tr(context)),
                 Tab(text: AppStrings.videos.tr(context)),
@@ -56,7 +57,7 @@ class SearchPage extends StatelessWidget {
               body: TabBarView(
                 
                 children: [
-                  AllSearchPage(),
+                  // AllSearchPage(),
                   PeopleSearchPage(),
                   PostsSearchPage(),
                   VideosSearchPage(),
@@ -76,9 +77,10 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: TextField(
+        style: TextStyle(color: Colors.black),
         decoration: InputDecoration(
           hintText: AppStrings.searchHint.tr(context),
-          prefixIcon: Icon(Icons.search, color: Color.fromRGBO(143, 148, 251, 1)),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
           filled: true,
           fillColor: Colors.white,

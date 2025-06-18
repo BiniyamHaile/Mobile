@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile/bloc/auth/search/search_bloc.dart';
+import 'package:mobile/ui/routes/route_names.dart';
 
 class PostsSearchPage extends StatelessWidget {
   @override
@@ -46,96 +48,102 @@ class _PostCard extends StatelessWidget {
     final lastName = owner['lastName'] ?? '';
     final username = owner['username'] ?? '';
     
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.grey[200],
-              child: Text(
-                firstName.isNotEmpty && lastName.isNotEmpty
-                    ? '${firstName[0]}${lastName[0]}'
-                    : '?',
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        context.go(RouteNames.feed, extra: {'postId': post['id']});
+      },
+      child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey[200],
+                child: Text(
+                  firstName.isNotEmpty && lastName.isNotEmpty
+                      ? '${firstName[0]}${lastName[0]}'
+                      : '?',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              title: Text(
+                firstName.isNotEmpty && lastName.isNotEmpty
+                    ? '$firstName $lastName'
+                    : 'Unknown User',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                username.isNotEmpty ? '@$username' : '',
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
             ),
-            title: Text(
-              firstName.isNotEmpty && lastName.isNotEmpty
-                  ? '$firstName $lastName'
-                  : 'Unknown User',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            if (post['content'] != null && post['content'].toString().isNotEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  post['content'].toString(),
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+            if (post['files'] != null && 
+                post['files'] is List && 
+                (post['files'] as List).isNotEmpty)
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                  image: DecorationImage(
+                    image: NetworkImage(post['files'][0]),
+                    fit: BoxFit.cover,
+                    alignment: Alignment(0, -0.3),
+                  ),
+                ),
+              ),
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _PostActionButton(
+                    icon: Icons.favorite_border,
+                    label: '${(post['likedBy'] as List?)?.length ?? 0}',
+                    onTap: () {},
+                  ),
+                  _PostActionButton(
+                    icon: Icons.comment_outlined,
+                    label: '${(post['commentIds'] as List?)?.length ?? 0}',
+                    onTap: () {},
+                  ),
+                  _PostActionButton(
+                    icon: Icons.share_outlined,
+                    label: 'Share',
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
-            subtitle: Text(
-              username.isNotEmpty ? '@$username' : '',
-              style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            ),
-          ),
-          if (post['content'] != null && post['content'].toString().isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                post['content'].toString(),
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          if (post['files'] != null && 
-              post['files'] is List && 
-              (post['files'] as List).isNotEmpty)
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-                image: DecorationImage(
-                  image: NetworkImage(post['files'][0]),
-                  fit: BoxFit.cover,
+                _formatDate(post['createdAt']?.toString()),
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12,
                 ),
               ),
             ),
-          Padding(
-            padding: EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _PostActionButton(
-                  icon: Icons.favorite_border,
-                  label: '${(post['likedBy'] as List?)?.length ?? 0}',
-                  onTap: () {},
-                ),
-                _PostActionButton(
-                  icon: Icons.comment_outlined,
-                  label: '${(post['commentIds'] as List?)?.length ?? 0}',
-                  onTap: () {},
-                ),
-                _PostActionButton(
-                  icon: Icons.share_outlined,
-                  label: 'Share',
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              _formatDate(post['createdAt']?.toString()),
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

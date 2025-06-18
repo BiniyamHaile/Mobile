@@ -204,12 +204,17 @@ class VideoFeedItem extends StatelessWidget {
         return StarReactionModal(
           recipientName: videoItem.username ?? "Daniel Tilahun",
           recipientAddress: recipientAddressString,
+          recipientId: videoItem.ownerId ?? '',
         );
       },
     ).then((amountInStars) {
       if (amountInStars != null && amountInStars > 0) {
         print('Modal returned amount: $amountInStars. Initiating gift...');
-        walletService.sendGiftStars(recipientAddressString, amountInStars);
+        walletService.sendGiftStars(
+          recipientAddressString,
+          amountInStars,
+          videoItem.ownerId ?? '',
+        );
       } else {
         print('Modal closed or no amount selected.');
       }

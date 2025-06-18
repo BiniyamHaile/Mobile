@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/bloc/auth/search/search_bloc.dart';
 import 'package:mobile/services/localization/app_string.dart';
 import 'package:mobile/services/localization/string_extension.dart';
+import 'package:mobile/ui/theme/app_theme.dart';
 
 class PeopleSearchPage extends StatelessWidget {
   @override
@@ -37,17 +38,17 @@ class PeopleSearchPage extends StatelessWidget {
 }
 
 class _PeopleListTile extends StatelessWidget {
-  final dynamic person; // Replace with your Person model
+  final dynamic person;
 
   const _PeopleListTile({required this.person});
 
   @override
   Widget build(BuildContext context) {
-    // Example fields: person['name'], person['subtitle'], person['avatarUrl'], person['isFriend'], person['isFollowing']
+    final theme = AppTheme.getTheme(context);
     return ListTile(
       leading: CircleAvatar(
         radius: 28,
-         backgroundImage: person['profilePic'] != null
+        backgroundImage: person['profilePic'] != null
             ? NetworkImage(person['profilePic'])
             : AssetImage('assets/images/default_avatar.jpg') as ImageProvider,
       ),
@@ -71,22 +72,28 @@ class _PeopleActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.getTheme(context);
+    
     if (person['isFollowing'] == true) {
       return OutlinedButton(
-        onPressed: () {},
+        onPressed: () {
+          context.read<SearchBloc>().add(UnfollowUser(person['id']));
+        },
         child: Text(AppStrings.following.tr(context)),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Color.fromRGBO(143, 148, 251, 1),
-          side: BorderSide(color: Color.fromRGBO(143, 148, 251, 1)),
+          foregroundColor: theme.colorScheme.primary,
+          side: BorderSide(color: theme.colorScheme.primary),
         ),
       );
     }
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        context.read<SearchBloc>().add(FollowUser(person['id']));
+      },
       child: Text(AppStrings.follow.tr(context)),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue[50],
-        foregroundColor: Colors.blue[800],
+        backgroundColor: theme.colorScheme.primaryContainer,
+        foregroundColor: theme.colorScheme.onPrimaryContainer,
         elevation: 0,
       ),
     );
