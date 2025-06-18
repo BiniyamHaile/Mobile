@@ -518,8 +518,10 @@ class _PostingScreenState extends State<PostingScreen> {
               duration: const Duration(seconds: 2),
             ),
           );
-          Navigator.push(
-              ctx, MaterialPageRoute(builder: (_) => const HomePage()));
+            Navigator.push(
+            ctx,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
         } else if (state is PostCreationFailure ||
             state is PostUpdateFailure) {
           setState(() => _isSubmitting = false);

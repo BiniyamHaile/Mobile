@@ -11,6 +11,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc() : super(SearchInitial()) {
     on<SearchQueryChanged>(_onQueryChanged);
     on<SearchTabChanged>(_onTabChanged);
+    on<FollowUser>(_onFollowUser);
+    on<UnfollowUser>(_onUnfollowUser);
   }
 
   // Future<void> _onQueryChanged(
@@ -72,18 +74,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       Map<String, dynamic> queryParams = {};
 
       switch (currentTab) {
-        case 0: // All
-          // Handle all search
-          return;
-        case 1: // People
+        // case 0: // All
+        //   // Handle all search
+        //   return;
+        case 0: // People
           endpoint = '${ApiEndpoints.baseUrl}/auth/search-users';
           queryParams = {'q': event.query};
           break;
-        case 2: // Posts
+        case 1: // Posts
           endpoint = '${ApiEndpoints.baseUrl}/social/posts/search';
           queryParams = {'search': event.query};
           break;
-        case 3: // Videos
+        case 2: // Videos
           // Handle videos search
           return;
         default:
@@ -98,10 +100,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
 
       List results;
-      if (currentTab == 2) { // Posts search returns FindResult
+      if (currentTab == 1) { // Posts search returns FindResult
         results = response.data['data'] as List;
       } else { // Users search returns array directly
         results = response.data as List;
+        print('Searcheeeeeeeeeeeeeeeeeeeeeeeeed  users: $results');
       }
       
       emit(SearchLoaded(results));
@@ -116,5 +119,61 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('currentSearchTab', event.tabIndex);
+  }
+
+  Future<void> _onFollowUser(
+    FollowUser event,
+    Emitter<SearchState> emit,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await Dio().post(
+        '${ApiEndpoints.baseUrl}/auth/follow/${event.targetId}',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (state is SearchLoaded) {
+        final currentState = state as SearchLoaded;
+        final updatedResults = currentState.results.map((person) {
+          if (person['id'] == event.targetId) {
+            return {...person, 'isFollowing': true};
+          }
+          return person;
+        }).toList();
+        emit(SearchLoaded(updatedResults));
+      }
+    } catch (e) {
+      emit(SearchError('Failed to follow user: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onUnfollowUser(
+    UnfollowUser event,
+    Emitter<SearchState> emit,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await Dio().post(
+        '${ApiEndpoints.baseUrl}/auth/unfollow/${event.targetId}',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (state is SearchLoaded) {
+        final currentState = state as SearchLoaded;
+        final updatedResults = currentState.results.map((person) {
+          if (person['id'] == event.targetId) {
+            return {...person, 'isFollowing': false};
+          }
+          return person;
+        }).toList();
+        emit(SearchLoaded(updatedResults));
+      }
+    } catch (e) {
+      emit(SearchError('Failed to unfollow user: ${e.toString()}'));
+    }
   }
 }
