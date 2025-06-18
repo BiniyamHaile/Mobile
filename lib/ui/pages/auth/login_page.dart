@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: InputDecoration(
                                   labelText: AppStrings.email.tr(context),
                                   labelStyle: TextStyle(
-                                    color: theme.colorScheme.primary,
+                                  color: Colors.black,
                                   ),
                                   prefixIcon: const Icon(Icons.email_outlined),
                                   prefixIconColor: theme.colorScheme.primary,
@@ -235,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: theme.colorScheme.onPrimary,
+                                  fillColor: Colors.white,
                                 ),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
@@ -257,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                                 obscureText: _obscurePassword,
                                 cursorColor: Colors.deepPurple,
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: Colors.black,
                                 ),
 
                                 decoration: InputDecoration(
@@ -283,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   filled: true,
-                                  fillColor: theme.colorScheme.onPrimary,
+                                  fillColor: Colors.white,
                                 ),
                                 onChanged: (value) =>
                                     _updatePasswordStrength(value),

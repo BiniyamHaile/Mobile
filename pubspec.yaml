@@ -81,6 +81,7 @@ dependencies:
   provider: ^6.1.5
   jwt_decoder: ^2.0.1
   easy_localization: ^3.0.5
+  animated_bottom_navigation_bar: ^1.4.0
 
 dev_dependencies:
   flutter_test:

@@ -42,256 +42,272 @@ class ProfileView extends StatelessWidget {
       builder: (context, state) {
         final theme = AppTheme.getTheme(context);
 
+        // Get user data if available, otherwise use default values
+        final user = state is ProfileLoaded ? state.user : null;
+        final videos = state is ProfileLoaded ? (state.videos ?? []) : [];
+        final followers = state is ProfileLoaded ? (state.followers ?? []) : [];
+        final following = state is ProfileLoaded ? (state.following ?? []) : [];
+        final isFollowing = state is ProfileLoaded ? (state.isFollowing ?? false) : false;
+
+        // Load profile if in initial state
         if (state is ProfileInitial) {
           context.read<ProfileBloc>().add(LoadProfile());
-          return const Center(child: CircularProgressIndicator());
         }
 
-        if (state is ProfileLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is ProfileError) {
-          return Center(
-            child: Text(
-              '${state.message}',
-              style: theme.textTheme.bodyMedium,
+        return Scaffold(
+          backgroundColor: theme.colorScheme.surface,
+          appBar: AppBar(
+            backgroundColor: theme.colorScheme.onPrimary,
+            // centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
+              onPressed: () => context.go(RouteNames.feed),
             ),
-          );
-        }
-
-        if (state is ProfileLoaded) {
-          final user = state.user;
-          final videos = state.videos ?? [];
-          final followers = state.followers ?? [];
-          final following = state.following ?? [];
-          final isFollowing = state.isFollowing ?? false;
-
-          return Scaffold(
-            backgroundColor: theme.colorScheme.surface,
-            appBar: AppBar(
-              backgroundColor: theme.colorScheme.onPrimary,
-              centerTitle: true,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
-                onPressed: () => context.go(RouteNames.feed),
+            title: Text(
+              user?.name ?? 'Profile',
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(color: theme.colorScheme.primary),
+            ),
+            actions: [
+              // language selector
+              PopupMenuButton<Locale>(
+                icon: Icon(Icons.language,
+                    color: theme.colorScheme.primary),
+                onSelected: languageService.changeLocale,
+                itemBuilder: (_) => languageService.supportedLocales
+                    .map((loc) => PopupMenuItem(
+                          value: loc,
+                          child: Text(loc.languageCode.toUpperCase()),
+                        ))
+                    .toList(),
               ),
-              title: Text(
-                user.name,
-                style: theme.textTheme.titleLarge
-                    ?.copyWith(color: theme.colorScheme.primary),
+              IconButton(
+                icon: Icon(Icons.settings,
+                    color: theme.colorScheme.primary),
+                onPressed: () =>
+                    context.go(RouteNames.profileSetting),
               ),
-              actions: [
-                // language selector
-                PopupMenuButton<Locale>(
-                  icon: Icon(Icons.language,
-                      color: theme.colorScheme.primary),
-                  onSelected: languageService.changeLocale,
-                  itemBuilder: (_) => languageService.supportedLocales
-                      .map((loc) => PopupMenuItem(
-                            value: loc,
-                            child: Text(loc.languageCode.toUpperCase()),
-                          ))
-                      .toList(),
+              IconButton(
+                icon: Icon(LucideIcons.bell,
+                    color: theme.colorScheme.primary,
                 ),
-                IconButton(
-                  icon: Icon(Icons.settings,
-                      color: theme.colorScheme.primary),
-                  onPressed: () =>
-                      context.go(RouteNames.profileSetting),
-                ),
-                IconButton(
-                  icon: Icon(LucideIcons.bell,
-                      color: theme.colorScheme.primary,
-                  ),
-                  onPressed: () =>
-                      context.push(RouteNames.notifications),
-                ),
-              ],
-            ),
-            body: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              children: [
-                const SizedBox(height: 20),
-                // also show current language at top-right of content
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: DropdownButton<Locale>(
-                    value: languageService.currentLocale,
-                    underline: const SizedBox(),
-                    onChanged: (loc) {
-                      if (loc != null) languageService.changeLocale(loc);
-                    },
-                    items: languageService.supportedLocales
-                        .map((loc) => DropdownMenuItem(
-                              value: loc,
-                              child:
-                                  Text(loc.languageCode.toUpperCase()),
-                            ))
-                        .toList(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: CachedNetworkImageProvider(
-                      user.profilePic ??
-                          'https://via.placeholder.com/150',
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    '@${user.username}',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(
-                          color: theme.colorScheme.onBackground,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatColumn(
-                      context,
-                      AppStrings.posts.tr(context),
-                      videos.length.toString(),
-                    ),
-                    _buildStatColumn(
-                      context,
-                      AppStrings.followers.tr(context),
-                      followers.length.toString(),
-                    ),
-                    _buildStatColumn(
-                      context,
-                      AppStrings.following.tr(context),
-                      following.length.toString(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.read<ProfileBloc>().add(
-                                isFollowing
-                                    ? UnfollowUser(user.id)
-                                    : FollowUser(user.id),
-                              );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              theme.colorScheme.primary,
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: Text(
-                          isFollowing
-                              ? 
-                              "unfollow"
-                              : AppStrings.follow.tr(context),
-                          style: theme.textTheme.bodyMedium
-                              ?.copyWith(
-                                color:
-                                    theme.colorScheme.onPrimary,
-                              ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // TODO: Implement Message action
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: theme.colorScheme.primary),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: Text(
-                          AppStrings.message.tr(context),
-                          style: theme.textTheme.bodyMedium
-                              ?.copyWith(
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  user.bio ?? '',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(
-                        color: theme.colorScheme.onBackground,
-                      ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Icon(Icons.grid_view_rounded,
-                        color: theme.colorScheme.onBackground),
-                    Icon(Icons.favorite_border,
-                        color: theme.colorScheme.onBackground),
-                    Icon(Icons.bookmark_border,
-                        color: theme.colorScheme.onBackground),
-                    Icon(Icons.lock_outline,
-                        color: theme.colorScheme.onBackground),
-                  ],
-                ),
-                Divider(
-                  color:
-                      theme.colorScheme.onBackground.withOpacity(0.2),
-                  height: 20,
-                  thickness: 0.5,
-                ),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 1.5,
-                    mainAxisSpacing: 1.5,
-                    childAspectRatio: 9 / 16,
-                  ),
-                  itemCount: videos.length,
-                  itemBuilder: (context, index) {
-                    return _buildVideoGridItem(
-                      context,
-                      index,
-                      videos[index],
-                      videos,
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        }
-
-        return const SizedBox.shrink();
+                onPressed: () =>
+                    context.push(RouteNames.notifications),
+              ),
+            ],
+          ),
+          body: _buildBody(context, state, theme, languageService, user, videos.cast<VideoItem>(), followers, following, isFollowing),
+        );
       },
     );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    ProfileState state,
+    ThemeData theme,
+    LanguageService languageService,
+    dynamic user,
+    List<VideoItem> videos,
+    List<dynamic> followers,
+    List<dynamic> following,
+    bool isFollowing,
+  ) {
+    // Show loading indicator for body content while loading
+    if (state is ProfileInitial || state is ProfileLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is ProfileError) {
+      return Center(
+        child: Text(
+          '${state.message}',
+          style: theme.textTheme.bodyMedium,
+        ),
+      );
+    }
+
+    if (state is ProfileLoaded && user != null) {
+      return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        children: [
+          const SizedBox(height: 20),
+          // also show current language at top-right of content
+          Align(
+            alignment: Alignment.centerRight,
+            child: DropdownButton<Locale>(
+              value: languageService.currentLocale,
+              underline: const SizedBox(),
+              onChanged: (loc) {
+                if (loc != null) languageService.changeLocale(loc);
+              },
+              items: languageService.supportedLocales
+                  .map((loc) => DropdownMenuItem(
+                        value: loc,
+                        child:
+                            Text(loc.languageCode.toUpperCase()),
+                      ))
+                  .toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: CachedNetworkImageProvider(
+                user.profilePic ??
+                    'https://via.placeholder.com/150',
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              '@${user.username}',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(
+                    color: theme.colorScheme.onBackground,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildStatColumn(
+                context,
+                AppStrings.posts.tr(context),
+                videos.length.toString(),
+              ),
+              _buildStatColumn(
+                context,
+                AppStrings.followers.tr(context),
+                followers.length.toString(),
+              ),
+              _buildStatColumn(
+                context,
+                AppStrings.following.tr(context),
+                following.length.toString(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // context.read<ProfileBloc>().add(
+                    //       isFollowing
+                    //           ? UnfollowUser(user.id)
+                    //           : FollowUser(user.id),
+                    //     );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        theme.colorScheme.primary,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: Text(
+                    isFollowing
+                        ? 
+                        "unfollow"
+                        : AppStrings.follow.tr(context),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(
+                          color:
+                              theme.colorScheme.onPrimary,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    // TODO: Implement Message action
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                        color: theme.colorScheme.primary),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: Text(
+                    AppStrings.message.tr(context),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            user.bio ?? '',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(
+                  color: theme.colorScheme.onBackground,
+                ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(Icons.grid_view_rounded,
+                  color: theme.colorScheme.onBackground),
+              Icon(Icons.favorite_border,
+                  color: theme.colorScheme.onBackground),
+              Icon(Icons.bookmark_border,
+                  color: theme.colorScheme.onBackground),
+              Icon(Icons.lock_outline,
+                  color: theme.colorScheme.onBackground),
+            ],
+          ),
+          Divider(
+            color:
+                theme.colorScheme.onBackground.withOpacity(0.2),
+            height: 20,
+            thickness: 0.5,
+          ),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 1.5,
+              mainAxisSpacing: 1.5,
+              childAspectRatio: 9 / 16,
+            ),
+            itemCount: videos.length,
+            itemBuilder: (context, index) {
+              return _buildVideoGridItem(
+                context,
+                index,
+                videos[index],
+                videos,
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+        ],
+      );
+    }
+
+    return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildStatColumn(
