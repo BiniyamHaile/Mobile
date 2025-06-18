@@ -61,7 +61,7 @@ class _PasswordInputState extends State<PasswordInput> {
           keyboardType: TextInputType.visiblePassword,
           prefixIcon: Icon(
             Icons.lock,
-            color: appTheme.iconTheme.color,
+            color: Colors.black,
           ),
           suffixIcon: IconButton(
             onPressed: () {
@@ -69,10 +69,32 @@ class _PasswordInputState extends State<PasswordInput> {
             },
             icon: Icon(
               value ? hideIcon : showIcon,
-              color: appTheme.iconTheme.color,
+              color: Colors.black,
             ),
           ),
           validator: widget.validator,
+          cursorColor: Colors.deepPurple,
+          style: TextStyle(color: Colors.black),
+          fillColor: Colors.white,
+          decoration: InputDecoration(
+            hintText: widget.hintText ?? 'Password',
+            hintStyle: TextStyle(color: Colors.black),
+            prefixIcon: Icon(Icons.lock, color: Colors.black),
+            suffixIcon: IconButton(
+              onPressed: () {
+                valueListenable.value = !value;
+              },
+              icon: Icon(
+                value ? hideIcon : showIcon,
+                color: Colors.black,
+              ),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
         );
       },
     );

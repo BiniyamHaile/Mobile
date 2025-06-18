@@ -100,7 +100,20 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 controller: widget.nameController,
                 hintText: AppStrings.firstName.tr(context),
                 keyboardType: TextInputType.name,
-                prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
+                prefixIcon: Icon(Icons.person, color: Colors.black),
+                cursorColor: Colors.deepPurple,
+                style: TextStyle(color: Colors.black),
+                fillColor: Colors.white,
+                decoration: InputDecoration(
+                  hintText: AppStrings.firstName.tr(context),
+                  hintStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.person, color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 validator: (value) => _validate(widget.nameController),
                 onChanged: (value) {
                   if (value == null) return null;
@@ -115,7 +128,20 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 controller: widget.surnameController,
                 hintText: AppStrings.lastName.tr(context),
                 keyboardType: TextInputType.name,
-                prefixIcon: Icon(Icons.person, color: appTheme.iconTheme.color),
+                prefixIcon: Icon(Icons.person, color: Colors.black),
+                cursorColor: Colors.deepPurple,
+                style: TextStyle(color: Colors.black),
+                fillColor: Colors.white,
+                decoration: InputDecoration(
+                  hintText: AppStrings.lastName.tr(context),
+                  hintStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.person, color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 validator: (value) => _validate(widget.surnameController),
                 onChanged: (value) {
                   if (value == null) return null;
@@ -141,7 +167,20 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 ),
                 hintText: AppStrings.email.tr(context),
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icon(Icons.email, color: appTheme.iconTheme.color),
+                prefixIcon: Icon(Icons.email, color: Colors.black),
+                cursorColor: Colors.deepPurple,
+                style: TextStyle(color: Colors.black),
+                fillColor: Colors.white,
+                decoration: InputDecoration(
+                  hintText: AppStrings.email.tr(context),
+                  hintStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.email, color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
               ),
               ValueListenableBuilder(
                   valueListenable: showPasswordErrorNotifier,
@@ -186,8 +225,17 @@ class _SignupInputFieldsState extends State<SignupInputFields> {
                 },
                 decoration: InputDecoration(
                   hintText: AppStrings.selectGender.tr(context),
-                  prefixIcon: Icon(Icons.people),
+                  hintStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.people, color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
+                style: TextStyle(color: Colors.black),
+                dropdownColor: Colors.white,
+                icon: Icon(Icons.arrow_drop_down, color: Colors.black),
               ),
             ],
             bottomGap: screen.scaledScreenHeight(0.025),
