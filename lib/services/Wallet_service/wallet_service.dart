@@ -355,27 +355,27 @@ class WalletService extends ChangeNotifier {
 
       Future.microtask(() {
         if (_isSepoliaAndReady && !_hasFetchedInitialData) {
-          final address = _connectedAddress;
+          final address = EthereumAddress.fromHex(_connectedAddress!);
           if (address != null) {
             print(
               "WalletService: Calling updateWallet backend API with ID: $address",
             );
             try {
-              _walletRepository
-                  .updateWallet(walletId: address)
-                  .then((_) {
-                    print("WalletService: Backend Wallet update successful.");
-                  })
-                  .catchError((e, s) {
-                    print(
-                      "WalletService: Error calling backend updateWallet API: $e\n$s",
-                    );
-                    _handleModalError(
-                      ModalError(
-                        'Failed to update backend wallet information. Please try reconnecting.',
-                      ),
-                    );
-                  });
+              // _walletRepository
+              //     .updateWallet(walletId: _connectedAddress!)
+              //     .then((_) {
+              //       print("WalletService: Backend Wallet update successful.");
+              //     })
+              //     .catchError((e, s) {
+              //       print(
+              //         "WalletService: Error calling backend updateWallet API: $e\n$s",
+              //       );
+              //       _handleModalError(
+              //         ModalError(
+              //           'Failed to update backend wallet information. Please try reconnecting.',
+              //         ),
+              //       );
+              //     });
             } catch (e, s) {
               print(
                 "WalletService: Unexpected sync error calling backend updateWallet API: $e\n$s",
