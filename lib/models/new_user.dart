@@ -5,7 +5,7 @@ class User {
   final String lastName;
   final String? password;
   final String? role;
-  final String? walletAddress;
+  final String? WalletId;
   final String? username;
   final String? bio;
   final String? profilePic;
@@ -21,7 +21,7 @@ class User {
     required this.lastName,
     this.password,
     this.role,
-    this.walletAddress,
+    this.WalletId,
     this.username,
     this.bio,
     this.profilePic,
@@ -39,7 +39,7 @@ class User {
       lastName: json['lastName'],
       password: json['password'],
       role: json['role'],
-      walletAddress: json['walletAddress'],
+      WalletId: json['WalletId'],
       username: json['username'],
       bio: json['bio'],
       profilePic: json['profilePic'],
@@ -58,7 +58,7 @@ class User {
       'lastName': lastName,
       'password': password,
       'role': role,
-      'walletAddress': walletAddress,
+      'WalletId': WalletId,
       'username': username,
       'bio': bio,
       'profilePic': profilePic,
