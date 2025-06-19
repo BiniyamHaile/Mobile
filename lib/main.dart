@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,7 +35,36 @@ import 'package:provider/provider.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+Future<String> getLocalIPAddress() async {
+  try {
+    // Get the list of network interfaces
+    final interfaces = await NetworkInterface.list();
+
+    // Iterate over the interfaces and find one that's not a loopback address
+    for (var interface in interfaces) {
+      for (var address in interface.addresses) {
+        if (!address.isLoopback) {
+          // Check if it's an IPv4 address (optional)
+          if (address.type == InternetAddressType.IPv4) {
+            return address.address;
+          }
+          // If you want IPv6 addresses as well, remove the type check
+          //return address.address;
+        }
+      }
+    }
+
+    return '127.0.0.1'; // Fallback to localhost if no suitable address is found
+  } catch (e) {
+    print('Error getting local IP: $e');
+    return '127.0.0.1'; // Fallback to localhost in case of errors
+  }
+}
+
 void main() async {
+  final ipAddress = await getLocalIPAddress();
+  print('Local IP Address: $ipAddress');
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await dotenv.load(fileName: ".env");
@@ -53,92 +84,97 @@ void main() async {
   );
 
   runApp(
-
     ChangeNotifierProvider(
       create: (context) => LanguageService(),
       child: MultiProvider(
         providers: [
-        MultiProvider(
-      providers: [
-        MultiBlocProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (context) =>
-                  WalletService(walletRepository: walletRepository),
-            ),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider(
-              create: (context) => PostBloc(postRepository: PostRepository()),
-              child: const PostingScreen(),
-            ),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-            BlocProvider(create: (_) => AuthFormBloc()),
-            BlocProvider(create: (_) => SignupBloc()),
-            BlocProvider(create: (_) => RetrieveNotificationsBloc()),
-            BlocProvider(
-              create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
-            ),
-            BlocProvider(create: (_) => RetrieveMessagesBloc()),
-            BlocProvider(create: (_) => SendMessageBloc()),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-            BlocProvider<ReelFeedAndActionBloc>(
-              create: (context) => getIt<ReelFeedAndActionBloc>(),
-            ),
-            BlocProvider<PostDetailsBloc>(
-              create: (context) => getIt<PostDetailsBloc>(),
-            ),
-            BlocProvider<CommentBloc>(
-              create: (context) => getIt<CommentBloc>(),
-            ),
-            BlocProvider(create: (_) => RetrieveNotificationsBloc()),
-            BlocProvider(
-              create: (_) => RecentChatBloc()..add(LoadRecentChatsEvent()),
-            ),
-            BlocProvider(create: (_) => RetrieveMessagesBloc()),
-            BlocProvider(create: (_) => SendMessageBloc()),
-            BlocProvider<AuthFormBloc>(create: (context) => AuthFormBloc()),
-            BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
-            BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
-            BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
-            BlocProvider<ResetPasswordBloc>(
-              create: (context) => ResetPasswordBloc(),
-            ),
-            BlocProvider<ForgotPasswordBloc>(
-              create: (context) => ForgotPasswordBloc(),
-            ),
-             BlocProvider<ProfileBloc>(
-               create: (context) => ProfileBloc(
-                 profileRepository: ProfileRepository(dio),
-               ),
-             ),
-          ],
-          child: App(),
-        ),
-      ],
-
-    ),
+          MultiProvider(
+            providers: [
+              MultiBlocProvider(
+                providers: [
+                  ChangeNotifierProvider(
+                    create: (context) =>
+                        WalletService(walletRepository: walletRepository),
+                  ),
+                  BlocProvider<AuthFormBloc>(
+                    create: (context) => AuthFormBloc(),
+                  ),
+                  BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+                  BlocProvider(
+                    create: (context) =>
+                        PostBloc(postRepository: PostRepository()),
+                    child: const PostingScreen(),
+                  ),
+                  BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+                  BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+                  BlocProvider<ResetPasswordBloc>(
+                    create: (context) => ResetPasswordBloc(),
+                  ),
+                  BlocProvider<ForgotPasswordBloc>(
+                    create: (context) => ForgotPasswordBloc(),
+                  ),
+                  BlocProvider(create: (_) => AuthFormBloc()),
+                  BlocProvider(create: (_) => SignupBloc()),
+                  BlocProvider(create: (_) => RetrieveNotificationsBloc()),
+                  BlocProvider(
+                    create: (_) =>
+                        RecentChatBloc()..add(LoadRecentChatsEvent()),
+                  ),
+                  BlocProvider(create: (_) => RetrieveMessagesBloc()),
+                  BlocProvider(create: (_) => SendMessageBloc()),
+                  BlocProvider<AuthFormBloc>(
+                    create: (context) => AuthFormBloc(),
+                  ),
+                  BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+                  BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+                  BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+                  BlocProvider<ResetPasswordBloc>(
+                    create: (context) => ResetPasswordBloc(),
+                  ),
+                  BlocProvider<ForgotPasswordBloc>(
+                    create: (context) => ForgotPasswordBloc(),
+                  ),
+                  BlocProvider<ReelFeedAndActionBloc>(
+                    create: (context) => getIt<ReelFeedAndActionBloc>(),
+                  ),
+                  BlocProvider<PostDetailsBloc>(
+                    create: (context) => getIt<PostDetailsBloc>(),
+                  ),
+                  BlocProvider<CommentBloc>(
+                    create: (context) => getIt<CommentBloc>(),
+                  ),
+                  BlocProvider(create: (_) => RetrieveNotificationsBloc()),
+                  BlocProvider(
+                    create: (_) =>
+                        RecentChatBloc()..add(LoadRecentChatsEvent()),
+                  ),
+                  BlocProvider(create: (_) => RetrieveMessagesBloc()),
+                  BlocProvider(create: (_) => SendMessageBloc()),
+                  BlocProvider<AuthFormBloc>(
+                    create: (context) => AuthFormBloc(),
+                  ),
+                  BlocProvider<SignupBloc>(create: (context) => SignupBloc()),
+                  BlocProvider<OtpBloc>(create: (context) => OtpBloc()),
+                  BlocProvider<LoginBloc>(create: (context) => LoginBloc()),
+                  BlocProvider<ResetPasswordBloc>(
+                    create: (context) => ResetPasswordBloc(),
+                  ),
+                  BlocProvider<ForgotPasswordBloc>(
+                    create: (context) => ForgotPasswordBloc(),
+                  ),
+                  BlocProvider<ProfileBloc>(
+                    create: (context) =>
+                        ProfileBloc(profileRepository: ProfileRepository(dio)),
+                  ),
+                ],
+                child: App(),
+              ),
+            ],
+          ),
         ],
       ),
-
-
-  ));
+    ),
+  );
 }
 
 Future<void> _initNotifications() async {

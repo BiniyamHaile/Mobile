@@ -67,7 +67,7 @@ class VideoOverlaySection extends StatelessWidget {
             currentUserId: currentUserId,
             onGiftStarsPressed: onGiftStarsPressed,
             gift:gift,
-            ownerId: ownerId, // Pass the ownerId
+            ownerId: ownerId,
           ),
         ],
       ),

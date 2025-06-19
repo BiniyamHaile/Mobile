@@ -92,7 +92,7 @@ class VideoFeedItem extends StatelessWidget {
                           'Connect Wallet',
                           style: TextStyle(
                             color: Color.fromRGBO(143, 148, 251, 1),
-                            fontSize: 20,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -127,7 +127,7 @@ class VideoFeedItem extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 8),
+                        SizedBox(width: 4),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
@@ -140,7 +140,7 @@ class VideoFeedItem extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: EdgeInsets.symmetric(
-                              horizontal: 16,
+                              horizontal: 10,
                               vertical: 12,
                             ),
                           ),
@@ -149,6 +149,7 @@ class VideoFeedItem extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
+
                             ),
                           ),
                         ),
