@@ -12,7 +12,6 @@ import 'package:mobile/ui/routes/route_names.dart';
 import 'package:mobile/ui/theme/app_theme.dart';
 import 'package:mobile/ui/views/auth/validation_indicator.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -70,7 +69,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     final lang = context.watch<LanguageService>();
 
     final theme = AppTheme.getTheme(context);
@@ -88,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (state is LoginSuccess) {
           // Navigate to home page after successful login
           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(
+            SnackBar(
               content: Text(
                 AppStrings.loginSuccess.tr(context),
                 style: TextStyle(color: Colors.white),
@@ -173,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                             margin: const EdgeInsets.only(top: 50),
                             child: Center(
                               child: Text(
-                               AppStrings.login.tr(context),
+                                AppStrings.login.tr(context),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 40,
@@ -223,14 +221,14 @@ class _LoginPageState extends State<LoginPage> {
                               TextFormField(
                                 controller: _emailController,
                                 cursorColor: Colors.deepPurple,
-                                style:  TextStyle(color: theme.colorScheme.primary),
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                ),
                                 decoration: InputDecoration(
                                   labelText: AppStrings.email.tr(context),
-                                  labelStyle: TextStyle(
-                                  color: Colors.black,
-                                  ),
+                                  labelStyle: TextStyle(color: Colors.black),
                                   prefixIcon: const Icon(Icons.email_outlined),
-                                  prefixIconColor:                                    Colors.black,
+                                  prefixIconColor: Colors.black,
 
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -257,15 +255,11 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
                                 cursorColor: Colors.deepPurple,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                style: TextStyle(color: Colors.black),
 
                                 decoration: InputDecoration(
                                   labelText: AppStrings.password.tr(context),
-                                  labelStyle: TextStyle(
-                                    color: Colors.black,
-                                  ),
+                                  labelStyle: TextStyle(color: Colors.black),
                                   prefixIcon: const Icon(Icons.lock_outline),
                                   prefixIconColor: Colors.black,
                                   suffixIcon: IconButton(
@@ -290,19 +284,29 @@ class _LoginPageState extends State<LoginPage> {
                                     _updatePasswordStrength(value),
                                 validator: (val) {
                                   if (val == null || val.isEmpty) {
-                                    return AppStrings.passwordRequired.tr(context);
+                                    return AppStrings.passwordRequired.tr(
+                                      context,
+                                    );
                                   }
                                   if (val.length < 8) {
-                                    return AppStrings.passwordMinLength.tr(context);
+                                    return AppStrings.passwordMinLength.tr(
+                                      context,
+                                    );
                                   }
                                   if (!RegExp(r'[A-Z]').hasMatch(val)) {
-                                    return AppStrings.passwordUppercase.tr(context);
+                                    return AppStrings.passwordUppercase.tr(
+                                      context,
+                                    );
                                   }
                                   if (!RegExp(r'[0-9]').hasMatch(val)) {
-                                    return AppStrings.passwordNumber.tr(context);
+                                    return AppStrings.passwordNumber.tr(
+                                      context,
+                                    );
                                   }
                                   if (!RegExp(r'[(@$!%*?&)]').hasMatch(val)) {
-                                    return AppStrings.passwordSpecialChar.tr(context);
+                                    return AppStrings.passwordSpecialChar.tr(
+                                      context,
+                                    );
                                   }
                                   return null;
                                 },
@@ -351,7 +355,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ? const CircularProgressIndicator(
                                           color: Colors.white,
                                         )
-                                      :  Text(
+                                      : Text(
                                           AppStrings.login.tr(context),
                                           style: TextStyle(
                                             fontSize: 16,
@@ -365,8 +369,8 @@ class _LoginPageState extends State<LoginPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    AppStrings.dontHaveAccount.tr(context),
-                                    style: TextStyle(color: Colors.grey[600]),
+                                    AppStrings.dontHaveAccount.tr(context).trim(),
+                                    style: TextStyle(color: Colors.grey[600] , fontSize: 14),
                                   ),
                                   TextButton(
                                     onPressed: isLoading
@@ -379,6 +383,7 @@ class _LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                         color: Color.fromRGBO(143, 148, 251, 1),
                                         fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ),
