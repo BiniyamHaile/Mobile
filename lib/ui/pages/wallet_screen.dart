@@ -505,15 +505,14 @@ class _WalletScreenState extends State<WalletScreen> {
                           color: theme.colorScheme.primary,
                           border: Border(
                             top: BorderSide(
-                              color: theme
-                                  .colorScheme
-                                  .onPrimary, // Top border color
+                             color:
+                                  theme.colorScheme.primary, // Top border color
                               width: 2.0, // Top border width
                             ),
                             bottom: BorderSide(
                               color: theme
                                   .colorScheme
-                                  .onPrimary, // Bottom border color
+                                  .primary, // Bottom border color
                               width: 2.0, // Bottom border width
                             ),
                             left: BorderSide(
@@ -523,9 +522,9 @@ class _WalletScreenState extends State<WalletScreen> {
                               width: 2.0, // Left border width
                             ),
                             right: BorderSide(
-                              color: theme
+                             color: theme
                                   .colorScheme
-                                  .onPrimary, // Right border color
+                                  .primary, // Right border color
                               width: 2.0, // Right border width
                             ),
                           ),
@@ -552,8 +551,12 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   SizedBox(height: 16.0),
                   ListTile(
-                    leading: Icon(Icons.shopping_cart),
-                    title: Text(AppStrings.buyStars.tr(context)),
+                    leading: Icon(Icons.shopping_cart,color: theme.colorScheme.primary,
+                    ),
+                    title: Text(AppStrings.buyStars.tr(context),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                        )),
                     onTap: enableBuyButton
                         ? () {
                             Navigator.pop(context);
@@ -563,8 +566,12 @@ class _WalletScreenState extends State<WalletScreen> {
                     enabled: enableBuyButton,
                   ),
                   ListTile(
-                    leading: Icon(Icons.token),
-                    title: Text(AppStrings.addStarsToken.tr(context)),
+                    leading: Icon(Icons.token,
+                        color: theme.colorScheme.primary),
+                    title: Text(AppStrings.addStarsToken.tr(context),
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                        )),
                     onTap: enableTxActions
                         ? walletService.addStarsTokenToWallet
                         : null,
@@ -592,14 +599,14 @@ class _WalletScreenState extends State<WalletScreen> {
 
                           style: TextStyle(
                             color: 
-                                theme.colorScheme.onPrimary,
+                                theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         leading: Icon(
                           Icons.logout,
 
-                          color: isConnected ? Colors.white : Colors.grey[500],
+                          color: theme.colorScheme.primary,
                         ),
                         onTap: isConnected
                             ? () {
@@ -622,13 +629,14 @@ class _WalletScreenState extends State<WalletScreen> {
                 children: [
                   Text(
                     AppStrings.welcomeWallet.tr(context),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   Text(
                     AppStrings.connectWalletMessage.tr(context),
-                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                    style: TextStyle(fontSize: 16, color: theme.colorScheme.primary),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 30),
@@ -747,7 +755,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                           '$formattedStarsBalance ${walletService.starsTokenSymbol}',
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.white,
+                                            color: theme.colorScheme.primary,
                                           ),
                                         ),
                                       ],
@@ -757,7 +765,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                       children: [
                                         Icon(
                                           Icons.account_balance_wallet_outlined,
-                                          color: Colors.white,
+                                          color: theme.colorScheme.primary,
                                           size: 16,
                                         ),
                                         SizedBox(width: 8),
@@ -765,7 +773,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                           '$formattedNativeBalance ${walletService.connectedNetwork?.currency ?? "Native"}',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: Colors.white,
+                                            color: theme.colorScheme.primary,
                                           ),
                                         ),
                                       ],
